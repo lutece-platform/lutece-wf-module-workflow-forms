@@ -1,0 +1,14 @@
+<#list list_step as step>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+        ${step.title}
+      </h3>
+    </div>
+    <div class="panel-body">
+      <#list step.questionHtml as questionHtml>
+        ${questionHtml}
+      </#list>
+    </div>
+  </div>
+</#list>
