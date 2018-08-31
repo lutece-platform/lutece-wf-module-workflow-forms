@@ -40,12 +40,16 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
+import fr.paris.lutece.plugins.genericattributes.business.Response;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 
 /**
@@ -57,7 +61,13 @@ public class EditFormResponseTask extends AbstractFormsTask
     // Message
     private static final String MESSAGE_TASK_TITLE = "module.workflow.forms.task.editFormResponse.title";
 
+    private static final String NULL = "null";
+    private static final String SEPARATOR = ", ";
+
     private final IEditFormResponseTaskService _editFormResponseTaskService;
+    private final IEditFormResponseTaskHistoryService _editFormResponseTaskHistoryService;
+
+    private List<EditableResponse> _listChangedResponse = new ArrayList<>( );
 
     /**
      * Constructor
@@ -66,13 +76,17 @@ public class EditFormResponseTask extends AbstractFormsTask
      *            the form task service
      * @param editFormResponseTaskService
      *            the edit form response task service
+     * @param editFormResponseTaskHistoryService
+     *            the edit form response task history service (returns history of forms workflow)
      */
     @Inject
-    public EditFormResponseTask( IFormsTaskService formsTaskService, IEditFormResponseTaskService editFormResponseTaskService )
+    public EditFormResponseTask( IFormsTaskService formsTaskService, IEditFormResponseTaskService editFormResponseTaskService,
+            IEditFormResponseTaskHistoryService editFormResponseTaskHistoryService )
     {
         super( formsTaskService );
 
         _editFormResponseTaskService = editFormResponseTaskService;
+        _editFormResponseTaskHistoryService = editFormResponseTaskHistoryService;
     }
 
     /**
@@ -92,10 +106,64 @@ public class EditFormResponseTask extends AbstractFormsTask
     {
         List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( formResponse );
         List<EditableResponse> listEditableResponse = createEditableResponses( formResponse, listQuestion, request );
-        List<FormQuestionResponse> listChangedResponse = findChangedResponses( listEditableResponse );
-        saveResponses( listChangedResponse );
-        
-        // TODO : save task information
+        _listChangedResponse = findChangedResponses( listEditableResponse );
+        List<FormQuestionResponse> listChangedResponseToSave = new ArrayList<>( );
+        for ( EditableResponse editableResponse : listEditableResponse )
+        {
+            listChangedResponseToSave.add( editableResponse._responseFromForm );
+        }
+        saveResponses( listChangedResponseToSave );
+    }
+
+    @Override
+    protected void saveTaskInformation( int nIdHistory )
+    {
+        for ( EditableResponse editableResponse : _listChangedResponse )
+        {
+            EditFormResponseTaskHistory editFormResponseTaskHistory = new EditFormResponseTaskHistory( );
+            editFormResponseTaskHistory.setQuestion( editableResponse._question );
+            editFormResponseTaskHistory.setIdTask( getId( ) );
+            editFormResponseTaskHistory.setIdHistory( nIdHistory );
+
+            String previousValue = StringUtils.EMPTY;
+            editFormResponseTaskHistory.setPreviousValue( createPreviousNewValue( editableResponse._responseSaved, previousValue ) );
+
+            String newValue = StringUtils.EMPTY;
+            editFormResponseTaskHistory.setNewValue( createPreviousNewValue( editableResponse._responseFromForm, newValue ) );
+
+            _editFormResponseTaskHistoryService.create( editFormResponseTaskHistory );
+        }
+    }
+
+    /**
+     * Create a string with previous or new value to set in history
+     * 
+     * @param responseForm
+     * @param value
+     * @return a value ready to be inserted in history
+     */
+    private String createPreviousNewValue( FormQuestionResponse responseForm, String value )
+    {
+        if ( responseForm != null )
+        {
+            for ( int i = 0; i < responseForm.getEntryResponse( ).size( ); i++ )
+            {
+                Response response = responseForm.getEntryResponse( ).get( i );
+                if ( response.getToStringValueResponse( ) == null || response.getToStringValueResponse( ).equalsIgnoreCase( NULL ) )
+                {
+                    value = StringUtils.EMPTY;
+                }
+                else
+                {
+                    value += response.getToStringValueResponse( );
+                }
+                if ( i + 1 != responseForm.getEntryResponse( ).size( ) )
+                {
+                    value += SEPARATOR;
+                }
+            }
+        }
+        return value;
     }
 
     /**
@@ -134,9 +202,9 @@ public class EditFormResponseTask extends AbstractFormsTask
      *            the list of editable responses
      * @return the list of responses that have changed
      */
-    private List<FormQuestionResponse> findChangedResponses( List<EditableResponse> listEditableResponse )
+    private List<EditableResponse> findChangedResponses( List<EditableResponse> listEditableResponse )
     {
-        List<FormQuestionResponse> listChangedResponse = new ArrayList<>( );
+        List<EditableResponse> listChangedResponse = new ArrayList<>( );
 
         for ( EditableResponse editableResponse : listEditableResponse )
         {
@@ -144,7 +212,7 @@ public class EditFormResponseTask extends AbstractFormsTask
 
             if ( dataService.isResponseChanged( editableResponse._responseSaved, editableResponse._responseFromForm ) )
             {
-                listChangedResponse.add( editableResponse._responseFromForm );
+                listChangedResponse.add( editableResponse );
             }
         }
 
@@ -189,7 +257,7 @@ public class EditFormResponseTask extends AbstractFormsTask
         {
             _responseSaved = responseSaved;
             _responseFromForm = responseFromForm;
-            
+
             if ( responseSaved != null )
             {
                 responseFromForm.setId( responseSaved.getId( ) );

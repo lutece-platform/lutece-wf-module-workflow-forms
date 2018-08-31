@@ -56,6 +56,8 @@ import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDisplayService;
 import fr.paris.lutece.plugins.genericattributes.business.GenericAttributeError;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskHistoryService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
 import fr.paris.lutece.plugins.workflow.web.task.NoConfigTaskComponent;
@@ -76,12 +78,14 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
 
     // Templates
     private static final String TEMPLATE_TASK_FORM = "admin/plugins/workflow/modules/forms/task_edit_form_response_form.html";
+    private static final String TEMPLATE_TASK_FORM_EDITRESPONSE_HISTORY = "admin/plugins/workflow/modules/forms/task_forms_editresponse_history.html";
 
     // Marks
     private static final String MARK_STEP_LIST = "list_step";
 
     private final IFormsTaskService _formsTaskService;
     private final IEditFormResponseTaskService _editFormResponseTaskService;
+    private final IEditFormResponseTaskHistoryService _editFormResponseTaskHistoryService;
 
     /**
      * Constructor
@@ -92,12 +96,14 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
      *            the edit form response task service
      */
     @Inject
-    public EditFormResponseTaskComponent( IFormsTaskService formsTaskService, IEditFormResponseTaskService editFormResponseTaskService )
+    public EditFormResponseTaskComponent( IFormsTaskService formsTaskService, IEditFormResponseTaskService editFormResponseTaskService,
+            IEditFormResponseTaskHistoryService editFormResponseTaskHistoryService )
     {
         super( );
 
         _formsTaskService = formsTaskService;
         _editFormResponseTaskService = editFormResponseTaskService;
+        _editFormResponseTaskHistoryService = editFormResponseTaskHistoryService;
     }
 
     /**
@@ -267,8 +273,13 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
     @Override
     public String getDisplayTaskInformation( int nIdHistory, HttpServletRequest request, Locale locale, ITask task )
     {
-        // TODO Auto-generated method stub
-        return null;
+        Map<String, Object> model = new HashMap<>( );
+        List<EditFormResponseTaskHistory> listEditFormResponseTaskHistory = _editFormResponseTaskHistoryService.load( nIdHistory, task.getId( ) );
+
+        model.put( FormsConstants.MARK_QUESTION_LIST_RESPONSES, listEditFormResponseTaskHistory );
+
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_FORM_EDITRESPONSE_HISTORY, locale, model );
+        return template.getHtml( );
     }
 
     /**

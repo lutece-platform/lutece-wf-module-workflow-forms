@@ -8,6 +8,11 @@
     <!-- Services -->
     <bean id="workflow-forms.formsTaskService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.FormsTaskService" />
     <bean id="workflow-forms.editFormResponseTaskService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTaskService" />
+    <bean id="workflow-forms.editFormResponseTaskHistoryService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTaskHistoryService" />
+
+    <!-- DAO -->
+    <bean id="worklow-forms.editFormResponseTaskHistoryDAO"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistoryDAO" />
 
     <!-- Task edit form response -->
     <bean id="workflow-forms.editFormResponseTask"
@@ -25,5 +30,4 @@
         class="fr.paris.lutece.plugins.workflow.modules.forms.web.task.EditFormResponseTaskComponent"
         p:taskType-ref="workflow-forms.editFormResponseTypeTask"
         scope="prototype" />
-
 </beans>

@@ -1,0 +1,28 @@
+<label>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.information.title} :</label>
+<br/>
+<#if list_responses?? && list_responses?has_content>
+	<#list list_responses as response>
+		<#if response?? && response?has_content>
+			<#if response.question?? && response.question?has_content>
+				<b>${response.question.title}</b> :  
+				<#if response.previousValue?? && response.previousValue?has_content && response.previousValue!="">
+					${response.previousValue}
+				<#else>
+					<i>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.empty}</i>
+				</#if>
+				<i class="fa fa-arrow-right" aria-hidden="true"></i>
+				<#if response.newValue?? && response.newValue?has_content && response.newValue!="">
+					${response.newValue}
+				<#else>
+					<i>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.empty}</i>
+				</#if>
+				<br/>
+			<#else>
+				<i>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.questionDeleted}</i>
+				<br/>
+			</#if>
+		</#if>
+	</#list>
+<#else>
+	<i>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.noModification}</i>
+</#if>

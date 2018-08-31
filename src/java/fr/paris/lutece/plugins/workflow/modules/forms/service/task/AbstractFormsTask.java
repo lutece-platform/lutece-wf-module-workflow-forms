@@ -74,6 +74,7 @@ public abstract class AbstractFormsTask extends SimpleTask
         {
             FormResponse formResponse = _formsTaskService.findFormResponseFrom( resourceHistory );
             processTask( formResponse, request, locale );
+            saveTaskInformation( nIdHistory );
         }
 
     }
@@ -89,4 +90,13 @@ public abstract class AbstractFormsTask extends SimpleTask
      *            the locale
      */
     protected abstract void processTask( FormResponse formResponse, HttpServletRequest request, Locale locale );
+
+    /**
+     * Process the task to save the information and create history
+     * 
+     * @param idHistory
+     *            idHistory
+     */
+    protected abstract void saveTaskInformation( int nIdHistory );
+
 }
