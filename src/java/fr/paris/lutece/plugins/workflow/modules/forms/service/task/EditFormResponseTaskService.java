@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import fr.paris.lutece.plugins.forms.business.Form;
 import fr.paris.lutece.plugins.forms.business.FormHome;
@@ -55,6 +56,7 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
     {
         Form form = FormHome.findByPrimaryKey( formResponse.getFormId( ) );
 
-        return QuestionHome.getListQuestionByIdForm( form.getId( ) );
+        List<Question> formQuestions = QuestionHome.getListQuestionByIdForm( form.getId( ) );
+        return formQuestions.stream( ).filter( question -> question.getEntry( ).isEditableBack( ) == true ).collect( Collectors.toList( ) );
     }
 }
