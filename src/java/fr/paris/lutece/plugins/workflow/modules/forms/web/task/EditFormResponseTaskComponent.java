@@ -43,19 +43,19 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import fr.paris.lutece.plugins.forms.business.FormDisplay;
+import fr.paris.lutece.plugins.forms.business.FormDisplayHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.util.FormsConstants;
+import fr.paris.lutece.plugins.forms.web.CompositeQuestionDisplay;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
-import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDisplayService;
 import fr.paris.lutece.plugins.genericattributes.business.GenericAttributeError;
-import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskHistoryService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
@@ -235,36 +235,12 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
      */
     private String buildHtmlForQuestion( FormResponse formResponse, Question question, Locale locale )
     {
-        Map<String, Object> model = new HashMap<>( );
-        List<Response> listResponse = findResponses( formResponse, question );
+        FormDisplay formDisplayQuestion = FormDisplayHome.getFormDisplayByFormStepAndComposite( formResponse.getFormId( ), question.getIdStep( ),
+                question.getId( ) );
+        CompositeQuestionDisplay compositeQuestionDisplay = new CompositeQuestionDisplay( formDisplayQuestion, formResponse, question.getIterationNumber( ) );
 
-        model.put( FormsConstants.MARK_QUESTION_LIST_RESPONSES, listResponse );
-
-        IEntryDisplayService displayService = EntryServiceManager.getInstance( ).getEntryDisplayService( question.getEntry( ).getEntryType( ) );
-        return displayService.getEntryTemplateDisplay( question.getEntry( ), locale, model, DisplayType.EDITION_BACKOFFICE );
-    }
-
-    /**
-     * Finds the responses in the specified form response for the specified question
-     * 
-     * @param formResponse
-     *            the form response containing the responses
-     * @param question
-     *            the question
-     * @return the responses
-     */
-    private List<Response> findResponses( FormResponse formResponse, Question question )
-    {
-        List<Response> listResponse = new ArrayList<>( );
-
-        FormQuestionResponse responseSave = FormQuestionResponseHome.findFormQuestionResponseByResponseQuestion( formResponse.getId( ), question.getId( ) );
-
-        if ( responseSave != null )
-        {
-            listResponse.addAll( responseSave.getEntryResponse( ) );
-        }
-
-        return listResponse;
+        return compositeQuestionDisplay.getCompositeHtml( _editFormResponseTaskService.findResponses( formResponse, question ), locale,
+                DisplayType.EDITION_BACKOFFICE );
     }
 
     /**

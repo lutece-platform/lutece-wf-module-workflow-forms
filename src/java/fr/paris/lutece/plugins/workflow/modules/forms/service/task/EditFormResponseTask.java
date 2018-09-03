@@ -43,13 +43,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
+import fr.paris.lutece.portal.business.file.File;
+import fr.paris.lutece.portal.business.file.FileHome;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 
 /**
@@ -108,10 +109,12 @@ public class EditFormResponseTask extends AbstractFormsTask
         List<EditableResponse> listEditableResponse = createEditableResponses( formResponse, listQuestion, request );
         _listChangedResponse = findChangedResponses( listEditableResponse );
         List<FormQuestionResponse> listChangedResponseToSave = new ArrayList<>( );
-        for ( EditableResponse editableResponse : listEditableResponse )
+
+        for ( EditableResponse editableResponse : _listChangedResponse )
         {
             listChangedResponseToSave.add( editableResponse._responseFromForm );
         }
+
         saveResponses( listChangedResponseToSave );
     }
 
@@ -149,14 +152,28 @@ public class EditFormResponseTask extends AbstractFormsTask
             for ( int i = 0; i < responseForm.getEntryResponse( ).size( ); i++ )
             {
                 Response response = responseForm.getEntryResponse( ).get( i );
-                if ( response.getToStringValueResponse( ) == null || response.getToStringValueResponse( ).equalsIgnoreCase( NULL ) )
+
+                if ( response.getFile( ) != null )
                 {
-                    value = StringUtils.EMPTY;
+                    File file = FileHome.findByPrimaryKey( response.getFile( ).getIdFile( ) );
+
+                    if ( file != null )
+                    {
+                        value = response.getFile( ).getTitle( );
+                    }
                 }
                 else
                 {
-                    value += response.getToStringValueResponse( );
+                    if ( response.getToStringValueResponse( ) == null || response.getToStringValueResponse( ).equalsIgnoreCase( NULL ) )
+                    {
+                        value = StringUtils.EMPTY;
+                    }
+                    else
+                    {
+                        value += response.getToStringValueResponse( );
+                    }
                 }
+
                 if ( i + 1 != responseForm.getEntryResponse( ).size( ) )
                 {
                     value += SEPARATOR;
@@ -186,13 +203,40 @@ public class EditFormResponseTask extends AbstractFormsTask
             IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
             FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request );
             responseFromForm.setIdFormResponse( formResponse.getId( ) );
-            FormQuestionResponse responseSave = FormQuestionResponseHome.findFormQuestionResponseByResponseQuestion( formResponse.getId( ), question.getId( ) );
+            FormQuestionResponse responseSaved = findSavedResponse( formResponse, question );
 
-            EditableResponse editableResponse = new EditableResponse( responseSave, responseFromForm );
+            EditableResponse editableResponse = new EditableResponse( responseSaved, responseFromForm );
             listEditableResponse.add( editableResponse );
         }
 
         return listEditableResponse;
+    }
+
+    /**
+     * Finds the saved responses of the specified question
+     * 
+     * @param formResponse
+     *            the form response containing the saved responses
+     * @param question
+     *            the question
+     * @return the saved responses
+     */
+    private FormQuestionResponse findSavedResponse( FormResponse formResponse, Question question )
+    {
+        FormQuestionResponse formQuestionResponse = null;
+
+        List<FormQuestionResponse> listResponseSaved = _editFormResponseTaskService.findResponses( formResponse, question );
+
+        for ( FormQuestionResponse responseSaved : listResponseSaved )
+        {
+            if ( responseSaved.getQuestion( ).getIterationNumber( ) == question.getIterationNumber( ) )
+            {
+                formQuestionResponse = responseSaved;
+                break;
+            }
+        }
+
+        return formQuestionResponse;
     }
 
     /**

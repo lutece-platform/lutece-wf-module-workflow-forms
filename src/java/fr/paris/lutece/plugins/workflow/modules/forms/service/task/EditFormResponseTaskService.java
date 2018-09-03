@@ -33,12 +33,17 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import fr.paris.lutece.plugins.forms.business.Form;
 import fr.paris.lutece.plugins.forms.business.FormHome;
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
+import fr.paris.lutece.plugins.forms.business.FormResponseStep;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
 
@@ -56,7 +61,68 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
     {
         Form form = FormHome.findByPrimaryKey( formResponse.getFormId( ) );
 
-        List<Question> formQuestions = QuestionHome.getListQuestionByIdForm( form.getId( ) );
-        return formQuestions.stream( ).filter( question -> question.getEntry( ).isEditableBack( ) == true ).collect( Collectors.toList( ) );
+        List<Question> listFormQuestion = QuestionHome.getListQuestionByIdForm( form.getId( ) );
+        listFormQuestion = listFormQuestion.stream( ).filter( question -> question.getEntry( ).isEditableBack( ) == true ).collect( Collectors.toList( ) );
+        listFormQuestion = addIteration( formResponse, listFormQuestion );
+
+        return listFormQuestion;
+    }
+
+    /**
+     * Adds the questions for iterations
+     * 
+     * @param formResponse
+     *            the form response containing the iterations
+     * @param listQuestion
+     *            the list of questions to complete
+     * @return the completed list of questions
+     */
+    private List<Question> addIteration( FormResponse formResponse, List<Question> listQuestion )
+    {
+        List<Question> listQuestionIteration = new ArrayList<>( );
+
+        for ( Question question : listQuestion )
+        {
+            List<FormQuestionResponse> listFormQuestionResponse = findResponses( formResponse, question );
+
+            if ( CollectionUtils.isEmpty( listFormQuestionResponse ) )
+            {
+                listQuestionIteration.add( question );
+            }
+            else
+            {
+                for ( FormQuestionResponse formQuestionResponse : listFormQuestionResponse )
+                {
+                    listQuestionIteration.add( formQuestionResponse.getQuestion( ) );
+                }
+            }
+        }
+
+        return listQuestionIteration;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<FormQuestionResponse> findResponses( FormResponse formResponse, Question question )
+    {
+        List<FormQuestionResponse> listFormQuestionResponse = new ArrayList<>( );
+
+        for ( FormResponseStep formResponseStep : formResponse.getSteps( ) )
+        {
+            if ( formResponseStep.getStep( ).getId( ) == question.getIdStep( ) )
+            {
+                for ( FormQuestionResponse formQuestionResponse : formResponseStep.getQuestions( ) )
+                {
+                    if ( formQuestionResponse.getQuestion( ).getId( ) == question.getId( ) )
+                    {
+                        listFormQuestionResponse.add( formQuestionResponse );
+                    }
+                }
+            }
+        }
+
+        return listFormQuestionResponse;
     }
 }

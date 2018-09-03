@@ -10,9 +10,9 @@ import fr.paris.lutece.util.sql.DAOUtil;
 
 public class EditFormResponseTaskHistoryDAO implements IEditFormResponseTaskHistoryDAO
 {
-    private static final String SQL_QUERY_SELECT = "SELECT id_history, id_task, id_question, previous_value, new_value FROM workflow_task_forms_editresponse_history ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_history, id_task, id_question, iteration_number, previous_value, new_value FROM workflow_task_forms_editresponse_history ";
     private static final String SQL_QUERY_INSERT = "INSERT INTO  workflow_task_forms_editresponse_history "
-            + "(id_history, id_task, id_question, previous_value, new_value)VALUES(?,?,?,?,?)";
+            + "(id_history, id_task, id_question, iteration_number, previous_value, new_value)VALUES(?,?,?,?,?,?)";
     private static final String SQL_FILTER_IDHISTORY_IDTASK = SQL_QUERY_SELECT + "WHERE id_history = ? AND id_task = ?";
 
     /**
@@ -28,6 +28,7 @@ public class EditFormResponseTaskHistoryDAO implements IEditFormResponseTaskHist
             daoUtil.setInt( ++nPos, editFormResponseTaskHistory.getIdHistory( ) );
             daoUtil.setInt( ++nPos, editFormResponseTaskHistory.getIdTask( ) );
             daoUtil.setInt( ++nPos, editFormResponseTaskHistory.getQuestion( ).getId( ) );
+            daoUtil.setInt( ++nPos, editFormResponseTaskHistory.getQuestion( ).getIterationNumber( ) );
             daoUtil.setString( ++nPos, editFormResponseTaskHistory.getPreviousValue( ) );
             daoUtil.setString( ++nPos, editFormResponseTaskHistory.getNewValue( ) );
 
@@ -74,6 +75,7 @@ public class EditFormResponseTaskHistoryDAO implements IEditFormResponseTaskHist
         editFormResponseTaskHistory.setIdTask( daoUtil.getInt( nIndex++ ) );
         Question question = new Question( );
         question.setId( daoUtil.getInt( nIndex++ ) );
+        question.setIterationNumber( daoUtil.getInt( nIndex++ ) );
         editFormResponseTaskHistory.setQuestion( question );
         editFormResponseTaskHistory.setPreviousValue( daoUtil.getString( nIndex++ ) );
         editFormResponseTaskHistory.setNewValue( daoUtil.getString( nIndex++ ) );

@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
 import java.util.List;
 
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 
@@ -52,4 +53,15 @@ public interface IEditFormResponseTaskService
      * @return the list of questions
      */
     List<Question> findQuestionsToEdit( FormResponse formResponse );
+
+    /**
+     * Finds the responses of the specified question from the specified form response
+     * 
+     * @param formResponse
+     *            the form response
+     * @param question
+     *            the question
+     * @return the list of responses
+     */
+    List<FormQuestionResponse> findResponses( FormResponse formResponse, Question question );
 }

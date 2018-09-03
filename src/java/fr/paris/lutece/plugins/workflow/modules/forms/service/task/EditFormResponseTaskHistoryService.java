@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.IEditFormResponseTaskHistoryDAO;
@@ -37,7 +38,9 @@ public class EditFormResponseTaskHistoryService implements IEditFormResponseTask
         List<EditFormResponseTaskHistory> listEditFormResponseTaskHistory = _editFormResponseTaskHistoryDAO.selectEditFormResponseHistoryByIdHistoryAndIdTask(
                 nIdHistory, nIdTask );
         listEditFormResponseTaskHistory.forEach( history -> {
-            history.setQuestion( QuestionHome.findByPrimaryKey( history.getQuestion( ).getId( ) ) );
+            Question question = QuestionHome.findByPrimaryKey( history.getQuestion( ).getId( ) );
+            question.setIterationNumber( history.getQuestion( ).getIterationNumber( ) );
+            history.setQuestion( question );
         } );
         return listEditFormResponseTaskHistory;
     }
