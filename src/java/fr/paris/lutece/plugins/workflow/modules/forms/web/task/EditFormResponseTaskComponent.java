@@ -142,8 +142,7 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
         for ( Question question : listQuestion )
         {
             IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
-            FormQuestionResponse formQuestionResponse = entryDataService.createResponseFromRequest( question, request );
-
+            FormQuestionResponse formQuestionResponse = entryDataService.createResponseFromRequest( question, request, true );
             if ( formQuestionResponse.hasError( ) )
             {
                 error = formQuestionResponse.getError( );

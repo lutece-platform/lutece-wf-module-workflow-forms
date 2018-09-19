@@ -201,7 +201,7 @@ public class EditFormResponseTask extends AbstractFormsTask
         for ( Question question : listQuestion )
         {
             IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
-            FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request );
+            FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, false );
             responseFromForm.setIdFormResponse( formResponse.getId( ) );
             FormQuestionResponse responseSaved = findSavedResponse( formResponse, question );
 
