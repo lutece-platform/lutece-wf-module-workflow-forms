@@ -179,7 +179,7 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
     {
         FormResponse formResponse = _formsTaskService.findFormResponseFrom( nIdResource, strResourceType );
         List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( formResponse );
-        Collection<StepDisplay> listStepDisplay = createStepDisplays( formResponse, listQuestion, locale );
+        Collection<StepDisplay> listStepDisplay = createStepDisplays( request, formResponse, listQuestion, locale );
         Map<String, Object> model = new HashMap<>( );
 
         model.put( MARK_STEP_LIST, listStepDisplay );
@@ -192,6 +192,8 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
     /**
      * Creates the {@code StepDisplay} objects for the specified questions
      * 
+     * @param request
+     *            the request
      * @param formResponse
      *            the form response associated to the questions
      * @param listQuestion
@@ -200,7 +202,7 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
      *            the locale
      * @return the {@code StepDisplay} objects
      */
-    private Collection<StepDisplay> createStepDisplays( FormResponse formResponse, List<Question> listQuestion, Locale locale )
+    private Collection<StepDisplay> createStepDisplays( HttpServletRequest request, FormResponse formResponse, List<Question> listQuestion, Locale locale )
     {
         Map<Integer, StepDisplay> mapStepDisplay = new HashMap<>( );
 
@@ -215,7 +217,7 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
                 mapStepDisplay.put( step.getId( ), stepDisplay );
             }
 
-            stepDisplay.addHtml( buildHtmlForQuestion( formResponse, question, locale ) );
+            stepDisplay.addHtml( buildHtmlForQuestion( request, formResponse, question, locale ) );
         }
 
         return mapStepDisplay.values( );
@@ -224,6 +226,8 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
     /**
      * Builds the HTML for the specified question
      * 
+     * @param request
+     *            the request
      * @param formResponse
      *            the form response associated to the questions
      * @param question
@@ -232,13 +236,13 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
      *            the locale
      * @return the HTML
      */
-    private String buildHtmlForQuestion( FormResponse formResponse, Question question, Locale locale )
+    private String buildHtmlForQuestion( HttpServletRequest request, FormResponse formResponse, Question question, Locale locale )
     {
         FormDisplay formDisplayQuestion = FormDisplayHome.getFormDisplayByFormStepAndComposite( formResponse.getFormId( ), question.getIdStep( ),
                 question.getId( ) );
         CompositeQuestionDisplay compositeQuestionDisplay = new CompositeQuestionDisplay( formDisplayQuestion, formResponse, question.getIterationNumber( ) );
 
-        return compositeQuestionDisplay.getCompositeHtml( _editFormResponseTaskService.findResponses( formResponse, question ), locale,
+        return compositeQuestionDisplay.getCompositeHtml( request, _editFormResponseTaskService.findResponses( formResponse, question ), locale,
                 DisplayType.EDITION_BACKOFFICE );
     }
 
