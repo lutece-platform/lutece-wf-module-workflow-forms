@@ -44,8 +44,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
+import fr.paris.lutece.plugins.forms.business.FormResponseStep;
+import fr.paris.lutece.plugins.forms.business.FormResponseStepHome;
 import fr.paris.lutece.plugins.forms.business.Question;
+import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
+import fr.paris.lutece.plugins.forms.util.FormsConstants;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
@@ -273,10 +277,45 @@ public class EditFormResponseTask extends AbstractFormsTask
     {
         for ( FormQuestionResponse formQuestionResponse : listFormQuestionResponse )
         {
-            Question question = formQuestionResponse.getQuestion( );
-            IEntryDataService dataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
-            dataService.save( formQuestionResponse );
+            saveStep( formQuestionResponse );
+            saveResponses( formQuestionResponse );
         }
+    }
+
+    /**
+     * Saves the step associated to the specified form question response
+     * 
+     * @param formQuestionResponse
+     *            the form question response
+     */
+    private void saveStep( FormQuestionResponse formQuestionResponse )
+    {
+        List<FormResponseStep> listFormResponseStep = FormResponseStepHome.findStepsByFormResponse( formQuestionResponse.getIdFormResponse( ) );
+        boolean bFormResponseStepFound = listFormResponseStep.stream( ).anyMatch(
+                formResponseStep -> formResponseStep.getStep( ).getId( ) == formQuestionResponse.getIdStep( ) );
+
+        if ( !bFormResponseStepFound )
+        {
+            FormResponseStep formResponseStep = new FormResponseStep( );
+            formResponseStep.setFormResponseId( formQuestionResponse.getIdFormResponse( ) );
+            formResponseStep.setStep( StepHome.findByPrimaryKey( formQuestionResponse.getIdStep( ) ) );
+            formResponseStep.setOrder( FormsConstants.ORDER_NOT_SET );
+
+            FormResponseStepHome.create( formResponseStep );
+        }
+    }
+
+    /**
+     * Saves the question associated to the specified form question response
+     * 
+     * @param formQuestionResponse
+     *            the form question response
+     */
+    private void saveResponses( FormQuestionResponse formQuestionResponse )
+    {
+        Question question = formQuestionResponse.getQuestion( );
+        IEntryDataService dataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
+        dataService.save( formQuestionResponse );
     }
 
     /**
