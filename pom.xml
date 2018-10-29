@@ -60,4 +60,10 @@
         <jiraProjectName>WFFORMS</jiraProjectName>
         <jiraComponentId>14552</jiraComponentId>
     </properties>
+    <scm>
+        <connection>scm:git:https://github.com/lutece-platform/lutece-wf-module-workflow-forms.git</connection>
+        <developerConnection>scm:git:https://github.com/lutece-platform/lutece-wf-module-workflow-forms.git</developerConnection>
+        <url>scm:git:https://github.com/lutece-platform/lutece-wf-module-workflow-forms.git</url>
+        <tag>HEAD</tag>
+  </scm>
 </project>
