@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import fr.paris.lutece.plugins.forms.business.FormDisplay;
 import fr.paris.lutece.plugins.forms.business.FormDisplayHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.Step;
@@ -53,6 +54,7 @@ import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.util.FormsConstants;
 import fr.paris.lutece.plugins.forms.web.CompositeQuestionDisplay;
+import fr.paris.lutece.plugins.forms.web.StepDisplayTree;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
 import fr.paris.lutece.plugins.genericattributes.business.GenericAttributeError;
@@ -66,6 +68,10 @@ import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.util.html.HtmlTemplate;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * This class represents a component for the task {@link fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTask EditFormResponseTask}
@@ -179,71 +185,31 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
     {
         FormResponse formResponse = _formsTaskService.findFormResponseFrom( nIdResource, strResourceType );
         List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( formResponse );
-        Collection<StepDisplay> listStepDisplay = createStepDisplays( request, formResponse, listQuestion, locale );
-        Map<String, Object> model = new HashMap<>( );
 
-        model.put( MARK_STEP_LIST, listStepDisplay );
+        Set<Integer> listStepId = new HashSet<>( );
+        List<Step> listStep = new ArrayList<>( );
+
+        for ( Question question : listQuestion )
+        {
+            if ( !listStepId.contains( question.getIdStep( ) ) )
+            {
+                listStepId.add( question.getIdStep( ) );
+            }
+        }
+
+        for ( Integer nIdStep : listStepId )
+        {
+            listStep.add( StepHome.findByPrimaryKey( nIdStep ) );
+        }
+
+        List<String> listStepDisplayTree = buildFormStepDisplayTreeList( request, listStep, listQuestion, formResponse );
+
+        Map<String, Object> model = new HashMap<>( );
+        model.put( MARK_STEP_LIST, listStepDisplayTree );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_FORM, locale, model );
 
         return template.getHtml( );
-    }
-
-    /**
-     * Creates the {@code StepDisplay} objects for the specified questions
-     * 
-     * @param request
-     *            the request
-     * @param formResponse
-     *            the form response associated to the questions
-     * @param listQuestion
-     *            the questions
-     * @param locale
-     *            the locale
-     * @return the {@code StepDisplay} objects
-     */
-    private Collection<StepDisplay> createStepDisplays( HttpServletRequest request, FormResponse formResponse, List<Question> listQuestion, Locale locale )
-    {
-        Map<Integer, StepDisplay> mapStepDisplay = new HashMap<>( );
-
-        for ( Question question : listQuestion )
-        {
-            Step step = StepHome.findByPrimaryKey( question.getIdStep( ) );
-            StepDisplay stepDisplay = mapStepDisplay.get( step.getId( ) );
-
-            if ( stepDisplay == null )
-            {
-                stepDisplay = new StepDisplay( step );
-                mapStepDisplay.put( step.getId( ), stepDisplay );
-            }
-
-            stepDisplay.addHtml( buildHtmlForQuestion( request, formResponse, question, locale ) );
-        }
-
-        return mapStepDisplay.values( );
-    }
-
-    /**
-     * Builds the HTML for the specified question
-     * 
-     * @param request
-     *            the request
-     * @param formResponse
-     *            the form response associated to the questions
-     * @param question
-     *            the question
-     * @param locale
-     *            the locale
-     * @return the HTML
-     */
-    private String buildHtmlForQuestion( HttpServletRequest request, FormResponse formResponse, Question question, Locale locale )
-    {
-        FormDisplay formDisplayQuestion = FormDisplayHome.getFormDisplayByFormStepAndComposite( formResponse.getFormId( ), question.getIdStep( ),
-                question.getId( ) );
-        CompositeQuestionDisplay compositeQuestionDisplay = new CompositeQuestionDisplay( formDisplayQuestion, formResponse, question.getIterationNumber( ) );
-
-        return compositeQuestionDisplay.getCompositeHtml( request, _editFormResponseTaskService.findResponses( formResponse, question ), locale,
-                DisplayType.EDITION_BACKOFFICE );
     }
 
     /**
@@ -271,56 +237,39 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
     }
 
     /**
-     * This class is used to display a step with editable questions
-     *
+     * Return the list of all DisplayTree for the given list of Step
+     * 
+     * @param request
+     *            the request
+     * @param listStep
+     *            The list of all Step on which the DisplayTree must be build
+     * @param formResponse
+     *            The form response on which to retrieve the Response objects
+     * @return the list of all DisplayTree for the given list of Step
      */
-    public static final class StepDisplay
+    private List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay,
+            FormResponse formResponse )
     {
-        private final String _strTitle;
-        private final List<String> _listQuestionHtml;
+        List<String> listFormDisplayTrees = new ArrayList<>( );
 
-        /**
-         * Constructor
-         * 
-         * @param step
-         *            the step containing editable questions
-         */
-        private StepDisplay( Step step )
+        List<FormQuestionResponse> listFormQuestionResponse = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
+        List<Integer> listQuestionToDisplayId = listQuestionToDisplay.stream( ).map( question -> question.getId( ) ).collect( Collectors.toList( ) );
+
+        listFormQuestionResponse.stream( ).filter( formQuestionResponse -> listQuestionToDisplayId.contains( formQuestionResponse.getQuestion( ).getId( ) ) );
+
+        if ( !CollectionUtils.isEmpty( listStep ) )
         {
-            _strTitle = step.getTitle( );
-            _listQuestionHtml = new ArrayList<>( );
+            for ( Step step : listStep )
+            {
+                int nIdStep = step.getId( );
+
+                StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, formResponse );
+                listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, listFormQuestionResponse, request.getLocale( ),
+                        DisplayType.EDITION_BACKOFFICE ) );
+            }
         }
 
-        /**
-         * Adds HTML for a question
-         * 
-         * @param strHtml
-         *            the HTML to add
-         */
-        private void addHtml( String strHtml )
-        {
-            _listQuestionHtml.add( strHtml );
-        }
-
-        /**
-         * Gives the title of the step
-         * 
-         * @return the title
-         */
-        public String getTitle( )
-        {
-            return _strTitle;
-        }
-
-        /**
-         * Gives the HTML of the questions
-         * 
-         * @return the HTML of the questions
-         */
-        public List<String> getQuestionHtml( )
-        {
-            return _listQuestionHtml;
-        }
+        return listFormDisplayTrees;
     }
 
 }
