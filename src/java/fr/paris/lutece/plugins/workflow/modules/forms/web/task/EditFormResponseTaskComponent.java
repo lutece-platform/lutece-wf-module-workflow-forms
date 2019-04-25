@@ -34,7 +34,6 @@
 package fr.paris.lutece.plugins.workflow.modules.forms.web.task;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -43,17 +42,15 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import fr.paris.lutece.plugins.forms.business.FormDisplay;
-import fr.paris.lutece.plugins.forms.business.FormDisplayHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
+import fr.paris.lutece.plugins.forms.business.FormResponseStep;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.util.FormsConstants;
-import fr.paris.lutece.plugins.forms.web.CompositeQuestionDisplay;
 import fr.paris.lutece.plugins.forms.web.StepDisplayTree;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
@@ -197,7 +194,18 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
             }
         }
 
-        for ( Integer nIdStep : listStepId )
+        List<FormResponseStep> listFormResponseStep = formResponse.getSteps( );
+        List<Integer> listStepsOrdered = new ArrayList<>( );
+
+        for ( FormResponseStep formResponseStep : listFormResponseStep )
+        {
+            listStepsOrdered.add( formResponseStep.getStep( ).getId( ) );
+        }
+
+        // Filter only the steps which contains question to edit in BO
+        listStepsOrdered.removeIf( stepId -> !listStepId.contains( stepId ) );
+
+        for ( Integer nIdStep : listStepsOrdered )
         {
             listStep.add( StepHome.findByPrimaryKey( nIdStep ) );
         }
