@@ -204,6 +204,15 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
 
         // Filter only the steps which contains question to edit in BO
         listStepsOrdered.removeIf( stepId -> !listStepId.contains( stepId ) );
+        
+        //Add the steps that are editable but not in the actuel form response flow
+        for ( Integer nIdStep : listStepId )
+        {
+            if ( !listStepsOrdered.contains( nIdStep ) )
+            {
+                listStepsOrdered.add( nIdStep );
+            }
+        }
 
         for ( Integer nIdStep : listStepsOrdered )
         {
