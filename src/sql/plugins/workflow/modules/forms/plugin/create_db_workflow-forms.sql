@@ -1,6 +1,7 @@
 --
 -- ADD  TABLE workflow_task_forms_editresponse_history to record changements about the forms workflow
 --
+DROP TABLE IF EXISTS workflow_task_forms_editresponse_history;
 CREATE TABLE workflow_task_forms_editresponse_history
 (
 	id_history INT DEFAULT 0 NOT NULL,
