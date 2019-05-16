@@ -6,6 +6,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" >
 
     <!-- Services -->
+    <bean id="workflow-forms.taskResubmitResponseConfigService" class="fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService"
+		p:taskConfigDAO-ref="worklow-forms.taskResubmitFormResponseConfigDAO" />
+	<bean id="workflow-forms.taskResubmitResponseService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.ResubmitFormResponseService" />
     <bean id="workflow-forms.formsTaskService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.FormsTaskService" />
     <bean id="workflow-forms.editFormResponseTaskService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTaskService" />
     <bean id="workflow-forms.editFormResponseTaskHistoryService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTaskHistoryService" />

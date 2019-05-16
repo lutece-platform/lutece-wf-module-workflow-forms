@@ -43,7 +43,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponseStep;
 import fr.paris.lutece.plugins.forms.business.Question;
@@ -51,7 +50,6 @@ import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.util.FormsConstants;
-import fr.paris.lutece.plugins.forms.web.StepDisplayTree;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
 import fr.paris.lutece.plugins.genericattributes.business.GenericAttributeError;
@@ -59,7 +57,6 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseT
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskHistoryService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
-import fr.paris.lutece.plugins.workflow.web.task.NoConfigTaskComponent;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
@@ -67,24 +64,18 @@ import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
-import org.apache.commons.collections.CollectionUtils;
 
 /**
  * This class represents a component for the task {@link fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTask EditFormResponseTask}
  *
  */
-public class EditFormResponseTaskComponent extends NoConfigTaskComponent
+public class EditFormResponseTaskComponent extends AbstractFormResponseTaskComponent
 {
     // Messages
     private static final String MESSAGE_ERROR = "module.workflow.forms.error.task.editFormResponse";
 
     // Templates
-    private static final String TEMPLATE_TASK_FORM = "admin/plugins/workflow/modules/forms/task_edit_form_response_form.html";
     private static final String TEMPLATE_TASK_FORM_EDITRESPONSE_HISTORY = "admin/plugins/workflow/modules/forms/task_forms_editresponse_history.html";
-
-    // Marks
-    private static final String MARK_STEP_LIST = "list_step";
 
     private final IFormsTaskService _formsTaskService;
     private final IEditFormResponseTaskService _editFormResponseTaskService;
@@ -219,7 +210,7 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
             listStep.add( StepHome.findByPrimaryKey( nIdStep ) );
         }
 
-        List<String> listStepDisplayTree = buildFormStepDisplayTreeList( request, listStep, listQuestion, formResponse );
+        List<String> listStepDisplayTree = buildFormStepDisplayTreeList( request, listStep, listQuestion, formResponse, DisplayType.EDITION_BACKOFFICE );
 
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_STEP_LIST, listStepDisplayTree );
@@ -243,50 +234,11 @@ public class EditFormResponseTaskComponent extends NoConfigTaskComponent
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_FORM_EDITRESPONSE_HISTORY, locale, model );
         return template.getHtml( );
     }
-
-    /**
-     * {@inheritDoc}
-     */
+    
     @Override
-    public String getTaskInformationXml( int nIdHistory, HttpServletRequest request, Locale locale, ITask task )
+    public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task ) 
     {
-        return null;
-    }
-
-    /**
-     * Return the list of all DisplayTree for the given list of Step
-     * 
-     * @param request
-     *            the request
-     * @param listStep
-     *            The list of all Step on which the DisplayTree must be build
-     * @param formResponse
-     *            The form response on which to retrieve the Response objects
-     * @return the list of all DisplayTree for the given list of Step
-     */
-    private List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay,
-            FormResponse formResponse )
-    {
-        List<String> listFormDisplayTrees = new ArrayList<>( );
-
-        List<FormQuestionResponse> listFormQuestionResponse = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
-        List<Integer> listQuestionToDisplayId = listQuestionToDisplay.stream( ).map( question -> question.getId( ) ).collect( Collectors.toList( ) );
-
-        listFormQuestionResponse.stream( ).filter( formQuestionResponse -> listQuestionToDisplayId.contains( formQuestionResponse.getQuestion( ).getId( ) ) );
-
-        if ( !CollectionUtils.isEmpty( listStep ) )
-        {
-            for ( Step step : listStep )
-            {
-                int nIdStep = step.getId( );
-
-                StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, formResponse );
-                listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, listFormQuestionResponse, request.getLocale( ),
-                        DisplayType.EDITION_BACKOFFICE ) );
-            }
-        }
-
-        return listFormDisplayTrees;
+    	return null;
     }
 
 }
