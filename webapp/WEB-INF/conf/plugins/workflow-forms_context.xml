@@ -13,7 +13,10 @@
     <!-- DAO -->
     <bean id="worklow-forms.editFormResponseTaskHistoryDAO"
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistoryDAO" />
-
+	<bean id="worklow-forms.resubmitFormResponseDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseDAO" />
+	<bean id="worklow-forms.resubmitFormResponseValueDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseValueDAO" />
+	<bean id="worklow-forms.taskResubmitFormResponseConfigDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseTaskConfigDAO" />
+	
     <!-- Task edit form response -->
     <bean id="workflow-forms.editFormResponseTask"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTask"
