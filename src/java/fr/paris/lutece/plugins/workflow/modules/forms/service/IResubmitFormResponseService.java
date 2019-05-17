@@ -59,4 +59,35 @@ public interface IResubmitFormResponseService {
     * @return
     */
    List<Question> findListQuestionShownCompleteness( FormResponse formResponse );
+   
+   /** 
+    * Remove a ResubmitFormResponse
+    * @param nIdHistory
+    *            the id history
+    * @param nIdTask
+    *            the id task
+    */
+   void removeByIdHistory( int nIdHistory, int nIdTask );
+   
+   /**
+    * Remove a ResubmitFormResponse by id task
+    * 
+    * @param nIdTask
+    *            the id task
+    */
+   void removeByIdTask( int nIdTask );
+   
+   /**
+    * Create a ResubmitFormResponse
+    * 
+    * @param resubmitFormResponse
+    */
+   void create( ResubmitFormResponse resubmitFormResponse );
+
+   /**
+    * Update a ResubmitFormResponse
+    * 
+    * @param resubmitFormResponse
+    */
+   void update( ResubmitFormResponse resubmitFormResponse );
 }

@@ -29,7 +29,6 @@ public class ResubmitFormResponseTaskComponent extends AbstractFormResponseTaskC
 	// Templates
 	private static final String TEMPLATE_TASK_RESUBMIT_RESPONSE_CONFIG = "admin/plugins/workflow/modules/forms/task_resubmit_response_config.html";
 	private static final String TEMPLATE_TASK_RESUBMIT_RESPONSE_INFORMATION = "admin/plugins/workflow/modules/forms/task_resubmit_response_information.html";
-	private static final String TEMPLATE_TASK_RESUBMIT_RESPONSE_FORM = "admin/plugins/workflow/modules/forms/task_resubmit_response_form.html";
 	
 	// Marks
 	private static final String MARK_CONFIG = "config";
@@ -69,6 +68,7 @@ public class ResubmitFormResponseTaskComponent extends AbstractFormResponseTaskC
 		List<Step> listStep = listQuestions.stream( )
 				.map( Question::getStep )
 				.map( Step::getId )
+				.distinct( )
 				.map( StepHome::findByPrimaryKey )
 				.collect( Collectors.toList( ) );
 		

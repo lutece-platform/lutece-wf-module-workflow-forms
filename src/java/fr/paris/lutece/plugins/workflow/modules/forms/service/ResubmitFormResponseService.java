@@ -116,11 +116,69 @@ public class ResubmitFormResponseService implements IResubmitFormResponseService
 	public  List<Question> findListQuestionShownCompleteness( FormResponse formResponse )
 	{
 		Form form = FormHome.findByPrimaryKey( formResponse.getFormId( ) );
-
-        List<Question> listFormQuestion = QuestionHome.getListQuestionByIdForm( form.getId( ) );
+		List<Question> listFormQuestion = QuestionHome.getListQuestionByIdForm( form.getId( ) );
         
         return listFormQuestion.stream( )
         		.filter( question -> question.getEntry( ).isShownInCompleteness( ) )
         		.collect( Collectors.toList( ) );
+	}
+
+	@Override
+    public void removeByIdHistory( int nIdHistory, int nIdTask )
+    {
+		ResubmitFormResponse resubmitFormResponse = find( nIdHistory, nIdTask );
+
+        if ( resubmitFormResponse != null )
+        {
+        	Plugin plugin = WorkflowUtils.getPlugin( );
+        	_resubmitFormResponseValueDAO.delete( resubmitFormResponse.getIdHistory( ), plugin );
+        	_resubmitFormResponseDAO.deleteByIdHistory( nIdHistory, nIdTask, plugin );
+        }
+    }
+	
+	@Override
+    public void removeByIdTask( int nIdTask )
+    {
+		Plugin plugin = WorkflowUtils.getPlugin( );
+		List<ResubmitFormResponse> listResponse = _resubmitFormResponseDAO.loadByIdTask( nIdTask, plugin );
+        for ( ResubmitFormResponse editRecord : listResponse )
+        {
+        	_resubmitFormResponseValueDAO.delete( editRecord.getIdHistory( ), plugin );
+        }
+
+        _resubmitFormResponseDAO.deleteByIdTask( nIdTask, plugin );
+    }
+	
+	@Override
+	public void create(ResubmitFormResponse resubmitFormResponse) {
+		if ( resubmitFormResponse != null )
+	    {
+			Plugin plugin = WorkflowUtils.getPlugin( );
+			_resubmitFormResponseDAO.insert( resubmitFormResponse, plugin );
+
+			for ( ResubmitFormResponseValue value : resubmitFormResponse.getListResubmitReponseValues( ) )
+			{
+				value.setIdHistory( resubmitFormResponse.getIdHistory( ) );
+				_resubmitFormResponseValueDAO.insert( value, plugin );
+			}
+	    }
+	}
+	
+	@Override
+	public void update(ResubmitFormResponse resubmitFormResponse) {
+		if ( resubmitFormResponse != null )
+        {
+			Plugin plugin = WorkflowUtils.getPlugin( );
+			_resubmitFormResponseDAO.store( resubmitFormResponse, plugin );
+            // Remove its edit record values first
+			_resubmitFormResponseValueDAO.delete( resubmitFormResponse.getIdHistory( ), plugin );
+
+            for ( ResubmitFormResponseValue value : resubmitFormResponse.getListResubmitReponseValues( ) )
+            {
+                value.setIdHistory( resubmitFormResponse.getIdHistory( ) );
+                _resubmitFormResponseValueDAO.insert( value, plugin );
+            }
+        }
+		
 	}
 }
