@@ -33,7 +33,14 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import fr.paris.lutece.plugins.forms.business.FormResponse;
+import fr.paris.lutece.plugins.forms.business.Question;
+import fr.paris.lutece.plugins.forms.business.Step;
+import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 
 /**
@@ -73,4 +80,6 @@ public interface IFormsTaskService
      * @return the form response
      */
     FormResponse findFormResponseFrom( int nIdResource, String strResourceType );
+    
+    List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay, FormResponse formResponse, DisplayType displayType );
 }

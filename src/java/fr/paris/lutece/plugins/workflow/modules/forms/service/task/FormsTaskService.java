@@ -33,10 +33,23 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
-import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.collections.CollectionUtils;
+
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponseHome;
+import fr.paris.lutece.plugins.forms.business.Question;
+import fr.paris.lutece.plugins.forms.business.Step;
+import fr.paris.lutece.plugins.forms.web.StepDisplayTree;
+import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.portal.service.util.AppException;
@@ -89,4 +102,30 @@ public class FormsTaskService implements IFormsTaskService
 
         return formResponse;
     }
+    
+    @Override
+	public List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay,
+	            FormResponse formResponse, DisplayType displayType )
+	{
+		List<String> listFormDisplayTrees = new ArrayList<>( );
+
+		List<FormQuestionResponse> listFormQuestionResponse = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
+		List<Integer> listQuestionToDisplayId = listQuestionToDisplay.stream( ).map( question -> question.getId( ) ).collect( Collectors.toList( ) );
+
+		listFormQuestionResponse.stream( ).filter( formQuestionResponse -> listQuestionToDisplayId.contains( formQuestionResponse.getQuestion( ).getId( ) ) );
+
+		if ( !CollectionUtils.isEmpty( listStep ) )
+		{
+				for ( Step step : listStep )
+				{
+					int nIdStep = step.getId( );
+
+					StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, formResponse );
+					listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, listFormQuestionResponse, request.getLocale( ),
+	                		displayType ) );
+				}
+		}
+
+		return listFormDisplayTrees;
+	}
 }

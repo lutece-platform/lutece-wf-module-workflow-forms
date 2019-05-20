@@ -22,8 +22,12 @@
     <admin-features>
     </admin-features>    
 
-    <!-- XPages parameters -->
+    <!-- Xpage configuration -->
     <applications>
+        <application>
+            <application-id>workflow-resubmit-form</application-id>
+            <application-class>fr.paris.lutece.plugins.workflow.modules.forms.web.ResubmitFormResponseApp</application-class>
+        </application>
     </applications>
 
     <!-- Portlet parameters -->

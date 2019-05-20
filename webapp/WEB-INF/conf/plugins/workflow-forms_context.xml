@@ -59,4 +59,18 @@
         p:taskType-ref="workflow-forms.resubmitFormResponseTypeTask"
         p:taskConfigService-ref="workflow-forms.taskResubmitResponseConfigService" />
     
+    <!-- SignRequest -->
+	<bean id="workflow-forms.hashService" class="fr.paris.lutece.util.signrequest.security.Sha1HashService" />
+	<bean id="workflow-forms.resubmitFormResponseRequestAuthenticator" class="fr.paris.lutece.util.signrequest.RequestHashAuthenticator" >
+		<property name="hashService" ref="workflow-forms.hashService" />
+		<property name="signatureElements" > 
+			<list>
+				<value>id_history</value>
+				<value>id_task</value>
+			</list>
+		</property>
+		<property name="privateKey">
+			<value>change me</value>
+		</property>
+	</bean>
 </beans>

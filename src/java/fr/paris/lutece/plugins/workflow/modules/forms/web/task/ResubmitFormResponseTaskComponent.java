@@ -72,7 +72,7 @@ public class ResubmitFormResponseTaskComponent extends AbstractFormResponseTaskC
 				.map( StepHome::findByPrimaryKey )
 				.collect( Collectors.toList( ) );
 		
-		List<String> listStepDisplayTree = buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse, DisplayType.SELECT_BACKOFFICE );
+		List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse, DisplayType.RESUBMIT_BACKOFFICE );
 
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_STEP_LIST, listStepDisplayTree );
@@ -80,17 +80,6 @@ public class ResubmitFormResponseTaskComponent extends AbstractFormResponseTaskC
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_FORM, locale, model );
 
         return template.getHtml( );
-		
-		
-//		ResubmitFormResponseTaskConfig config = _taskResubmitResponseConfigService.findByPrimaryKey( task.getId( ) );
-//
-//        Map<String, Object> model = new HashMap<>( );
-//        model.put( MARK_CONFIG, config );
-//        model.put( MARK_LIST_ENTRIES, _resubmitResponseService.getFormListEntries( nIdResource, strResourceType ) );
-//
-//        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_RESUBMIT_RESPONSE_FORM, locale, model );
-//
-//        return template.getHtml( );
 	}
 
 	@Override

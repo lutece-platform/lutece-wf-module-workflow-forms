@@ -210,7 +210,7 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
             listStep.add( StepHome.findByPrimaryKey( nIdStep ) );
         }
 
-        List<String> listStepDisplayTree = buildFormStepDisplayTreeList( request, listStep, listQuestion, formResponse, DisplayType.EDITION_BACKOFFICE );
+        List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestion, formResponse, DisplayType.EDITION_BACKOFFICE );
 
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_STEP_LIST, listStepDisplayTree );
