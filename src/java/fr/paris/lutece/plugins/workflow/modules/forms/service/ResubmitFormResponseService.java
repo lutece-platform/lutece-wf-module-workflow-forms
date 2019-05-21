@@ -9,21 +9,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import fr.paris.lutece.plugins.forms.business.Form;
 import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponseHome;
 import fr.paris.lutece.plugins.forms.business.IFormResponseDAO;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
-import fr.paris.lutece.plugins.forms.business.Step;
-import fr.paris.lutece.plugins.forms.web.StepDisplayTree;
-import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
 import fr.paris.lutece.plugins.genericattributes.business.IEntryDAO;
@@ -32,6 +27,9 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.IResubmitFormResp
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseTaskConfig;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseValue;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
+import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
@@ -45,9 +43,11 @@ import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowSe
 import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
+import fr.paris.lutece.portal.service.message.SiteMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.message.SiteMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.portal.service.workflow.WorkflowService;
 import fr.paris.lutece.util.ReferenceList;
 
 /**
@@ -55,6 +55,9 @@ import fr.paris.lutece.util.ReferenceList;
  */
 public class ResubmitFormResponseService implements IResubmitFormResponseService {
 
+	private static final String MESSAGE_APP_ERROR = "module.workflow.forms.message.app_error";
+	private static final String PARAMETER_URL_RETURN = "url_return";
+	
 	@Inject
     private IActionService _actionService;
 	
@@ -85,6 +88,12 @@ public class ResubmitFormResponseService implements IResubmitFormResponseService
 	
 	@Inject
     private IResourceWorkflowService _resourceWorkflowService;
+	
+	@Inject
+	private IFormsTaskService _formsTaskService;
+	
+	@Inject
+	private IEditFormResponseTaskService _editFormResponseTaskService;
 	
 	@Override
 	public ReferenceList getListStates(int nIdAction)
@@ -274,16 +283,79 @@ public class ResubmitFormResponseService implements IResubmitFormResponseService
     }
 	
 	 @Override
-	 public List<Entry> getListEntriesToEdit( List<ResubmitFormResponseValue> listEditRecordValues )
+	 public List<Question> getListQuestionToEdit( FormResponse formResponse, List<ResubmitFormResponseValue> listEditRecordValues )
 	 {
-		 List<Entry> listEntries = new ArrayList<>( );
-		
-		 for ( ResubmitFormResponseValue value : listEditRecordValues )
-		 {
+		List<Entry> listEntries = new ArrayList<>( );
+		for ( ResubmitFormResponseValue value : listEditRecordValues )
+		{
 			Entry entry = EntryHome.findByPrimaryKey( value.getIdEntry( ) );
 			listEntries.add( entry );
-		 }
+		}
+		List<Integer> idEntries = listEntries.stream( ).map( Entry::getIdEntry ).collect( Collectors.toList( ) );
 		
-		return listEntries;
+		List<Question> listQuestions = findListQuestionShownCompleteness( formResponse );
+		return listQuestions.stream( )
+					.filter( question -> idEntries.contains( question.getEntry( ).getIdEntry( ) ) )
+					.collect( Collectors.toList( ) );
+	}
+	 
+	@Override
+	public boolean doEditResponseData( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse ) throws SiteMessageException {
+		FormResponse response = getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
+		if ( response == null)
+		{
+			setSiteMessage( request, MESSAGE_APP_ERROR, SiteMessage.TYPE_STOP, request.getParameter( PARAMETER_URL_RETURN ) );
+
+	        return false;
+		}
+		List<Question> listQuestions = getListQuestionToEdit( response, resubmitFormResponse.getListResubmitReponseValues( ) );
+		
+		List<EditableResponse> listEditableResponse = _formsTaskService.createEditableResponses( response, listQuestions, request );
+		List<EditableResponse>_listChangedResponse = _formsTaskService.findChangedResponses( listEditableResponse );
+        List<FormQuestionResponse> listChangedResponseToSave = new ArrayList<>( );
+
+        for ( EditableResponse editableResponse : _listChangedResponse )
+        {
+            listChangedResponseToSave.add( editableResponse.getResponseFromForm( ) );
+        }
+
+        _editFormResponseTaskService.saveResponses( listChangedResponseToSave );
+		
+		return true;
+	}
+	
+	@Override
+    public void doChangeResponseState( ResubmitFormResponse resubmitFormResponse, Locale locale )
+    {
+        ITask task = _taskService.findByPrimaryKey( resubmitFormResponse.getIdTask( ), locale );
+        ResubmitFormResponseTaskConfig config = _taskResubmitResponseConfigService.findByPrimaryKey( resubmitFormResponse.getIdTask( ) );
+
+        if ( task != null && config != null )
+        {
+            State state = _stateService.findByPrimaryKey( config.getIdStateAfterEdition( ) );
+            Action action = _actionService.findByPrimaryKey( task.getAction( ).getId( ) );
+
+            if ( state != null && action != null )
+            {
+            	FormResponse response = getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
+
+                // Update Resource
+                ResourceWorkflow resourceWorkflow = _resourceWorkflowService.findByPrimaryKey( response.getId( ), FormResponse.RESOURCE_TYPE, action
+                        .getWorkflow( ).getId( ) );
+                resourceWorkflow.setState( state );
+                _resourceWorkflowService.update( resourceWorkflow );
+                WorkflowService.getInstance( ).doProcessAutomaticReflexiveActions( response.getId( ), FormResponse.RESOURCE_TYPE,
+                        action.getStateAfter( ).getId( ), resourceWorkflow.getExternalParentId( ), locale );
+                // if new state have action automatic
+                WorkflowService.getInstance( ).executeActionAutomatic( response.getId( ), FormResponse.RESOURCE_TYPE, action.getWorkflow( ).getId( ),
+                        resourceWorkflow.getExternalParentId( ) );
+            }
+        }
+    }
+	
+	@Override
+	public void doCompleteResponse(ResubmitFormResponse resubmitFormResponse) {
+		resubmitFormResponse.setIsComplete( true );
+		update( resubmitFormResponse );
 	}
 }

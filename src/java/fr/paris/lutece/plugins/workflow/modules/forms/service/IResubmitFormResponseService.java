@@ -7,8 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
-import fr.paris.lutece.plugins.forms.business.Step;
-import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseValue;
@@ -135,12 +133,42 @@ public interface IResubmitFormResponseService {
    FormResponse getFormResponseFromIdHistory( int nIdHistory );
    
    /**
-    * Get the list of entries to edit
+    * Get the list of questions to edit
     * 
     * @param listEditRecordValues
     *            the list of edit record values
     * @return a list of entries
     */
-   List<Entry> getListEntriesToEdit( List<ResubmitFormResponseValue> listEditRecordValues );
+   List<Question> getListQuestionToEdit( FormResponse formResponse, List<ResubmitFormResponseValue> listEditRecordValues );
    
+   /**
+    * Do edit the response
+    * 
+    * @param request
+    *            the HTTP request
+    * @param resubmitFormResponse
+    *            the response
+    * @return true if the user the record must be updated, false otherwise
+    * @throws SiteMessageException
+    *             site message if there is a problem
+    */
+   boolean doEditResponseData( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse ) throws SiteMessageException;
+   
+   /**
+    * Do change the Response
+    * 
+    * @param resubmitFormResponse
+    *            the response
+    * @param locale
+    *            the locale
+    */
+   void doChangeResponseState( ResubmitFormResponse resubmitFormResponse, Locale locale );
+   
+   /**
+    * Do change the Response to complete
+    * 
+    * @param resubmitFormResponse
+    *            the Response
+    */
+   void doCompleteResponse( ResubmitFormResponse resubmitFormResponse );
 }

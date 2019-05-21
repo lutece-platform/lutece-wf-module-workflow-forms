@@ -15,7 +15,6 @@ import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
-import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.IResubmitFormResponseService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.signrequest.ResubmitFormResponseRequestAuthenticatorService;
@@ -40,10 +39,14 @@ public class ResubmitFormResponseApp implements XPageApplication
 	// TEMPLATES
     private static final String TEMPLATE_RESUBMIT_FORM = "skin/plugins/workflow/modules/forms/resubmit_form.html";
 
+    // ACTIONS
+    private static final String ACTION_DO_MODIFY_RESPONSE = "do_modify_response";
+    
     // MESSAGES
     private static final String MESSAGE_RECORD_ALREADY_COMPLETED = "module.workflow.forms.message.response_already_completed";
     private static final String PROPERTY_XPAGE_RESUBMIT_FORM_PAGETITLE = "module.workflow.forms.resubmit_form.page_title";
     private static final String PROPERTY_XPAGE_RESUBMIT_FORM_PATHLABEL = "module.workflow.forms.resubmit_form.page_label";
+    private static final String MESSAGE_EDITION_COMPLETE = "module.workflow.forms.message.edition_complete";
     
     // PARAMETERS
     private static final String PARAMETER_URL_RETURN = "url_return";
@@ -51,6 +54,7 @@ public class ResubmitFormResponseApp implements XPageApplication
     private static final String PARAMETER_ID_TASK = "id_task";
     private static final String PARAMETER_SIGNATURE = "signature";
     private static final String PARAMETER_TIMESTAMP = "timestamp";
+    private static final String PARAMETER_ACTION = "action";
     
     // MARKS
     private static final String MARK_STEP_LIST = "list_step";
@@ -71,8 +75,7 @@ public class ResubmitFormResponseApp implements XPageApplication
     public XPage getPage( HttpServletRequest request, int nMode, Plugin plugin ) throws UserNotSignedException, SiteMessageException
     {
     	XPage page = null;
-    	if ( true )
-    	//if ( ResubmitFormResponseRequestAuthenticatorService.getRequestAuthenticator( ).isRequestAuthenticated( request ))
+    	if ( ResubmitFormResponseRequestAuthenticatorService.getRequestAuthenticator( ).isRequestAuthenticated( request ))
     	{
     		String strIdHistory = request.getParameter( PARAMETER_ID_HISTORY );
             String strIdTask = request.getParameter( PARAMETER_ID_TASK );
@@ -133,14 +136,8 @@ public class ResubmitFormResponseApp implements XPageApplication
     {
     	XPage page = new XPage( );
     	
-    	List<Entry> listEntries = _resubmitFormResponseService.getListEntriesToEdit( resubmitFormResponse.getListResubmitReponseValues( ) );
-    	List<Integer> idEntries = listEntries.stream( ).map( Entry::getIdEntry ).collect( Collectors.toList( ) );
-    	
     	FormResponse formResponse = _resubmitFormResponseService.getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
-		List<Question> listQuestions = _resubmitFormResponseService.findListQuestionShownCompleteness( formResponse );
-		listQuestions = listQuestions.stream( )
-				.filter( question -> idEntries.contains( question.getEntry( ).getIdEntry( ) ) )
-				.collect( Collectors.toList( ) );
+		List<Question> listQuestions = _resubmitFormResponseService.getListQuestionToEdit( formResponse, resubmitFormResponse.getListResubmitReponseValues( ) );
 		
 		List<Step> listStep = listQuestions.stream( )
 				.map( Question::getStep )
@@ -176,6 +173,53 @@ public class ResubmitFormResponseApp implements XPageApplication
     
     private void doAction( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse ) throws SiteMessageException
     {
-    	
+    	String strAction = request.getParameter( PARAMETER_ACTION );
+
+        if ( StringUtils.isNotBlank( strAction ) )
+        {
+            if ( ACTION_DO_MODIFY_RESPONSE.equals( strAction ) )
+            {
+                if ( doEditResponse( request, resubmitFormResponse ) )
+                {
+                    // Back to home page
+                    String strUrlReturn = request.getParameter( PARAMETER_URL_RETURN );
+                    strUrlReturn = StringUtils.isNotBlank( strUrlReturn ) ? strUrlReturn : AppPathService.getBaseUrl( request );
+                    _resubmitFormResponseService.setSiteMessage( request, MESSAGE_EDITION_COMPLETE, SiteMessage.TYPE_INFO, strUrlReturn );
+                }
+            }
+        }
+    }
+    
+    /**
+     * Do edit a response
+     * 
+     * @param request
+     *            the HTTP request
+     * @param response
+     *            the response
+     * @return true if the record must be updated, false otherwise
+     * @throws SiteMessageException
+     *             a site message if there is a problem
+     */
+    private boolean doEditResponse( HttpServletRequest request, ResubmitFormResponse response ) throws SiteMessageException
+    {
+    	if ( _resubmitFormResponseService.isRecordStateValid( response, request.getLocale( ) ) )
+        {
+    		if ( _resubmitFormResponseService.doEditResponseData( request, response ) )
+    		{
+    			_resubmitFormResponseService.doChangeResponseState(response, request.getLocale( ) );
+    			
+    			_resubmitFormResponseService.doCompleteResponse(response);
+    			
+    			return true;
+    		}
+    		return false;
+        }
+    	else
+        {
+    		_resubmitFormResponseService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP,
+                    request.getParameter( PARAMETER_URL_RETURN ) );
+        }
+    	return false;
     }
 }
