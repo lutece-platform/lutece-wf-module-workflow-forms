@@ -33,7 +33,16 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
+import fr.paris.lutece.plugins.forms.business.Question;
+import fr.paris.lutece.plugins.forms.business.Step;
+import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
+import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 
 /**
@@ -73,4 +82,40 @@ public interface IFormsTaskService
      * @return the form response
      */
     FormResponse findFormResponseFrom( int nIdResource, String strResourceType );
+    
+    List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay, FormResponse formResponse, DisplayType displayType );
+    
+    /**
+     * Finds the responses that have changed
+     * 
+     * @param listEditableResponse
+     *            the list of editable responses
+     * @return the list of responses that have changed
+     */
+    List<EditableResponse> findChangedResponses( List<EditableResponse> listEditableResponse );
+    
+    /**
+     * Creates the editable responses from the specified form response and questions
+     * 
+     * @param formResponse
+     *            the form response
+     * @param listQuestion
+     *            the list of questions
+     * @param request
+     *            the request containing the user inputs
+     * @return the list of editable responses
+     */
+    List<EditableResponse> createEditableResponses( FormResponse formResponse, List<Question> listQuestion, HttpServletRequest request );
+    
+    /**
+     * Finds the responses of the specified question from the specified form response
+     * 
+     * @param formResponse
+     *            the form response
+     * @param question
+     *            the question
+     * @return the list of responses
+     */
+    List<FormQuestionResponse> findResponses( FormResponse formResponse, Question question );
+
 }

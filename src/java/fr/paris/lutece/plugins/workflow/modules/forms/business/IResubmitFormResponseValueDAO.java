@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2018, Mairie de Paris
+ * Copyright (c) 2002-2017, Mairie de Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,34 +31,47 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
+package fr.paris.lutece.plugins.workflow.modules.forms.business;
+
+import fr.paris.lutece.portal.service.plugin.Plugin;
 
 import java.util.List;
 
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
-import fr.paris.lutece.plugins.forms.business.FormResponse;
-import fr.paris.lutece.plugins.forms.business.Question;
-
 /**
- * This interface represents a service for the task {@link EditFormResponseTask}
+ *
+ * IResubmitFormResponseValueDAO
  *
  */
-public interface IEditFormResponseTaskService
+public interface IResubmitFormResponseValueDAO
 {
     /**
-     * Finds the questions to edit for the specified form response
+     * Insert new record
      * 
-     * @param formResponse
-     *            the form response
-     * @return the list of questions
+     * @param ResubmitFormResponseValue
+     *            the ResubmitFormResponseValue Object
+     * @param plugin
+     *            the plugin
      */
-    List<Question> findQuestionsToEdit( FormResponse formResponse );
+    void insert( ResubmitFormResponseValue ResubmitFormResponseValue, Plugin plugin );
 
     /**
-     * Saves the specified responses
+     * Load a ResubmitFormResponseValue by id edit record
      * 
-     * @param listFormQuestionResponse
-     *            the responses to save
+     * @param nIdHistory
+     *            the id history
+     * @param plugin
+     *            the plugin
+     * @return a list of ResubmitFormResponseValue
      */
-    void saveResponses( List<FormQuestionResponse> listFormQuestionResponse );
+    List<ResubmitFormResponseValue> load( int nIdHistory, Plugin plugin );
+
+    /**
+     * Remove by id edit record
+     * 
+     * @param nIdHistory
+     *            the id history
+     * @param plugin
+     *            the plugin
+     */
+    void delete( int nIdHistory, Plugin plugin );
 }

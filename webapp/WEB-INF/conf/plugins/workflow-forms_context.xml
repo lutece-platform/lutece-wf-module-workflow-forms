@@ -6,6 +6,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" >
 
     <!-- Services -->
+    <bean id="workflow-forms.taskResubmitResponseConfigService" class="fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService"
+		p:taskConfigDAO-ref="worklow-forms.taskResubmitFormResponseConfigDAO" />
+	<bean id="workflow-forms.taskResubmitResponseService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.ResubmitFormResponseService" />
     <bean id="workflow-forms.formsTaskService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.FormsTaskService" />
     <bean id="workflow-forms.editFormResponseTaskService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTaskService" />
     <bean id="workflow-forms.editFormResponseTaskHistoryService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTaskHistoryService" />
@@ -13,7 +16,10 @@
     <!-- DAO -->
     <bean id="worklow-forms.editFormResponseTaskHistoryDAO"
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistoryDAO" />
-
+	<bean id="worklow-forms.resubmitFormResponseDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseDAO" />
+	<bean id="worklow-forms.resubmitFormResponseValueDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseValueDAO" />
+	<bean id="worklow-forms.taskResubmitFormResponseConfigDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseTaskConfigDAO" />
+	
     <!-- Task edit form response -->
     <bean id="workflow-forms.editFormResponseTask"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTask"
@@ -30,4 +36,48 @@
         class="fr.paris.lutece.plugins.workflow.modules.forms.web.task.EditFormResponseTaskComponent"
         p:taskType-ref="workflow-forms.editFormResponseTypeTask"
         scope="prototype" />
+        
+    <!-- Task Resubmit Form Response -->
+    <bean id="workflow-forms.resubmitFormResponseTask"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.ResubmitFormResponseTask"
+        scope="prototype" />
+    <bean id="workflow-forms.resubmitFormResponseTaskConfig"
+		class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseTaskConfig"
+		scope="prototype" />
+    
+    <bean id="workflow-forms.resubmitFormResponseTypeTask"
+        class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+        p:key="resubmitFormResponseTypeTask"
+        p:titleI18nKey="module.workflow.forms.task.resubmitFormResponse.title"
+        p:beanName="workflow-forms.resubmitFormResponseTask"
+        p:configBeanName="workflow-forms.resubmitFormResponseTaskConfig"
+		p:configRequired="true"
+        p:formTaskRequired="true" />
+        
+    <bean id="workflow-forms.resubmitFormResponseTaskComponent"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.web.task.ResubmitFormResponseTaskComponent"
+        p:taskType-ref="workflow-forms.resubmitFormResponseTypeTask"
+        p:taskConfigService-ref="workflow-forms.taskResubmitResponseConfigService" />
+    
+    <!-- TaskInfoProvider -->
+	<bean id="workflow-forms.resubmitFormResponseTaskInfoProvider" class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.ResubmitFormResponseTaskInfoProvider"
+		p:taskType-ref="workflow-forms.resubmitFormResponseTypeTask" />
+	
+    <!-- Marker provider -->
+    <bean id="workflow-forms.resubmitFormResponseMarkerProvider" class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.ResubmitFormResponseMarkerProvider" />
+    
+    <!-- SignRequest -->
+	<bean id="workflow-forms.hashService" class="fr.paris.lutece.util.signrequest.security.Sha1HashService" />
+	<bean id="workflow-forms.resubmitFormResponseRequestAuthenticator" class="fr.paris.lutece.util.signrequest.RequestHashAuthenticator" >
+		<property name="hashService" ref="workflow-forms.hashService" />
+		<property name="signatureElements" > 
+			<list>
+				<value>id_history</value>
+				<value>id_task</value>
+			</list>
+		</property>
+		<property name="privateKey">
+			<value>change me</value>
+		</property>
+	</bean>
 </beans>

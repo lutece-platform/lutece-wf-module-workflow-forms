@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
 import org.apache.commons.collections.CollectionUtils;
 
 import fr.paris.lutece.plugins.forms.business.Form;
@@ -44,8 +46,13 @@ import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponseStep;
+import fr.paris.lutece.plugins.forms.business.FormResponseStepHome;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
+import fr.paris.lutece.plugins.forms.business.StepHome;
+import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
+import fr.paris.lutece.plugins.forms.util.FormsConstants;
+import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
 
 /**
  * This class is a service for the task {@link EditFormResponseTask}
@@ -53,6 +60,10 @@ import fr.paris.lutece.plugins.forms.business.QuestionHome;
  */
 public class EditFormResponseTaskService implements IEditFormResponseTaskService
 {
+	
+	@Inject
+	private IFormsTaskService _formsTaskService;
+	
     /**
      * {@inheritDoc}
      */
@@ -83,7 +94,7 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
 
         for ( Question question : listQuestion )
         {
-            List<FormQuestionResponse> listFormQuestionResponse = findResponses( formResponse, question );
+            List<FormQuestionResponse> listFormQuestionResponse = _formsTaskService.findResponses( formResponse, question );
 
             if ( CollectionUtils.isEmpty( listFormQuestionResponse ) )
             {
@@ -100,29 +111,49 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
 
         return listQuestionIteration;
     }
+    
+    public void saveResponses( List<FormQuestionResponse> listFormQuestionResponse )
+    {
+        for ( FormQuestionResponse formQuestionResponse : listFormQuestionResponse )
+        {
+            saveStep( formQuestionResponse );
+            saveResponses( formQuestionResponse );
+        }
+    }
 
     /**
-     * {@inheritDoc}
+     * Saves the step associated to the specified form question response
+     * 
+     * @param formQuestionResponse
+     *            the form question response
      */
-    @Override
-    public List<FormQuestionResponse> findResponses( FormResponse formResponse, Question question )
+    private void saveStep( FormQuestionResponse formQuestionResponse )
     {
-        List<FormQuestionResponse> listFormQuestionResponse = new ArrayList<>( );
+        List<FormResponseStep> listFormResponseStep = FormResponseStepHome.findStepsByFormResponse( formQuestionResponse.getIdFormResponse( ) );
+        boolean bFormResponseStepFound = listFormResponseStep.stream( ).anyMatch(
+                formResponseStep -> formResponseStep.getStep( ).getId( ) == formQuestionResponse.getIdStep( ) );
 
-        for ( FormResponseStep formResponseStep : formResponse.getSteps( ) )
+        if ( !bFormResponseStepFound )
         {
-            if ( formResponseStep.getStep( ).getId( ) == question.getIdStep( ) )
-            {
-                for ( FormQuestionResponse formQuestionResponse : formResponseStep.getQuestions( ) )
-                {
-                    if ( formQuestionResponse.getQuestion( ).getId( ) == question.getId( ) )
-                    {
-                        listFormQuestionResponse.add( formQuestionResponse );
-                    }
-                }
-            }
-        }
+            FormResponseStep formResponseStep = new FormResponseStep( );
+            formResponseStep.setFormResponseId( formQuestionResponse.getIdFormResponse( ) );
+            formResponseStep.setStep( StepHome.findByPrimaryKey( formQuestionResponse.getIdStep( ) ) );
+            formResponseStep.setOrder( FormsConstants.ORDER_NOT_SET );
 
-        return listFormQuestionResponse;
+            FormResponseStepHome.create( formResponseStep );
+        }
+    }
+
+    /**
+     * Saves the question associated to the specified form question response
+     * 
+     * @param formQuestionResponse
+     *            the form question response
+     */
+    private void saveResponses( FormQuestionResponse formQuestionResponse )
+    {
+        Question question = formQuestionResponse.getQuestion( );
+        IEntryDataService dataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
+        dataService.save( formQuestionResponse );
     }
 }

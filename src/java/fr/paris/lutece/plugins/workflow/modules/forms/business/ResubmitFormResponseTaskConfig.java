@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2018, Mairie de Paris
+ * Copyright (c) 2002-2017, Mairie de Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,34 +31,64 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
+package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
-import java.util.List;
+import fr.paris.lutece.plugins.workflowcore.business.config.TaskConfig;
 
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
-import fr.paris.lutece.plugins.forms.business.FormResponse;
-import fr.paris.lutece.plugins.forms.business.Question;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 /**
- * This interface represents a service for the task {@link EditFormResponseTask}
+ *
+ * TaskResubmitFormResponseConfig
  *
  */
-public interface IEditFormResponseTaskService
+public class ResubmitFormResponseTaskConfig extends TaskConfig
 {
-    /**
-     * Finds the questions to edit for the specified form response
-     * 
-     * @param formResponse
-     *            the form response
-     * @return the list of questions
-     */
-    List<Question> findQuestionsToEdit( FormResponse formResponse );
+    @NotNull
+    @Min( 1 )
+    private int _nIdStateAfterEdition;
+    private String _strDefaultMessage;
 
     /**
-     * Saves the specified responses
+     * Set the id state after edition
      * 
-     * @param listFormQuestionResponse
-     *            the responses to save
+     * @param nIdStateAfterEdition
+     *            the id state after edition
      */
-    void saveResponses( List<FormQuestionResponse> listFormQuestionResponse );
+    public void setIdStateAfterEdition( int nIdStateAfterEdition )
+    {
+        _nIdStateAfterEdition = nIdStateAfterEdition;
+    }
+
+    /**
+     * Get the id state after edition
+     * 
+     * @return the id state after edition
+     */
+    public int getIdStateAfterEdition( )
+    {
+        return _nIdStateAfterEdition;
+    }
+
+    /**
+     * Set the default message
+     * 
+     * @param strDefaultMessage
+     *            the default message
+     */
+    public void setDefaultMessage( String strDefaultMessage )
+    {
+        _strDefaultMessage = strDefaultMessage;
+    }
+
+    /**
+     * Get the default message
+     * 
+     * @return the default message
+     */
+    public String getDefaultMessage( )
+    {
+        return _strDefaultMessage;
+    }
 }

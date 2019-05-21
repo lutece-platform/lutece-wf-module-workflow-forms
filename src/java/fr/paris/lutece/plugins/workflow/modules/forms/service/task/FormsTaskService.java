@@ -33,10 +33,27 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
-import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.collections.CollectionUtils;
+
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponseHome;
+import fr.paris.lutece.plugins.forms.business.FormResponseStep;
+import fr.paris.lutece.plugins.forms.business.Question;
+import fr.paris.lutece.plugins.forms.business.Step;
+import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
+import fr.paris.lutece.plugins.forms.web.StepDisplayTree;
+import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
+import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
+import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.portal.service.util.AppException;
@@ -88,5 +105,108 @@ public class FormsTaskService implements IFormsTaskService
         }
 
         return formResponse;
+    }
+    
+    @Override
+	public List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay,
+	            FormResponse formResponse, DisplayType displayType )
+	{
+		List<String> listFormDisplayTrees = new ArrayList<>( );
+
+		List<FormQuestionResponse> listFormQuestionResponse = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
+		List<Integer> listQuestionToDisplayId = listQuestionToDisplay.stream( ).map( question -> question.getId( ) ).collect( Collectors.toList( ) );
+
+		listFormQuestionResponse.stream( ).filter( formQuestionResponse -> listQuestionToDisplayId.contains( formQuestionResponse.getQuestion( ).getId( ) ) );
+
+		if ( !CollectionUtils.isEmpty( listStep ) )
+		{
+				for ( Step step : listStep )
+				{
+					int nIdStep = step.getId( );
+
+					StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, formResponse );
+					listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, listFormQuestionResponse, request.getLocale( ),
+	                		displayType ) );
+				}
+		}
+
+		return listFormDisplayTrees;
+	}
+    
+    @Override
+    public List<EditableResponse> findChangedResponses( List<EditableResponse> listEditableResponse )
+    {
+        List<EditableResponse> listChangedResponse = new ArrayList<>( );
+
+        for ( EditableResponse editableResponse : listEditableResponse )
+        {
+            IEntryDataService dataService = EntryServiceManager.getInstance( ).getEntryDataService( editableResponse.getQuestion( ).getEntry( ).getEntryType( ) );
+
+            if ( dataService.isResponseChanged( editableResponse.getResponseSaved( ), editableResponse.getResponseFromForm( ) ) )
+            {
+                listChangedResponse.add( editableResponse );
+            }
+        }
+
+        return listChangedResponse;
+    }
+    
+    @Override
+    public List<EditableResponse> createEditableResponses( FormResponse formResponse, List<Question> listQuestion, HttpServletRequest request )
+    {
+        List<EditableResponse> listEditableResponse = new ArrayList<>( );
+
+        for ( Question question : listQuestion )
+        {
+            IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
+            FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, false );
+            responseFromForm.setIdFormResponse( formResponse.getId( ) );
+            FormQuestionResponse responseSaved = findSavedResponse( formResponse, question );
+
+            EditableResponse editableResponse = new EditableResponse( responseSaved, responseFromForm );
+            listEditableResponse.add( editableResponse );
+        }
+
+        return listEditableResponse;
+    }
+    
+    private FormQuestionResponse findSavedResponse( FormResponse formResponse, Question question )
+    {
+        FormQuestionResponse formQuestionResponse = null;
+
+        List<FormQuestionResponse> listResponseSaved = findResponses( formResponse, question );
+
+        for ( FormQuestionResponse responseSaved : listResponseSaved )
+        {
+            if ( responseSaved.getQuestion( ).getIterationNumber( ) == question.getIterationNumber( ) )
+            {
+                formQuestionResponse = responseSaved;
+                break;
+            }
+        }
+
+        return formQuestionResponse;
+    }
+    
+    @Override
+    public List<FormQuestionResponse> findResponses( FormResponse formResponse, Question question )
+    {
+        List<FormQuestionResponse> listFormQuestionResponse = new ArrayList<>( );
+
+        for ( FormResponseStep formResponseStep : formResponse.getSteps( ) )
+        {
+            if ( formResponseStep.getStep( ).getId( ) == question.getIdStep( ) )
+            {
+                for ( FormQuestionResponse formQuestionResponse : formResponseStep.getQuestions( ) )
+                {
+                    if ( formQuestionResponse.getQuestion( ).getId( ) == question.getId( ) )
+                    {
+                        listFormQuestionResponse.add( formQuestionResponse );
+                    }
+                }
+            }
+        }
+
+        return listFormQuestionResponse;
     }
 }
