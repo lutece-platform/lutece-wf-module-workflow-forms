@@ -44,15 +44,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
-import fr.paris.lutece.plugins.forms.business.FormResponseStep;
-import fr.paris.lutece.plugins.forms.business.FormResponseStepHome;
 import fr.paris.lutece.plugins.forms.business.Question;
-import fr.paris.lutece.plugins.forms.business.StepHome;
-import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
-import fr.paris.lutece.plugins.forms.util.FormsConstants;
-import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
+import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
 import fr.paris.lutece.portal.business.file.File;
 import fr.paris.lutece.portal.business.file.FileHome;
 import fr.paris.lutece.portal.service.i18n.I18nService;
@@ -110,16 +105,16 @@ public class EditFormResponseTask extends AbstractFormsTask
     public void processTask( FormResponse formResponse, HttpServletRequest request, Locale locale )
     {
         List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( formResponse );
-        List<EditableResponse> listEditableResponse = createEditableResponses( formResponse, listQuestion, request );
-        _listChangedResponse = findChangedResponses( listEditableResponse );
+        List<EditableResponse> listEditableResponse = _formsTaskService.createEditableResponses( formResponse, listQuestion, request );
+        _listChangedResponse = _formsTaskService.findChangedResponses( listEditableResponse );
         List<FormQuestionResponse> listChangedResponseToSave = new ArrayList<>( );
 
         for ( EditableResponse editableResponse : _listChangedResponse )
         {
-            listChangedResponseToSave.add( editableResponse._responseFromForm );
+            listChangedResponseToSave.add( editableResponse.getResponseFromForm( ) );
         }
 
-        saveResponses( listChangedResponseToSave );
+        _editFormResponseTaskService.saveResponses( listChangedResponseToSave );
     }
 
     @Override
@@ -128,15 +123,15 @@ public class EditFormResponseTask extends AbstractFormsTask
         for ( EditableResponse editableResponse : _listChangedResponse )
         {
             EditFormResponseTaskHistory editFormResponseTaskHistory = new EditFormResponseTaskHistory( );
-            editFormResponseTaskHistory.setQuestion( editableResponse._question );
+            editFormResponseTaskHistory.setQuestion( editableResponse.getQuestion( ) );
             editFormResponseTaskHistory.setIdTask( getId( ) );
             editFormResponseTaskHistory.setIdHistory( nIdHistory );
 
             String previousValue = StringUtils.EMPTY;
-            editFormResponseTaskHistory.setPreviousValue( createPreviousNewValue( editableResponse._responseSaved, previousValue ) );
+            editFormResponseTaskHistory.setPreviousValue( createPreviousNewValue( editableResponse.getResponseSaved( ), previousValue ) );
 
             String newValue = StringUtils.EMPTY;
-            editFormResponseTaskHistory.setNewValue( createPreviousNewValue( editableResponse._responseFromForm, newValue ) );
+            editFormResponseTaskHistory.setNewValue( createPreviousNewValue( editableResponse.getResponseFromForm( ), newValue ) );
 
             _editFormResponseTaskHistoryService.create( editFormResponseTaskHistory );
         }
@@ -186,168 +181,4 @@ public class EditFormResponseTask extends AbstractFormsTask
         }
         return value;
     }
-
-    /**
-     * Creates the editable responses from the specified form response and questions
-     * 
-     * @param formResponse
-     *            the form response
-     * @param listQuestion
-     *            the list of questions
-     * @param request
-     *            the request containing the user inputs
-     * @return the list of editable responses
-     */
-    private List<EditableResponse> createEditableResponses( FormResponse formResponse, List<Question> listQuestion, HttpServletRequest request )
-    {
-        List<EditableResponse> listEditableResponse = new ArrayList<>( );
-
-        for ( Question question : listQuestion )
-        {
-            IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
-            FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, false );
-            responseFromForm.setIdFormResponse( formResponse.getId( ) );
-            FormQuestionResponse responseSaved = findSavedResponse( formResponse, question );
-
-            EditableResponse editableResponse = new EditableResponse( responseSaved, responseFromForm );
-            listEditableResponse.add( editableResponse );
-        }
-
-        return listEditableResponse;
-    }
-
-    /**
-     * Finds the saved responses of the specified question
-     * 
-     * @param formResponse
-     *            the form response containing the saved responses
-     * @param question
-     *            the question
-     * @return the saved responses
-     */
-    private FormQuestionResponse findSavedResponse( FormResponse formResponse, Question question )
-    {
-        FormQuestionResponse formQuestionResponse = null;
-
-        List<FormQuestionResponse> listResponseSaved = _editFormResponseTaskService.findResponses( formResponse, question );
-
-        for ( FormQuestionResponse responseSaved : listResponseSaved )
-        {
-            if ( responseSaved.getQuestion( ).getIterationNumber( ) == question.getIterationNumber( ) )
-            {
-                formQuestionResponse = responseSaved;
-                break;
-            }
-        }
-
-        return formQuestionResponse;
-    }
-
-    /**
-     * Finds the responses that have changed
-     * 
-     * @param listEditableResponse
-     *            the list of editable responses
-     * @return the list of responses that have changed
-     */
-    private List<EditableResponse> findChangedResponses( List<EditableResponse> listEditableResponse )
-    {
-        List<EditableResponse> listChangedResponse = new ArrayList<>( );
-
-        for ( EditableResponse editableResponse : listEditableResponse )
-        {
-            IEntryDataService dataService = EntryServiceManager.getInstance( ).getEntryDataService( editableResponse._question.getEntry( ).getEntryType( ) );
-
-            if ( dataService.isResponseChanged( editableResponse._responseSaved, editableResponse._responseFromForm ) )
-            {
-                listChangedResponse.add( editableResponse );
-            }
-        }
-
-        return listChangedResponse;
-    }
-
-    /**
-     * Saves the specified responses
-     * 
-     * @param listFormQuestionResponse
-     *            the responses to save
-     */
-    private void saveResponses( List<FormQuestionResponse> listFormQuestionResponse )
-    {
-        for ( FormQuestionResponse formQuestionResponse : listFormQuestionResponse )
-        {
-            saveStep( formQuestionResponse );
-            saveResponses( formQuestionResponse );
-        }
-    }
-
-    /**
-     * Saves the step associated to the specified form question response
-     * 
-     * @param formQuestionResponse
-     *            the form question response
-     */
-    private void saveStep( FormQuestionResponse formQuestionResponse )
-    {
-        List<FormResponseStep> listFormResponseStep = FormResponseStepHome.findStepsByFormResponse( formQuestionResponse.getIdFormResponse( ) );
-        boolean bFormResponseStepFound = listFormResponseStep.stream( ).anyMatch(
-                formResponseStep -> formResponseStep.getStep( ).getId( ) == formQuestionResponse.getIdStep( ) );
-
-        if ( !bFormResponseStepFound )
-        {
-            FormResponseStep formResponseStep = new FormResponseStep( );
-            formResponseStep.setFormResponseId( formQuestionResponse.getIdFormResponse( ) );
-            formResponseStep.setStep( StepHome.findByPrimaryKey( formQuestionResponse.getIdStep( ) ) );
-            formResponseStep.setOrder( FormsConstants.ORDER_NOT_SET );
-
-            FormResponseStepHome.create( formResponseStep );
-        }
-    }
-
-    /**
-     * Saves the question associated to the specified form question response
-     * 
-     * @param formQuestionResponse
-     *            the form question response
-     */
-    private void saveResponses( FormQuestionResponse formQuestionResponse )
-    {
-        Question question = formQuestionResponse.getQuestion( );
-        IEntryDataService dataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
-        dataService.save( formQuestionResponse );
-    }
-
-    /**
-     * This class represents an editable response
-     *
-     */
-    private static class EditableResponse
-    {
-        private final Question _question;
-        private final FormQuestionResponse _responseSaved;
-        private final FormQuestionResponse _responseFromForm;
-
-        /**
-         * Constructor
-         * 
-         * @param responseSaved
-         *            the saved response
-         * @param responseFromForm
-         *            the response from the form
-         */
-        EditableResponse( FormQuestionResponse responseSaved, FormQuestionResponse responseFromForm )
-        {
-            _responseSaved = responseSaved;
-            _responseFromForm = responseFromForm;
-
-            if ( responseSaved != null )
-            {
-                responseFromForm.setId( responseSaved.getId( ) );
-            }
-
-            _question = _responseFromForm.getQuestion( );
-        }
-    }
-
 }

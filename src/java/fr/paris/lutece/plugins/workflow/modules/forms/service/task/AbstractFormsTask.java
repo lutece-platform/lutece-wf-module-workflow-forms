@@ -47,7 +47,7 @@ import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
  */
 public abstract class AbstractFormsTask extends SimpleTask
 {
-    private final IFormsTaskService _formsTaskService;
+    protected final IFormsTaskService _formsTaskService;
 
     /**
      * Constructor

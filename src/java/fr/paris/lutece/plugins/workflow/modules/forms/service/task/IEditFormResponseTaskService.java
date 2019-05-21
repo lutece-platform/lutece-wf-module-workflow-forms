@@ -55,13 +55,10 @@ public interface IEditFormResponseTaskService
     List<Question> findQuestionsToEdit( FormResponse formResponse );
 
     /**
-     * Finds the responses of the specified question from the specified form response
+     * Saves the specified responses
      * 
-     * @param formResponse
-     *            the form response
-     * @param question
-     *            the question
-     * @return the list of responses
+     * @param listFormQuestionResponse
+     *            the responses to save
      */
-    List<FormQuestionResponse> findResponses( FormResponse formResponse, Question question );
+    void saveResponses( List<FormQuestionResponse> listFormQuestionResponse );
 }
