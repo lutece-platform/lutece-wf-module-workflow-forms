@@ -22,7 +22,6 @@ import fr.paris.lutece.plugins.workflowcore.service.task.Task;
 
 public class ResubmitFormResponseTask extends Task {
 
-	private static final String PARAMETER_MESSAGE = "message_";
 	private static final String PARAMETER_IDS_ENTRY = "ids_entry";
 	
 	@Inject
@@ -38,7 +37,6 @@ public class ResubmitFormResponseTask extends Task {
 	@Override
 	public void processTask(int nIdResourceHistory, HttpServletRequest request, Locale locale)
 	{
-		String strMessage = request.getParameter( PARAMETER_MESSAGE + getId( ) );
         String [ ] listIdsEntry = request.getParameterValues( PARAMETER_IDS_ENTRY );
 
         boolean bCreate = false;
@@ -68,6 +66,9 @@ public class ResubmitFormResponseTask extends Task {
                 }
             }
         }
+        
+        ResubmitFormResponseTaskConfig config = _taskResubmitResponseConfigService.findByPrimaryKey( getId( ) );
+        String strMessage = config.getDefaultMessage( );
         
         resubmitFormResponse.setMessage( StringUtils.isNotBlank( strMessage ) ? strMessage : StringUtils.EMPTY );
         resubmitFormResponse.setListResubmitReponseValues( listResubmitFormResponseValues );
