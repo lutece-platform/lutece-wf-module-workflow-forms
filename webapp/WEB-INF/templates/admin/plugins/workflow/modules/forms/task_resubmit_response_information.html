@@ -1,6 +1,5 @@
 <#if config?exists>
     <#if edit_response?exists>
-    	<p>#i18n{module.workflow.forms.task_resubmit_response_information.label_message} : 
 	    <#if edit_response.message??>${edit_response.message}</#if></p>
 		<p>#i18n{module.workflow.forms.task_resubmit_response_information.label_is_complete}</p>
 	    <#if edit_response.isComplete(  )>
