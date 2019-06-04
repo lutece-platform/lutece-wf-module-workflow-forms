@@ -3,6 +3,7 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service.provider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -79,8 +80,14 @@ public class ResubmitFormResponseMarkerProvider implements IMarkerProvider
     public Collection<InfoMarker> provideMarkerValues( ResourceHistory resourceHistory, ITask task, HttpServletRequest request )
     {
         List<InfoMarker> listMarkers = new ArrayList<>( );
+        
+        Locale locale = Locale.getDefault( );
+        if ( request != null )
+        {
+        	locale = request.getLocale( );
+        }
 
-        for ( ITask taskOther : _taskService.getListTaskByIdAction( resourceHistory.getAction( ).getId( ), request.getLocale( ) ) )
+        for ( ITask taskOther : _taskService.getListTaskByIdAction( resourceHistory.getAction( ).getId( ), locale ) )
         {
             if ( taskOther.getTaskType( ).getKey( ).equals( _resubmitFormResponseTaskInfoProvider.getTaskType( ).getKey( ) ) )
             {

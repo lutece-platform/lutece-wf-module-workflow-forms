@@ -51,6 +51,7 @@
         p:titleI18nKey="module.workflow.forms.task.resubmitFormResponse.title"
         p:beanName="workflow-forms.resubmitFormResponseTask"
         p:configBeanName="workflow-forms.resubmitFormResponseTaskConfig"
+        p:taskForAutomaticAction="true"
 		p:configRequired="true"
         p:formTaskRequired="true" />
         
