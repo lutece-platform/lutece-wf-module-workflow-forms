@@ -37,8 +37,6 @@ public class ResubmitFormResponseTask extends Task {
 	@Override
 	public void processTask(int nIdResourceHistory, HttpServletRequest request, Locale locale)
 	{
-        String [ ] listIdsEntry = request.getParameterValues( PARAMETER_IDS_ENTRY );
-
         boolean bCreate = false;
         List<ResubmitFormResponseValue> listResubmitFormResponseValues = new ArrayList<>( );
         
@@ -52,17 +50,22 @@ public class ResubmitFormResponseTask extends Task {
             bCreate = true;
         }
         
-        if ( listIdsEntry != null )
+        if ( request != null )
         {
-            for ( String strIdEntry : listIdsEntry )
+        	String [ ] listIdsEntry = request.getParameterValues( PARAMETER_IDS_ENTRY );
+        	
+        	if ( listIdsEntry != null )
             {
-                if ( StringUtils.isNotBlank( strIdEntry ) && StringUtils.isNumeric( strIdEntry ) )
+                for ( String strIdEntry : listIdsEntry )
                 {
-                    int nIdEntry = Integer.parseInt( strIdEntry );
-                    ResubmitFormResponseValue editRecordValue = new ResubmitFormResponseValue( );
-                    editRecordValue.setIdEntry( nIdEntry );
+                    if ( StringUtils.isNotBlank( strIdEntry ) && StringUtils.isNumeric( strIdEntry ) )
+                    {
+                        int nIdEntry = Integer.parseInt( strIdEntry );
+                        ResubmitFormResponseValue editRecordValue = new ResubmitFormResponseValue( );
+                        editRecordValue.setIdEntry( nIdEntry );
 
-                    listResubmitFormResponseValues.add( editRecordValue );
+                        listResubmitFormResponseValues.add( editRecordValue );
+                    }
                 }
             }
         }
