@@ -48,6 +48,7 @@ import fr.paris.lutece.plugins.forms.business.FormResponseStep;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.business.StepHome;
+import fr.paris.lutece.plugins.forms.business.TransitionHome;
 import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.util.FormsConstants;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
@@ -199,7 +200,7 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
         //Add the steps that are editable but not in the actuel form response flow
         for ( Integer nIdStep : listStepId )
         {
-            if ( !listStepsOrdered.contains( nIdStep ) )
+            if ( !listStepsOrdered.contains( nIdStep ) && TransitionHome.getTransitionsListFromStep( nIdStep ).isEmpty( ) )
             {
                 listStepsOrdered.add( nIdStep );
             }
