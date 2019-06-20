@@ -38,8 +38,11 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormResponse;
+import fr.paris.lutece.plugins.forms.service.FormService;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
+import javax.inject.Inject;
 
 /**
  * This abstract class is represents a task for the plugin-forms
@@ -48,6 +51,9 @@ import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
 public abstract class AbstractFormsTask extends SimpleTask
 {
     protected final IFormsTaskService _formsTaskService;
+    @Inject
+    private static FormService _formService = SpringContextService.getBean( FormService.BEAN_NAME );
+    
 
     /**
      * Constructor
@@ -75,6 +81,7 @@ public abstract class AbstractFormsTask extends SimpleTask
             FormResponse formResponse = _formsTaskService.findFormResponseFrom( resourceHistory );
             processTask( formResponse, request, locale );
             saveTaskInformation( nIdHistory );
+            _formService.fireFormResponseEventUpdate( formResponse );
         }
 
     }
