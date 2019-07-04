@@ -51,6 +51,7 @@ import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
+import fr.paris.lutece.plugins.forms.service.FormService;
 import fr.paris.lutece.plugins.forms.util.FormsConstants;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
 
@@ -63,6 +64,9 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
 	
 	@Inject
 	private IFormsTaskService _formsTaskService;
+	
+	@Inject
+	private FormService _formService;
 	
     /**
      * {@inheritDoc}
@@ -112,13 +116,14 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
         return listQuestionIteration;
     }
     
-    public void saveResponses( List<FormQuestionResponse> listFormQuestionResponse )
+    public void saveResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse )
     {
         for ( FormQuestionResponse formQuestionResponse : listFormQuestionResponse )
         {
             saveStep( formQuestionResponse );
             saveResponses( formQuestionResponse );
         }
+        _formService.fireFormResponseEventUpdate( formResponse );
     }
 
     /**
