@@ -319,7 +319,7 @@ public class ResubmitFormResponseService implements IResubmitFormResponseService
             listChangedResponseToSave.add( editableResponse.getResponseFromForm( ) );
         }
 
-        _editFormResponseTaskService.saveResponses( listChangedResponseToSave );
+        _editFormResponseTaskService.saveResponses( response, listChangedResponseToSave );
 		
 		return true;
 	}

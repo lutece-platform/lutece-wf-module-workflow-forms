@@ -68,7 +68,7 @@ public class EditFormResponseTask extends AbstractFormsTask
     private final IEditFormResponseTaskHistoryService _editFormResponseTaskHistoryService;
 
     private List<EditableResponse> _listChangedResponse = new ArrayList<>( );
-
+    
     /**
      * Constructor
      * 
@@ -114,7 +114,7 @@ public class EditFormResponseTask extends AbstractFormsTask
             listChangedResponseToSave.add( editableResponse.getResponseFromForm( ) );
         }
 
-        _editFormResponseTaskService.saveResponses( listChangedResponseToSave );
+        _editFormResponseTaskService.saveResponses( formResponse, listChangedResponseToSave );
     }
 
     @Override

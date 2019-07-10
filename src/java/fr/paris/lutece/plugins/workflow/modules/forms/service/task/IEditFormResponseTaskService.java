@@ -60,5 +60,5 @@ public interface IEditFormResponseTaskService
      * @param listFormQuestionResponse
      *            the responses to save
      */
-    void saveResponses( List<FormQuestionResponse> listFormQuestionResponse );
+    void saveResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse );
 }
