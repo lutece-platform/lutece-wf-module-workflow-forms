@@ -35,7 +35,6 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -53,6 +52,7 @@ import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.web.StepDisplayTree;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
+import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
@@ -114,12 +114,26 @@ public class FormsTaskService implements IFormsTaskService
 		List<String> listFormDisplayTrees = new ArrayList<>( );
 
 		List<FormQuestionResponse> listFormQuestionResponse = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
-		List<Integer> listQuestionToDisplayId = listQuestionToDisplay.stream( ).map( question -> question.getId( ) ).collect( Collectors.toList( ) );
 
-		listFormQuestionResponse = listFormQuestionResponse.stream( )
-				.filter( formQuestionResponse -> listQuestionToDisplayId.contains( formQuestionResponse.getQuestion( ).getId( ) ) )
-				.collect( Collectors.toList( ) );
-
+		List<FormQuestionResponse> filteredListFormQuestionResponse = new ArrayList<>( listQuestionToDisplay.size( ) );
+		for ( Question question : listQuestionToDisplay )
+		{
+			FormQuestionResponse fqr = listFormQuestionResponse.stream( )
+					.filter( formQuestionResponse -> question.getId( ) == formQuestionResponse.getQuestion( ).getId( ) )
+					.findFirst( ).orElse( null );
+			if ( fqr == null )
+			{
+				fqr = new FormQuestionResponse( );
+				fqr.setQuestion( question );
+				
+				List<Response> listResponse = new ArrayList<>( );
+				listResponse.add( new Response( ) );
+				listResponse.get( 0 ).setEntry( question.getEntry( ) );
+				fqr.setEntryResponse( listResponse );
+			}
+			filteredListFormQuestionResponse.add( fqr );
+		}
+		
 		if ( !CollectionUtils.isEmpty( listStep ) )
 		{
 				for ( Step step : listStep )
@@ -127,7 +141,7 @@ public class FormsTaskService implements IFormsTaskService
 					int nIdStep = step.getId( );
 
 					StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, formResponse );
-					listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, listFormQuestionResponse, request.getLocale( ),
+					listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, filteredListFormQuestionResponse, request.getLocale( ),
 	                		displayType ) );
 				}
 		}
