@@ -2,6 +2,7 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -36,6 +37,10 @@ public class CompleteFormResponseService implements ICompleteFormResponseService
 	public List<Question> findListQuestionWithoutResponse( FormResponse formResponse )
 	{
 		List<Question> listQuestionForm = QuestionHome.getListQuestionByIdForm( formResponse.getFormId( ) );
+		listQuestionForm = listQuestionForm.stream( )
+				.filter( question -> !question.getEntry( ).isOnlyDisplayInBack( ) && !question.getEntry( ).getEntryType( ).getComment( ) )
+				.collect( Collectors.toList( ) );
+		
 		List<FormQuestionResponse> listFormQuestionResponses = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
 		
 		List<Question> listQuestionWithoutResponse = new ArrayList<>( );
