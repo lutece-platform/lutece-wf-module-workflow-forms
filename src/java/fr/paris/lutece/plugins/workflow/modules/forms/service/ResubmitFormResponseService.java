@@ -9,13 +9,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
-
 import fr.paris.lutece.plugins.forms.business.Form;
 import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
-import fr.paris.lutece.plugins.forms.business.FormResponseHome;
 import fr.paris.lutece.plugins.forms.business.IFormResponseDAO;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
@@ -32,19 +29,16 @@ import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskSer
 import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflowcore.business.action.Action;
-import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflow;
 import fr.paris.lutece.plugins.workflowcore.business.state.State;
 import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
-import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowService;
 import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
 import fr.paris.lutece.portal.service.message.SiteMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
-import fr.paris.lutece.portal.service.message.SiteMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.workflow.WorkflowService;
 
@@ -76,9 +70,6 @@ public class ResubmitFormResponseService implements IResubmitFormResponseService
 	
 	@Inject
 	private IFormResponseDAO formResponseDAO;
-	
-	@Inject
-    private IResourceHistoryService _resourceHistoryService;
 	
 	@Inject
     @Named( "workflow-forms.taskResubmitResponseConfigService" )
@@ -203,33 +194,6 @@ public class ResubmitFormResponseService implements IResubmitFormResponseService
 	}
 	
 	@Override
-	public void setSiteMessage( HttpServletRequest request, String strMessage, int nTypeMessage, String strUrlReturn) throws SiteMessageException
-	{
-		if ( StringUtils.isNotBlank( strUrlReturn ) )
-		{
-			SiteMessageService.setMessage( request, strMessage, nTypeMessage, strUrlReturn );
-		}
-		else
-		{
-			SiteMessageService.setMessage( request, strMessage, nTypeMessage );
-		}
-	}
-	
-	@Override
-    public FormResponse getFormResponseFromIdHistory( int nIdHistory )
-    {
-		FormResponse response = null;
-        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdHistory );
-
-        if ( resourceHistory != null && FormResponse.RESOURCE_TYPE.equals( resourceHistory.getResourceType( ) ) )
-        {
-        	response = FormResponseHome.findByPrimaryKey( resourceHistory.getIdResource( ) );
-        }
-
-        return response;
-    }
-	
-	@Override
     public boolean isRecordStateValid( ResubmitFormResponse resubmitFormResponse, Locale locale )
     {
         boolean bIsValid = false;
@@ -243,7 +207,7 @@ public class ResubmitFormResponseService implements IResubmitFormResponseService
 
             if ( ( action != null ) && ( action.getStateAfter( ) != null ) )
             {
-            	FormResponse formResponse = getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
+            	FormResponse formResponse = _formsTaskService.getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
 
                 // Update Resource
                 ResourceWorkflow resourceWorkflow = _resourceWorkflowService.findByPrimaryKey( formResponse.getId( ), FormResponse.RESOURCE_TYPE, action
@@ -279,10 +243,10 @@ public class ResubmitFormResponseService implements IResubmitFormResponseService
 	 
 	@Override
 	public boolean doEditResponseData( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse ) throws SiteMessageException {
-		FormResponse response = getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
+		FormResponse response = _formsTaskService.getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
 		if ( response == null)
 		{
-			setSiteMessage( request, MESSAGE_APP_ERROR, SiteMessage.TYPE_STOP, request.getParameter( PARAMETER_URL_RETURN ) );
+			_formsTaskService.setSiteMessage( request, MESSAGE_APP_ERROR, SiteMessage.TYPE_STOP, request.getParameter( PARAMETER_URL_RETURN ) );
 
 	        return false;
 		}
@@ -315,7 +279,7 @@ public class ResubmitFormResponseService implements IResubmitFormResponseService
 
             if ( state != null && action != null )
             {
-            	FormResponse response = getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
+            	FormResponse response = _formsTaskService.getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
 
                 // Update Resource
                 ResourceWorkflow resourceWorkflow = _resourceWorkflowService.findByPrimaryKey( response.getId( ), FormResponse.RESOURCE_TYPE, action

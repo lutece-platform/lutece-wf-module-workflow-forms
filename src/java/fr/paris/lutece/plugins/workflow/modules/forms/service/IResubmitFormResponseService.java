@@ -87,22 +87,6 @@ public interface IResubmitFormResponseService {
    void update( ResubmitFormResponse resubmitFormResponse );
    
    /**
-    * Set the site message
-    * 
-    * @param request
-    *            the HTTP request
-    * @param strMessage
-    *            the message
-    * @param nTypeMessage
-    *            the message type
-    * @param strUrlReturn
-    *            the url return
-    * @throws SiteMessageException
-    *             the site message
-    */
-   void setSiteMessage( HttpServletRequest request, String strMessage, int nTypeMessage, String strUrlReturn ) throws SiteMessageException;
-
-   /**
     * Check if the response has the same state before executing the action
     * 
     * @param resubmitFormResponse
@@ -112,15 +96,6 @@ public interface IResubmitFormResponseService {
     * @return true if the record has a valid state, false otherwise
     */
    boolean isRecordStateValid( ResubmitFormResponse resubmitFormResponse, Locale locale );
-   
-   /**
-    * Get the FormResponse from a given id history
-    * 
-    * @param nIdHistory
-    *            the id history
-    * @return the FormResponse
-    */
-   FormResponse getFormResponseFromIdHistory( int nIdHistory );
    
    /**
     * Get the list of questions to edit

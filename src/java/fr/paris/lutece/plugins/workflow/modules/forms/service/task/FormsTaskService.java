@@ -62,6 +62,8 @@ import fr.paris.lutece.plugins.workflowcore.business.state.StateFilter;
 import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
+import fr.paris.lutece.portal.service.message.SiteMessageException;
+import fr.paris.lutece.portal.service.message.SiteMessageService;
 import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.util.ReferenceList;
 
@@ -244,4 +246,31 @@ public class FormsTaskService implements IFormsTaskService
 
         return referenceListStates;
 	}
+    
+    @Override
+	public void setSiteMessage( HttpServletRequest request, String strMessage, int nTypeMessage, String strUrlReturn) throws SiteMessageException
+	{
+		if ( StringUtils.isNotBlank( strUrlReturn ) )
+		{
+			SiteMessageService.setMessage( request, strMessage, nTypeMessage, strUrlReturn );
+		}
+		else
+		{
+			SiteMessageService.setMessage( request, strMessage, nTypeMessage );
+		}
+	}
+    
+    @Override
+    public FormResponse getFormResponseFromIdHistory( int nIdHistory )
+    {
+		FormResponse response = null;
+        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdHistory );
+
+        if ( resourceHistory != null && FormResponse.RESOURCE_TYPE.equals( resourceHistory.getResourceType( ) ) )
+        {
+        	response = FormResponseHome.findByPrimaryKey( resourceHistory.getIdResource( ) );
+        }
+
+        return response;
+    }
 }

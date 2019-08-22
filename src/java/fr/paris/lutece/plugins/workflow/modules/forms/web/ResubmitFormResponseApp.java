@@ -96,25 +96,25 @@ public class ResubmitFormResponseApp implements XPageApplication
                      }
                 	 else
                 	 {
-                		 _resubmitFormResponseService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP,
+                		 _formsTaskService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP,
                                  request.getParameter( PARAMETER_URL_RETURN ) );
                 	 }
                 }
                 else
                 {
-                	_resubmitFormResponseService.setSiteMessage( request, MESSAGE_RECORD_ALREADY_COMPLETED, SiteMessage.TYPE_INFO,
+                	_formsTaskService.setSiteMessage( request, MESSAGE_RECORD_ALREADY_COMPLETED, SiteMessage.TYPE_INFO,
                             request.getParameter( PARAMETER_URL_RETURN ) );
                 }
             }
             else
             {
-            	_resubmitFormResponseService.setSiteMessage( request, Messages.MANDATORY_FIELDS, SiteMessage.TYPE_STOP,
+            	_formsTaskService.setSiteMessage( request, Messages.MANDATORY_FIELDS, SiteMessage.TYPE_STOP,
                          request.getParameter( PARAMETER_URL_RETURN ) );
             }
     	}
     	else 
     	{
-    		_resubmitFormResponseService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP,
+    		_formsTaskService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP,
                      request.getParameter( PARAMETER_URL_RETURN ) );
     	}
     	
@@ -136,7 +136,7 @@ public class ResubmitFormResponseApp implements XPageApplication
     {
     	XPage page = new XPage( );
     	
-    	FormResponse formResponse = _resubmitFormResponseService.getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
+    	FormResponse formResponse = _formsTaskService.getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
 		List<Question> listQuestions = _resubmitFormResponseService.getListQuestionToEdit( formResponse, resubmitFormResponse.getListResubmitReponseValues( ) );
 		
 		List<Step> listStep = listQuestions.stream( )
@@ -184,7 +184,7 @@ public class ResubmitFormResponseApp implements XPageApplication
                     // Back to home page
                     String strUrlReturn = request.getParameter( PARAMETER_URL_RETURN );
                     strUrlReturn = StringUtils.isNotBlank( strUrlReturn ) ? strUrlReturn : AppPathService.getBaseUrl( request );
-                    _resubmitFormResponseService.setSiteMessage( request, MESSAGE_EDITION_COMPLETE, SiteMessage.TYPE_INFO, strUrlReturn );
+                    _formsTaskService.setSiteMessage( request, MESSAGE_EDITION_COMPLETE, SiteMessage.TYPE_INFO, strUrlReturn );
                 }
             }
         }
@@ -217,7 +217,7 @@ public class ResubmitFormResponseApp implements XPageApplication
         }
     	else
         {
-    		_resubmitFormResponseService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP,
+    		_formsTaskService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP,
                     request.getParameter( PARAMETER_URL_RETURN ) );
         }
     	return false;
