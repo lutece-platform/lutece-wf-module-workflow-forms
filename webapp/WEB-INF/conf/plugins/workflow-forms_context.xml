@@ -12,13 +12,18 @@
     <bean id="workflow-forms.formsTaskService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.FormsTaskService" />
     <bean id="workflow-forms.editFormResponseTaskService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTaskService" />
     <bean id="workflow-forms.editFormResponseTaskHistoryService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTaskHistoryService" />
-
+	 <bean id="workflow-forms.taskCompleteResponseConfigService" class="fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService"
+		p:taskConfigDAO-ref="worklow-forms.taskCompleteFormResponseConfigDAO" />
+	
     <!-- DAO -->
     <bean id="worklow-forms.editFormResponseTaskHistoryDAO"
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistoryDAO" />
 	<bean id="worklow-forms.resubmitFormResponseDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseDAO" />
 	<bean id="worklow-forms.resubmitFormResponseValueDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseValueDAO" />
 	<bean id="worklow-forms.taskResubmitFormResponseConfigDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseTaskConfigDAO" />
+	<bean id="worklow-forms.completeFormResponseDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseDAO" />
+	<bean id="worklow-forms.completeFormResponseValueDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseValueDAO" />
+	<bean id="worklow-forms.taskCompleteFormResponseConfigDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskConfigDAO" />
 	
     <!-- Task edit form response -->
     <bean id="workflow-forms.editFormResponseTask"
