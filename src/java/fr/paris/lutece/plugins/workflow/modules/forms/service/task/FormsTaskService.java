@@ -126,7 +126,7 @@ public class FormsTaskService implements IFormsTaskService
 				{
 					int nIdStep = step.getId( );
 
-					StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, formResponse );
+					StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, formResponse, listQuestionToDisplayId );
 					listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, listFormQuestionResponse, request.getLocale( ),
 	                		displayType ) );
 				}
