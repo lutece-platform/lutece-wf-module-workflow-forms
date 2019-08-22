@@ -44,6 +44,7 @@ import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
+import fr.paris.lutece.util.ReferenceList;
 
 /**
  * This interface represents a service for the tasks of the plugin-forms
@@ -118,4 +119,12 @@ public interface IFormsTaskService
      */
     List<FormQuestionResponse> findResponses( FormResponse formResponse, Question question );
 
+    /**
+     * Get the list of states
+     * 
+     * @param nIdAction
+     *            the id action
+     * @return a ReferenceList
+     */
+    ReferenceList getListStates( int nIdAction );
 }

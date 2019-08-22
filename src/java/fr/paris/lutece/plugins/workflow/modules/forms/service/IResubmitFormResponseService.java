@@ -11,22 +11,12 @@ import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseValue;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
-import fr.paris.lutece.util.ReferenceList;
 
 /**
  * Service for ResubmitFormResponseTask
  */
 public interface IResubmitFormResponseService {
 
-	 /**
-     * Get the list of states
-     * 
-     * @param nIdAction
-     *            the id action
-     * @return a ReferenceList
-     */
-    ReferenceList getListStates( int nIdAction );
-    
     /**
     * Find an ResubmitFormResponse
     * 

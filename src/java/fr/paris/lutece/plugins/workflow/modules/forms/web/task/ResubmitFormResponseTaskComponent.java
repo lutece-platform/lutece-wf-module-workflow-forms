@@ -51,7 +51,7 @@ public class ResubmitFormResponseTaskComponent extends AbstractFormResponseTaskC
     {
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_CONFIG, _taskResubmitResponseConfigService.findByPrimaryKey( task.getId( ) ) );
-        model.put( MARK_LIST_STATES, _resubmitResponseService.getListStates( task.getAction( ).getId( ) ) );
+        model.put( MARK_LIST_STATES, _formsTaskService.getListStates( task.getAction( ).getId( ) ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_RESUBMIT_RESPONSE_CONFIG, locale, model );
 
