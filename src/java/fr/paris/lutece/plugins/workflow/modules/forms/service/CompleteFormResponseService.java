@@ -40,7 +40,7 @@ public class CompleteFormResponseService implements ICompleteFormResponseService
 		
 		List<Question> listQuestionWithoutResponse = new ArrayList<>( );
 		
-		for ( Question question : listQuestionForm)
+		for ( Question question : listQuestionForm )
 		{
 			FormQuestionResponse formQuestionResponse = listFormQuestionResponses.stream( )
 					.filter( fqr -> fqr.getQuestion( ).getId( ) == question.getId( ) )
@@ -85,4 +85,64 @@ public class CompleteFormResponseService implements ICompleteFormResponseService
 		}
 		return listEntries;
 	}
+	
+	@Override
+	public void create( CompleteFormResponse completeFormResponse )
+	{
+		if ( completeFormResponse != null )
+	    {
+			Plugin plugin = WorkflowUtils.getPlugin( );
+			_completeFormResponseDAO.insert( completeFormResponse, plugin );
+
+			for ( CompleteFormResponseValue value : completeFormResponse.getListCompleteReponseValues( ) )
+			{
+				value.setIdHistory( completeFormResponse.getIdHistory( ) );
+				_completeFormResponseValueDAO.insert( value, plugin );
+			}
+	    }
+	}
+	
+	@Override
+	public void update( CompleteFormResponse completeFormResponse )
+	{
+		if ( completeFormResponse != null )
+        {
+			Plugin plugin = WorkflowUtils.getPlugin( );
+			_completeFormResponseDAO.store( completeFormResponse, plugin );
+            // Remove its edit record values first
+			_completeFormResponseValueDAO.delete( completeFormResponse.getIdHistory( ), plugin );
+
+            for ( CompleteFormResponseValue value : completeFormResponse.getListCompleteReponseValues( ) )
+            {
+                value.setIdHistory( completeFormResponse.getIdHistory( ) );
+                _completeFormResponseValueDAO.insert( value, plugin );
+            }
+        }
+	}
+	
+	@Override
+    public void removeByIdHistory( int nIdHistory, int nIdTask )
+    {
+		CompleteFormResponse resubmitFormResponse = find( nIdHistory, nIdTask );
+
+        if ( resubmitFormResponse != null )
+        {
+        	Plugin plugin = WorkflowUtils.getPlugin( );
+        	_completeFormResponseValueDAO.delete( resubmitFormResponse.getIdHistory( ), plugin );
+        	_completeFormResponseDAO.deleteByIdHistory( nIdHistory, nIdTask, plugin );
+        }
+    }
+	
+	@Override
+    public void removeByIdTask( int nIdTask )
+    {
+		Plugin plugin = WorkflowUtils.getPlugin( );
+		List<CompleteFormResponse> listResponse = _completeFormResponseDAO.loadByIdTask( nIdTask, plugin );
+        for ( CompleteFormResponse editRecord : listResponse )
+        {
+        	_completeFormResponseValueDAO.delete( editRecord.getIdHistory( ), plugin );
+        }
+
+        _completeFormResponseDAO.deleteByIdTask( nIdTask, plugin );
+    }
 }

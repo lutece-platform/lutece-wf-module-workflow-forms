@@ -72,7 +72,7 @@ public class CompleteFormResponseTaskComponent extends AbstractFormResponseTaskC
 				.map( StepHome::findByPrimaryKey )
 				.collect( Collectors.toList( ) );
 		
-		List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse, DisplayType.RESUBMIT_BACKOFFICE );
+		List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse, DisplayType.COMPLETE_BACKOFFICE );
 
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_STEP_LIST, listStepDisplayTree );

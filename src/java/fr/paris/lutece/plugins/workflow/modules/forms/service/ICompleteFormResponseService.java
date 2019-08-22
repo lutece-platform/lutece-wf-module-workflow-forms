@@ -33,4 +33,33 @@ public interface ICompleteFormResponseService {
 	 * @return a list of entries
 	 */
 	List<Entry> getInformationListEntries( int nIdHistory );
+	
+	/**
+	 * Create a CompleteFormResponse
+	 * 
+	 * @param completeFormResponse
+	 */
+	void create( CompleteFormResponse completeFormResponse );
+
+	/**
+	 * Update a CompleteFormResponse
+	 * 
+	 * @param completeFormResponse
+	 */
+	void update( CompleteFormResponse completeFormResponse );
+	
+	/**
+	 * Remove a CompleteFormResponse
+	 * 
+	 * @param nIdHistory the id history
+	 * @param nIdTask    the id task
+	 */
+	void removeByIdHistory( int nIdHistory, int nIdTask );
+
+	/**
+	 * Remove a CompleteFormResponse by id task
+	 * 
+	 * @param nIdTask the id task
+	 */
+	void removeByIdTask( int nIdTask );
 }
