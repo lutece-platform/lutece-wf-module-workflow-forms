@@ -110,4 +110,16 @@
 			<value>change me</value>
 		</property>
 	</bean>
+	<bean id="workflow-forms.completeFormResponseRequestAuthenticator" class="fr.paris.lutece.util.signrequest.RequestHashAuthenticator" >
+		<property name="hashService" ref="workflow-forms.hashService" />
+		<property name="signatureElements" > 
+			<list>
+				<value>id_history</value>
+				<value>id_task</value>
+			</list>
+		</property>
+		<property name="privateKey">
+			<value>change me</value>
+		</property>
+	</bean>
 </beans>

@@ -1,0 +1,65 @@
+<#include "/admin/util/editor/editor.html" />
+<#include "/skin/plugins/asynchronousupload/upload_commons.html" />
+<@addRequiredJsFiles />
+<script type="text/javascript" src="jsp/site/plugins/asynchronousupload/GetMainUploadJs.jsp?handler=formsAsynchronousUploadHandler" ></script>
+
+<div class="portlet-background">
+	<div class="portlet-background-header">#i18n{module.workflow.forms.complete_form.page_title}</div>
+	<div class="portlet-background-content">
+		<#if complete_form.message?? && complete_form.message != ''>
+			<div class="alert alert-warning">${complete_form.message}</div>
+		</#if>
+		<form class="form-horizontal" action="jsp/site/Portal.jsp" method="post" enctype="multipart/form-data">
+			<input type="hidden" name="page" value="workflow-resubmit-form" />
+			<input type="hidden" name="id_history" value="${complete_form.idHistory}" />
+			<input type="hidden" name="id_task" value="${complete_form.idTask}" />
+			<input type="hidden" name="action" value="do_modify_response" />
+			<#if id_response??>
+				<input type="hidden" name="id_response" value="id_response" />
+			</#if>
+			<#if url_return?? && url_return != ''>
+				<input type="hidden" name="url_return" value="${url_return}" />
+			</#if>
+			<#if signature?? && signature != ''>
+				<input type="hidden" name="signature" value="${signature}" />
+			</#if>
+			<#if timestamp?? && timestamp != ''>
+				<input type="hidden" name="timestamp" value="${timestamp}" />
+			</#if>
+			<#if list_step?has_content>
+			    <#list list_step as step_display>
+			        ${step_display!}
+			    </#list>
+			</#if>
+      		<div class="form-actions">
+				<button type="submit" class="btn btn-primary btn-small" name="save">
+					<i class="icon-ok icon-white"></i>&nbsp;#i18n{module.workflow.forms.complete_form.button_save}
+				</button>
+			</div>
+   			
+		</form>
+	</div>
+</div>
+<@initEditor />
+
+<script type="text/javascript">
+	//for datepicker questions
+	$( document ).ready( function (  ) {
+		var locale = "en-US";
+		if( document.getElementById( "locale" ) != null ) {
+			locale = document.getElementById( "locale" ).innerHTML;
+		}
+		$.datepicker.setDefaults( {
+			showOn: 'button', 
+			buttonImageOnly: true, 
+			buttonImage: 'js/jquery/plugins/ui/datepicker/calendar.png', 
+			buttonText: 'Calendar', 
+			showAnim: 'slideDown', 
+			speed: 'fast'
+		} );
+	
+		$( ".datepicker-element" ).each( function( i ) {
+			$( this ).datepicker(  );
+		} );
+	});
+</script>

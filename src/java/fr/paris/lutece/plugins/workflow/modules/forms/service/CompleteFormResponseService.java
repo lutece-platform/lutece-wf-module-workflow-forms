@@ -2,9 +2,12 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -14,16 +17,27 @@ import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
+import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
 import fr.paris.lutece.plugins.genericattributes.business.IEntryDAO;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponse;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskConfig;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseValue;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ICompleteFormResponseDAO;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ICompleteFormResponseValueDAO;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseTaskConfig;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
+import fr.paris.lutece.portal.service.message.SiteMessage;
+import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 
-public class CompleteFormResponseService implements ICompleteFormResponseService {
+public class CompleteFormResponseService extends AbstractFormResponseService implements ICompleteFormResponseService {
 
+	private static final String MESSAGE_APP_ERROR = "module.workflow.forms.message.app_error";
+	private static final String PARAMETER_URL_RETURN = "url_return";
+	
 	@Inject
     private ICompleteFormResponseDAO _completeFormResponseDAO;
 	
@@ -32,6 +46,13 @@ public class CompleteFormResponseService implements ICompleteFormResponseService
 	
 	@Inject
 	private IEntryDAO _entryDAO;
+	
+	@Inject
+    @Named( "workflow-forms.taskCompleteResponseConfigService" )
+    private ITaskConfigService _taskCompleteResponseConfigService;
+	
+	@Inject
+    private ITaskService _taskService;
 	
 	@Override
 	public List<Question> findListQuestionWithoutResponse( FormResponse formResponse )
@@ -150,4 +171,63 @@ public class CompleteFormResponseService implements ICompleteFormResponseService
 
         _completeFormResponseDAO.deleteByIdTask( nIdTask, plugin );
     }
+	
+	@Override
+    public boolean isRecordStateValid( CompleteFormResponse completeFormResponse, Locale locale )
+    {
+        ITask task = _taskService.findByPrimaryKey( completeFormResponse.getIdTask( ), locale );
+        CompleteFormResponseTaskConfig config = _taskCompleteResponseConfigService.findByPrimaryKey( completeFormResponse.getIdTask( ) );
+
+        return isRecordStateValid( task, config, completeFormResponse.getIdHistory( ) );
+    }
+	
+	@Override
+	public List<Question> getListQuestionToEdit( FormResponse formResponse, List<CompleteFormResponseValue> listEditRecordValues )
+	{
+		List<Integer> idEntries = listEditRecordValues.stream( )
+			.map( CompleteFormResponseValue::getIdEntry )
+			.map( EntryHome::findByPrimaryKey )
+			.map( Entry::getIdEntry )
+			.collect( Collectors.toList( ) );
+
+		List<Question> listQuestions = findListQuestionWithoutResponse( formResponse );
+		return listQuestions.stream( ).filter( question -> idEntries.contains( question.getEntry( ).getIdEntry( ) ) )
+				.collect( Collectors.toList( ) );
+	}
+	
+	@Override
+	public boolean doEditResponseData( HttpServletRequest request, CompleteFormResponse completeFormResponse ) throws SiteMessageException
+	{
+		FormResponse response = _formsTaskService.getFormResponseFromIdHistory( completeFormResponse.getIdHistory( ) );
+		if ( response == null )
+		{
+			_formsTaskService.setSiteMessage( request, MESSAGE_APP_ERROR, SiteMessage.TYPE_STOP,
+					request.getParameter( PARAMETER_URL_RETURN ) );
+
+			return false;
+		}
+		List<Question> listQuestions = getListQuestionToEdit( response, completeFormResponse.getListCompleteReponseValues( ) );
+
+		doEditResponseData( request, response, listQuestions );
+		return true;
+	}
+	
+	@Override
+	public void doChangeResponseState( CompleteFormResponse completeFormResponse, Locale locale )
+	{
+		ITask task = _taskService.findByPrimaryKey( completeFormResponse.getIdTask( ), locale );
+		ResubmitFormResponseTaskConfig config = _taskCompleteResponseConfigService.findByPrimaryKey( completeFormResponse.getIdTask( ) );
+
+		if ( task != null && config != null )
+		{
+			doChangeResponseState( task, config.getIdStateAfterEdition( ), completeFormResponse.getIdHistory( ), locale );
+		}
+	}
+	
+	@Override
+	public void doCompleteResponse( CompleteFormResponse completeFormResponse )
+	{
+		completeFormResponse.setIsComplete( true );
+		update( completeFormResponse );
+	}
 }

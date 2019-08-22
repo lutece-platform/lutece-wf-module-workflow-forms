@@ -28,6 +28,10 @@
             <application-id>workflow-resubmit-form</application-id>
             <application-class>fr.paris.lutece.plugins.workflow.modules.forms.web.ResubmitFormResponseApp</application-class>
         </application>
+         <application>
+            <application-id>workflow-complete-form</application-id>
+            <application-class>fr.paris.lutece.plugins.workflow.modules.forms.web.CompleteFormResponseApp</application-class>
+        </application>
     </applications>
 
     <!-- Portlet parameters -->
