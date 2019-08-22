@@ -32,7 +32,7 @@ CREATE TABLE workflow_task_complete_response (
 );
 
 DROP TABLE IF EXISTS workflow_task_complete_response_value;
-CREATE TABLE workflow_task_resubmit_complete_value (
+CREATE TABLE workflow_task_complete_response_value (
   id_history INT DEFAULT 0 NOT NULL,
   id_entry INT DEFAULT 0 NOT NULL,
   PRIMARY KEY (id_history, id_entry)
