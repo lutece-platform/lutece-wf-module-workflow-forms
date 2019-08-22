@@ -1,0 +1,20 @@
+<#if config?exists>
+    <#if edit_response?exists>
+	    <#if edit_response.message??>${edit_response.message}</#if></p>
+		<p>#i18n{module.workflow.forms.task_complete_response_information.label_is_complete}</p>
+	    <#if edit_response.isComplete(  )>
+	    	<div class="alert alert-success">#i18n{module.workflow.forms.task_complete_response_information.label_completed}</div>
+		<#else>
+	    	<div class="alert alert-warning">#i18n{module.workflow.forms.task_complete_response_information.label_not_completed}</div>
+		</#if>
+	</#if>
+    <#if list_entries?exists && list_entries?has_content>
+    	<p>#i18n{module.workflow.forms.task_complete_response_information.label_list_entries}</p>
+	    <#list list_entries as entry>
+	   		<span>${entry.title}</span>
+	   		<#if entry_has_next>
+	   			<br />
+	   		</#if>
+		</#list>
+    </#if>
+</#if>
