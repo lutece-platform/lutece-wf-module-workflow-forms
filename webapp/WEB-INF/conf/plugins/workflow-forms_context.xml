@@ -93,8 +93,12 @@
 	<bean id="workflow-forms.resubmitFormResponseTaskInfoProvider" class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.ResubmitFormResponseTaskInfoProvider"
 		p:taskType-ref="workflow-forms.resubmitFormResponseTypeTask" />
 	
+	<bean id="workflow-forms.completeFormResponseTaskInfoProvider" class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.CompleteFormResponseTaskInfoProvider"
+		p:taskType-ref="workflow-forms.completeFormResponseTypeTask" />
+	
     <!-- Marker provider -->
     <bean id="workflow-forms.resubmitFormResponseMarkerProvider" class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.ResubmitFormResponseMarkerProvider" />
+    <bean id="workflow-forms.completeFormResponseMarkerProvider" class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.CompleteFormResponseMarkerProvider" />
     
     <!-- SignRequest -->
 	<bean id="workflow-forms.hashService" class="fr.paris.lutece.util.signrequest.security.Sha1HashService" />
