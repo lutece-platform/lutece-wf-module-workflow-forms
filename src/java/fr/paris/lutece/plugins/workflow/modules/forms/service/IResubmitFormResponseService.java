@@ -11,22 +11,12 @@ import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseValue;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
-import fr.paris.lutece.util.ReferenceList;
 
 /**
  * Service for ResubmitFormResponseTask
  */
 public interface IResubmitFormResponseService {
 
-	 /**
-     * Get the list of states
-     * 
-     * @param nIdAction
-     *            the id action
-     * @return a ReferenceList
-     */
-    ReferenceList getListStates( int nIdAction );
-    
     /**
     * Find an ResubmitFormResponse
     * 
@@ -97,22 +87,6 @@ public interface IResubmitFormResponseService {
    void update( ResubmitFormResponse resubmitFormResponse );
    
    /**
-    * Set the site message
-    * 
-    * @param request
-    *            the HTTP request
-    * @param strMessage
-    *            the message
-    * @param nTypeMessage
-    *            the message type
-    * @param strUrlReturn
-    *            the url return
-    * @throws SiteMessageException
-    *             the site message
-    */
-   void setSiteMessage( HttpServletRequest request, String strMessage, int nTypeMessage, String strUrlReturn ) throws SiteMessageException;
-
-   /**
     * Check if the response has the same state before executing the action
     * 
     * @param resubmitFormResponse
@@ -122,15 +96,6 @@ public interface IResubmitFormResponseService {
     * @return true if the record has a valid state, false otherwise
     */
    boolean isRecordStateValid( ResubmitFormResponse resubmitFormResponse, Locale locale );
-   
-   /**
-    * Get the FormResponse from a given id history
-    * 
-    * @param nIdHistory
-    *            the id history
-    * @return the FormResponse
-    */
-   FormResponse getFormResponseFromIdHistory( int nIdHistory );
    
    /**
     * Get the list of questions to edit

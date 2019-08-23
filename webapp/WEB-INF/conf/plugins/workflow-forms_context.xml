@@ -12,13 +12,19 @@
     <bean id="workflow-forms.formsTaskService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.FormsTaskService" />
     <bean id="workflow-forms.editFormResponseTaskService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTaskService" />
     <bean id="workflow-forms.editFormResponseTaskHistoryService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTaskHistoryService" />
-
+	 <bean id="workflow-forms.taskCompleteResponseConfigService" class="fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService"
+		p:taskConfigDAO-ref="worklow-forms.taskCompleteFormResponseConfigDAO" />
+	<bean id="workflow-forms.taskCompleteResponseService" class="fr.paris.lutece.plugins.workflow.modules.forms.service.CompleteFormResponseService" />
+	
     <!-- DAO -->
     <bean id="worklow-forms.editFormResponseTaskHistoryDAO"
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistoryDAO" />
 	<bean id="worklow-forms.resubmitFormResponseDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseDAO" />
 	<bean id="worklow-forms.resubmitFormResponseValueDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseValueDAO" />
 	<bean id="worklow-forms.taskResubmitFormResponseConfigDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseTaskConfigDAO" />
+	<bean id="worklow-forms.completeFormResponseDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseDAO" />
+	<bean id="worklow-forms.completeFormResponseValueDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseValueDAO" />
+	<bean id="worklow-forms.taskCompleteFormResponseConfigDAO" class="fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskConfigDAO" />
 	
     <!-- Task edit form response -->
     <bean id="workflow-forms.editFormResponseTask"
@@ -59,17 +65,56 @@
         class="fr.paris.lutece.plugins.workflow.modules.forms.web.task.ResubmitFormResponseTaskComponent"
         p:taskType-ref="workflow-forms.resubmitFormResponseTypeTask"
         p:taskConfigService-ref="workflow-forms.taskResubmitResponseConfigService" />
+        
+    <!-- Task Complete Form Response -->
+    <bean id="workflow-forms.completeFormResponseTask"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.CompleteFormResponseTask"
+        scope="prototype" />
+    <bean id="workflow-forms.completeFormResponseTaskConfig"
+		class="fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskConfig"
+		scope="prototype" />
+    
+    <bean id="workflow-forms.completeFormResponseTypeTask"
+        class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+        p:key="completeFormResponseTypeTask"
+        p:titleI18nKey="module.workflow.forms.task.completeFormResponse.title"
+        p:beanName="workflow-forms.completeFormResponseTask"
+        p:configBeanName="workflow-forms.completeFormResponseTaskConfig"
+        p:taskForAutomaticAction="true"
+		p:configRequired="true"
+        p:formTaskRequired="true" />
+        
+    <bean id="workflow-forms.completetFormResponseTaskComponent"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.web.task.CompleteFormResponseTaskComponent"
+        p:taskType-ref="workflow-forms.completeFormResponseTypeTask"
+        p:taskConfigService-ref="workflow-forms.taskCompleteResponseConfigService" />
     
     <!-- TaskInfoProvider -->
 	<bean id="workflow-forms.resubmitFormResponseTaskInfoProvider" class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.ResubmitFormResponseTaskInfoProvider"
 		p:taskType-ref="workflow-forms.resubmitFormResponseTypeTask" />
 	
+	<bean id="workflow-forms.completeFormResponseTaskInfoProvider" class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.CompleteFormResponseTaskInfoProvider"
+		p:taskType-ref="workflow-forms.completeFormResponseTypeTask" />
+	
     <!-- Marker provider -->
     <bean id="workflow-forms.resubmitFormResponseMarkerProvider" class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.ResubmitFormResponseMarkerProvider" />
+    <bean id="workflow-forms.completeFormResponseMarkerProvider" class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.CompleteFormResponseMarkerProvider" />
     
     <!-- SignRequest -->
 	<bean id="workflow-forms.hashService" class="fr.paris.lutece.util.signrequest.security.Sha1HashService" />
 	<bean id="workflow-forms.resubmitFormResponseRequestAuthenticator" class="fr.paris.lutece.util.signrequest.RequestHashAuthenticator" >
+		<property name="hashService" ref="workflow-forms.hashService" />
+		<property name="signatureElements" > 
+			<list>
+				<value>id_history</value>
+				<value>id_task</value>
+			</list>
+		</property>
+		<property name="privateKey">
+			<value>change me</value>
+		</property>
+	</bean>
+	<bean id="workflow-forms.completeFormResponseRequestAuthenticator" class="fr.paris.lutece.util.signrequest.RequestHashAuthenticator" >
 		<property name="hashService" ref="workflow-forms.hashService" />
 		<property name="signatureElements" > 
 			<list>

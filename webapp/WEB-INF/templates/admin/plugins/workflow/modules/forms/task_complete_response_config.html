@@ -1,0 +1,22 @@
+<#assign idStateAfterEdition = -1>
+<#assign defaultMessage = ''>
+<#if config?exists>
+	<#assign idStateAfterEdition = config.idStateAfterEdition>
+	<#if config.defaultMessage??>
+		<#assign defaultMessage = config.defaultMessage>
+	</#if>
+</#if>
+<p class="lead">#i18n{module.workflow.forms.task_complete_response_config.title}</p>
+<div class="control-group">
+	<label class="control-label" for="idStateAfterEdition">#i18n{module.workflow.forms.task_complete_response_config.label_state_after_edition} *</label>
+		<div class="controls">
+		<@comboWithParams name="idStateAfterEdition" default_value=idStateAfterEdition?string additionalParameters="class=\"input-xxlarge\"" items=list_states />
+		<span class="help-text">#i18n{module.workflow.forms.task_complete_response_config.label_state_after_edition_comment}</span>
+	</div>
+</div>	
+<div class="control-group">
+	<label class="control-label" for="defaultMessage">#i18n{module.workflow.forms.task_complete_response_config.label_default_message}</label>
+	<div class="controls">	
+		<textarea name="defaultMessage" rows="4" style="width:50%;">${defaultMessage}</textarea>
+		</div>
+</div>	

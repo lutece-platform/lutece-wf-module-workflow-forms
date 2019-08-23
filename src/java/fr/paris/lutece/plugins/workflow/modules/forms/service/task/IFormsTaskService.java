@@ -44,6 +44,8 @@ import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
+import fr.paris.lutece.portal.service.message.SiteMessageException;
+import fr.paris.lutece.util.ReferenceList;
 
 /**
  * This interface represents a service for the tasks of the plugin-forms
@@ -118,4 +120,37 @@ public interface IFormsTaskService
      */
     List<FormQuestionResponse> findResponses( FormResponse formResponse, Question question );
 
+    /**
+     * Get the list of states
+     * 
+     * @param nIdAction
+     *            the id action
+     * @return a ReferenceList
+     */
+    ReferenceList getListStates( int nIdAction );
+    
+    /**
+     * Set the site message
+     * 
+     * @param request
+     *            the HTTP request
+     * @param strMessage
+     *            the message
+     * @param nTypeMessage
+     *            the message type
+     * @param strUrlReturn
+     *            the url return
+     * @throws SiteMessageException
+     *             the site message
+     */
+    void setSiteMessage( HttpServletRequest request, String strMessage, int nTypeMessage, String strUrlReturn ) throws SiteMessageException;
+    
+    /**
+     * Get the FormResponse from a given id history
+     * 
+     * @param nIdHistory
+     *            the id history
+     * @return the FormResponse
+     */
+    FormResponse getFormResponseFromIdHistory( int nIdHistory );
 }
