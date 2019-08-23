@@ -10,7 +10,7 @@
 			<div class="alert alert-warning">${complete_form.message}</div>
 		</#if>
 		<form class="form-horizontal" action="jsp/site/Portal.jsp" method="post" enctype="multipart/form-data">
-			<input type="hidden" name="page" value="workflow-resubmit-form" />
+			<input type="hidden" name="page" value="workflow-complete-form" />
 			<input type="hidden" name="id_history" value="${complete_form.idHistory}" />
 			<input type="hidden" name="id_task" value="${complete_form.idTask}" />
 			<input type="hidden" name="action" value="do_modify_response" />

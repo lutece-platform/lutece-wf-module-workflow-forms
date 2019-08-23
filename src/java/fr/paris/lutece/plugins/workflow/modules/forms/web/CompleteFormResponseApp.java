@@ -24,6 +24,7 @@ import fr.paris.lutece.portal.service.message.SiteMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.security.UserNotSignedException;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.web.constants.Messages;
@@ -66,11 +67,10 @@ public class CompleteFormResponseApp implements XPageApplication
     private static final String MARK_TIMESTAMP = "timestamp";
     
     // SERVICES
-    @Inject
-    private ICompleteFormResponseService _completeFormResponseService;
+    private ICompleteFormResponseService _completeFormResponseService = SpringContextService.getBean( "workflow-forms.taskCompleteResponseService" );
     
     @Inject
-    private IFormsTaskService _formsTaskService;
+    private IFormsTaskService _formsTaskService = SpringContextService.getBean( "workflow-forms.formsTaskService" );
    
     @Override
     public XPage getPage( HttpServletRequest request, int nMode, Plugin plugin ) throws UserNotSignedException, SiteMessageException

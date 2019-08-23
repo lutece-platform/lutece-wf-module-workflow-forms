@@ -24,7 +24,6 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormRespo
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseValue;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ICompleteFormResponseDAO;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ICompleteFormResponseValueDAO;
-import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseTaskConfig;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
@@ -216,7 +215,7 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
 	public void doChangeResponseState( CompleteFormResponse completeFormResponse, Locale locale )
 	{
 		ITask task = _taskService.findByPrimaryKey( completeFormResponse.getIdTask( ), locale );
-		ResubmitFormResponseTaskConfig config = _taskCompleteResponseConfigService.findByPrimaryKey( completeFormResponse.getIdTask( ) );
+		CompleteFormResponseTaskConfig config = _taskCompleteResponseConfigService.findByPrimaryKey( completeFormResponse.getIdTask( ) );
 
 		if ( task != null && config != null )
 		{
