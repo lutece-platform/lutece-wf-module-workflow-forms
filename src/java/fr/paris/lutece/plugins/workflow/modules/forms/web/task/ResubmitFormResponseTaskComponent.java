@@ -63,7 +63,7 @@ public class ResubmitFormResponseTaskComponent extends AbstractFormResponseTaskC
 	{
 		
 		FormResponse formResponse = _formsTaskService.findFormResponseFrom( nIdResource, strResourceType );
-		List<Question> listQuestions = _resubmitResponseService.findListQuestionShownCompleteness( formResponse );
+		List<Question> listQuestions = _resubmitResponseService.findListQuestionUsedCorrectForm( formResponse );
 		
 		List<Step> listStep = listQuestions.stream( )
 				.map( Question::getStep )

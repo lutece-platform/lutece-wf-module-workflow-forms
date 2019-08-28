@@ -99,13 +99,13 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
     }
 	
 	@Override
-	public  List<Question> findListQuestionShownCompleteness( FormResponse formResponse )
+	public  List<Question> findListQuestionUsedCorrectForm( FormResponse formResponse )
 	{
 		Form form = FormHome.findByPrimaryKey( formResponse.getFormId( ) );
 		List<Question> listFormQuestion = QuestionHome.getListQuestionByIdForm( form.getId( ) );
         
         return listFormQuestion.stream( )
-        		.filter( question -> question.getEntry( ).isShownInCompleteness( ) )
+        		.filter( question -> question.getEntry( ).isUsedInCorrectFormResponse( ) )
         		.collect( Collectors.toList( ) );
 	}
 
@@ -187,7 +187,7 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
 		}
 		List<Integer> idEntries = listEntries.stream( ).map( Entry::getIdEntry ).collect( Collectors.toList( ) );
 		
-		List<Question> listQuestions = findListQuestionShownCompleteness( formResponse );
+		List<Question> listQuestions = findListQuestionUsedCorrectForm( formResponse );
 		return listQuestions.stream( )
 					.filter( question -> idEntries.contains( question.getEntry( ).getIdEntry( ) ) )
 					.collect( Collectors.toList( ) );
