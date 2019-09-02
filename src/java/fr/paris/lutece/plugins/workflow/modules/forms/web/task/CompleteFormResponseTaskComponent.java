@@ -63,7 +63,7 @@ public class CompleteFormResponseTaskComponent extends AbstractFormResponseTaskC
 	{
 		
 		FormResponse formResponse = _formsTaskService.findFormResponseFrom( nIdResource, strResourceType );
-		List<Question> listQuestions = _completeResponseService.findListQuestionWithoutResponse( formResponse );
+		List<Question> listQuestions = _completeResponseService.findListQuestionUsedCorrectForm( formResponse );
 		
 		List<Step> listStep = listQuestions.stream( )
 				.map( Question::getStep )

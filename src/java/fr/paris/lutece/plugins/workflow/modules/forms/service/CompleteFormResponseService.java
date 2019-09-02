@@ -9,10 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.collections.CollectionUtils;
-
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
@@ -54,29 +50,12 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
     private ITaskService _taskService;
 	
 	@Override
-	public List<Question> findListQuestionWithoutResponse( FormResponse formResponse )
+	public List<Question> findListQuestionUsedCorrectForm( FormResponse formResponse )
 	{
 		List<Question> listQuestionForm = QuestionHome.getListQuestionByIdForm( formResponse.getFormId( ) );
-		listQuestionForm = listQuestionForm.stream( )
-				.filter( question -> !question.getEntry( ).isOnlyDisplayInBack( ) && !question.getEntry( ).getEntryType( ).getComment( ) )
+		return listQuestionForm.stream( )
+				.filter( question -> question.getEntry( ).isUsedInCompleteFormResponse( ) )
 				.collect( Collectors.toList( ) );
-		
-		List<FormQuestionResponse> listFormQuestionResponses = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
-		
-		List<Question> listQuestionWithoutResponse = new ArrayList<>( );
-		
-		for ( Question question : listQuestionForm )
-		{
-			FormQuestionResponse formQuestionResponse = listFormQuestionResponses.stream( )
-					.filter( fqr -> fqr.getQuestion( ).getId( ) == question.getId( ) )
-					.findFirst( ).orElse( null );
-			
-			if ( formQuestionResponse == null || CollectionUtils.isEmpty( formQuestionResponse.getEntryResponse( ) ) )
-			{
-				listQuestionWithoutResponse.add( question );
-			}
-		}
-		return listQuestionWithoutResponse;
 	}
 
 	@Override
@@ -189,7 +168,7 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
 			.map( Entry::getIdEntry )
 			.collect( Collectors.toList( ) );
 
-		List<Question> listQuestions = findListQuestionWithoutResponse( formResponse );
+		List<Question> listQuestions = findListQuestionUsedCorrectForm( formResponse );
 		return listQuestions.stream( ).filter( question -> idEntries.contains( question.getEntry( ).getIdEntry( ) ) )
 				.collect( Collectors.toList( ) );
 	}
