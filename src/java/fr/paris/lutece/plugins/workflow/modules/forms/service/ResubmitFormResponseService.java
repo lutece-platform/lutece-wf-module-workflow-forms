@@ -9,8 +9,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import fr.paris.lutece.plugins.forms.business.Form;
 import fr.paris.lutece.plugins.forms.business.FormHome;
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.IFormResponseDAO;
 import fr.paris.lutece.plugins.forms.business.Question;
@@ -103,10 +107,27 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
 	{
 		Form form = FormHome.findByPrimaryKey( formResponse.getFormId( ) );
 		List<Question> listFormQuestion = QuestionHome.getListQuestionByIdForm( form.getId( ) );
-        
-        return listFormQuestion.stream( )
+		
+		listFormQuestion = listFormQuestion.stream( )
         		.filter( question -> question.getEntry( ).isUsedInCorrectFormResponse( ) )
         		.collect( Collectors.toList( ) );
+        
+		List<FormQuestionResponse> listFormQuestionResponses = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
+		
+		List<Question> listQuestionWithResponse = new ArrayList<>( );
+		
+		for ( Question question : listFormQuestion )
+		{
+			FormQuestionResponse formQuestionResponse = listFormQuestionResponses.stream( )
+					.filter( fqr -> fqr.getQuestion( ).getId( ) == question.getId( ) )
+					.findFirst( ).orElse( null );
+			
+			if ( formQuestionResponse != null && CollectionUtils.isNotEmpty( formQuestionResponse.getEntryResponse( ) ) )
+			{
+				listQuestionWithResponse.add( question );
+			}
+		}
+		return listQuestionWithResponse;
 	}
 
 	@Override
