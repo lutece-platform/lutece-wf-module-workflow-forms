@@ -20,7 +20,7 @@ public interface ICompleteFormResponseService {
 	 * @param formResponse
 	 * @return
 	 */
-	List<Question> findListQuestionWithoutResponse( FormResponse formResponse );
+	List<Question> findListQuestionUsedCorrectForm( FormResponse formResponse );
 
 	/**
 	 * Find an CompleteFormResponse

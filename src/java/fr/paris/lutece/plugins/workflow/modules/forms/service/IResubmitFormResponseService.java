@@ -49,11 +49,11 @@ public interface IResubmitFormResponseService {
    List<Entry> getFormListEntries( int nIdRecord, String strResourceType );
    
    /**
-    * Find the list of question which can be shown in completensess.
+    * Find the list of question which can be used in the correct form task.
     * @param formResponse
     * @return
     */
-   List<Question> findListQuestionShownCompleteness( FormResponse formResponse );
+   List<Question> findListQuestionUsedCorrectForm( FormResponse formResponse );
    
    /** 
     * Remove a ResubmitFormResponse
