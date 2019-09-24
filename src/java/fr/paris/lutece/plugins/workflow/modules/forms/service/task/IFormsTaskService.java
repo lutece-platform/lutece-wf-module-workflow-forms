@@ -85,6 +85,17 @@ public interface IFormsTaskService
      */
     FormResponse findFormResponseFrom( int nIdResource, String strResourceType );
     
+    /**
+     * Finds a form response from the specified resource id and resource type
+     * 
+     * @param nIdResource
+     *            the resource id
+     * @param strResourceType
+     *            the resource type
+     * @return the form response
+     */
+    FormResponse findFormResponseWithoutSteps( int nIdResource, String strResourceType );
+    
     List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay, FormResponse formResponse, DisplayType displayType );
     
     /**
