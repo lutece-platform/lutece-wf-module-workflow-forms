@@ -108,11 +108,29 @@ public class FormsTaskService implements IFormsTaskService
     @Override
     public FormResponse findFormResponseFrom( int nIdResource, String strResourceType )
     {
-        FormResponse formResponse = null;
+    	return loadFormResponse( nIdResource, strResourceType, true );
+    }
+    
+    @Override
+    public FormResponse findFormResponseWithoutSteps( int nIdResource, String strResourceType )
+    {
+    	return loadFormResponse( nIdResource, strResourceType, false );
+    }
+    
+    private FormResponse loadFormResponse( int nIdResource, String strResourceType, boolean loadSteps )
+    {
+    	FormResponse formResponse = null;
 
         if ( FormResponse.RESOURCE_TYPE.equals( strResourceType ) )
         {
-            formResponse = FormResponseHome.findByPrimaryKey( nIdResource );
+        	if ( loadSteps )
+        	{
+        		formResponse = FormResponseHome.findByPrimaryKey( nIdResource );
+        	}
+        	else
+        	{
+        		formResponse = FormResponseHome.loadById( nIdResource );
+        	}
         }
         else
         {
