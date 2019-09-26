@@ -147,7 +147,7 @@ public class CompleteFormResponseApp implements XPageApplication
 				.map( StepHome::findByPrimaryKey )
 				.collect( Collectors.toList( ) );
 		
-		List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse, DisplayType.RESUBMIT_FRONTOFFICE );
+		List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse, DisplayType.COMPLETE_FRONTOFFICE );
     	
     	Map<String, Object> model = new HashMap<String, Object>( );
         model.put( MARK_COMPLETE_FORM, completeFormResponse );
