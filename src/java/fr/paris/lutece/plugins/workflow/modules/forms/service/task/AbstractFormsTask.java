@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2018, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -94,7 +94,7 @@ public abstract class AbstractFormsTask extends SimpleTask
     /**
      * Process the task to save the information and create history
      * 
-     * @param idHistory
+     * @param nIdHistory
      *            idHistory
      */
     protected abstract void saveTaskInformation( int nIdHistory );

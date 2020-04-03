@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2018, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -74,11 +74,11 @@ import fr.paris.lutece.util.ReferenceList;
 public class FormsTaskService implements IFormsTaskService
 {
     private final IResourceHistoryService _resourceHistoryService;
-    
+
     @Inject
     private IActionService _actionService;
-	
-	@Inject
+
+    @Inject
     private IStateService _stateService;
 
     /**
@@ -108,29 +108,29 @@ public class FormsTaskService implements IFormsTaskService
     @Override
     public FormResponse findFormResponseFrom( int nIdResource, String strResourceType )
     {
-    	return loadFormResponse( nIdResource, strResourceType, true );
+        return loadFormResponse( nIdResource, strResourceType, true );
     }
-    
+
     @Override
     public FormResponse findFormResponseWithoutSteps( int nIdResource, String strResourceType )
     {
-    	return loadFormResponse( nIdResource, strResourceType, false );
+        return loadFormResponse( nIdResource, strResourceType, false );
     }
-    
+
     private FormResponse loadFormResponse( int nIdResource, String strResourceType, boolean loadSteps )
     {
-    	FormResponse formResponse = null;
+        FormResponse formResponse = null;
 
         if ( FormResponse.RESOURCE_TYPE.equals( strResourceType ) )
         {
-        	if ( loadSteps )
-        	{
-        		formResponse = FormResponseHome.findByPrimaryKey( nIdResource );
-        	}
-        	else
-        	{
-        		formResponse = FormResponseHome.loadById( nIdResource );
-        	}
+            if ( loadSteps )
+            {
+                formResponse = FormResponseHome.findByPrimaryKey( nIdResource );
+            }
+            else
+            {
+                formResponse = FormResponseHome.loadById( nIdResource );
+            }
         }
         else
         {
@@ -139,35 +139,34 @@ public class FormsTaskService implements IFormsTaskService
 
         return formResponse;
     }
-    
+
     @Override
-	public List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay,
-	            FormResponse formResponse, DisplayType displayType )
-	{
-		List<String> listFormDisplayTrees = new ArrayList<>( );
+    public List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay,
+            FormResponse formResponse, DisplayType displayType )
+    {
+        List<String> listFormDisplayTrees = new ArrayList<>( );
 
-		List<FormQuestionResponse> listFormQuestionResponse = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
-		List<Integer> listQuestionToDisplayId = listQuestionToDisplay.stream( ).map( question -> question.getId( ) ).collect( Collectors.toList( ) );
+        List<FormQuestionResponse> listFormQuestionResponse = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
+        List<Integer> listQuestionToDisplayId = listQuestionToDisplay.stream( ).map( question -> question.getId( ) ).collect( Collectors.toList( ) );
 
-		listFormQuestionResponse = listFormQuestionResponse.stream( )
-				.filter( formQuestionResponse -> listQuestionToDisplayId.contains( formQuestionResponse.getQuestion( ).getId( ) ) )
-				.collect( Collectors.toList( ) );
+        listFormQuestionResponse = listFormQuestionResponse.stream( )
+                .filter( formQuestionResponse -> listQuestionToDisplayId.contains( formQuestionResponse.getQuestion( ).getId( ) ) )
+                .collect( Collectors.toList( ) );
 
-		if ( !CollectionUtils.isEmpty( listStep ) )
-		{
-				for ( Step step : listStep )
-				{
-					int nIdStep = step.getId( );
+        if ( !CollectionUtils.isEmpty( listStep ) )
+        {
+            for ( Step step : listStep )
+            {
+                int nIdStep = step.getId( );
 
-					StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, formResponse, listQuestionToDisplayId );
-					listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, listFormQuestionResponse, request.getLocale( ),
-	                		displayType ) );
-				}
-		}
+                StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, formResponse, listQuestionToDisplayId );
+                listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, listFormQuestionResponse, request.getLocale( ), displayType ) );
+            }
+        }
 
-		return listFormDisplayTrees;
-	}
-    
+        return listFormDisplayTrees;
+    }
+
     @Override
     public List<EditableResponse> findChangedResponses( List<EditableResponse> listEditableResponse )
     {
@@ -175,7 +174,8 @@ public class FormsTaskService implements IFormsTaskService
 
         for ( EditableResponse editableResponse : listEditableResponse )
         {
-            IEntryDataService dataService = EntryServiceManager.getInstance( ).getEntryDataService( editableResponse.getQuestion( ).getEntry( ).getEntryType( ) );
+            IEntryDataService dataService = EntryServiceManager.getInstance( )
+                    .getEntryDataService( editableResponse.getQuestion( ).getEntry( ).getEntryType( ) );
 
             if ( dataService.isResponseChanged( editableResponse.getResponseSaved( ), editableResponse.getResponseFromForm( ) ) )
             {
@@ -185,7 +185,7 @@ public class FormsTaskService implements IFormsTaskService
 
         return listChangedResponse;
     }
-    
+
     @Override
     public List<EditableResponse> createEditableResponses( FormResponse formResponse, List<Question> listQuestion, HttpServletRequest request )
     {
@@ -204,7 +204,7 @@ public class FormsTaskService implements IFormsTaskService
 
         return listEditableResponse;
     }
-    
+
     private FormQuestionResponse findSavedResponse( FormResponse formResponse, Question question )
     {
         FormQuestionResponse formQuestionResponse = null;
@@ -222,7 +222,7 @@ public class FormsTaskService implements IFormsTaskService
 
         return formQuestionResponse;
     }
-    
+
     @Override
     public List<FormQuestionResponse> findResponses( FormResponse formResponse, Question question )
     {
@@ -244,11 +244,11 @@ public class FormsTaskService implements IFormsTaskService
 
         return listFormQuestionResponse;
     }
-    
+
     @Override
-	public ReferenceList getListStates(int nIdAction)
-	{
-		ReferenceList referenceListStates = new ReferenceList( );
+    public ReferenceList getListStates( int nIdAction )
+    {
+        ReferenceList referenceListStates = new ReferenceList( );
         Action action = _actionService.findByPrimaryKey( nIdAction );
 
         if ( ( action != null ) && ( action.getWorkflow( ) != null ) )
@@ -263,30 +263,30 @@ public class FormsTaskService implements IFormsTaskService
         }
 
         return referenceListStates;
-	}
-    
+    }
+
     @Override
-	public void setSiteMessage( HttpServletRequest request, String strMessage, int nTypeMessage, String strUrlReturn) throws SiteMessageException
-	{
-		if ( StringUtils.isNotBlank( strUrlReturn ) )
-		{
-			SiteMessageService.setMessage( request, strMessage, nTypeMessage, strUrlReturn );
-		}
-		else
-		{
-			SiteMessageService.setMessage( request, strMessage, nTypeMessage );
-		}
-	}
-    
+    public void setSiteMessage( HttpServletRequest request, String strMessage, int nTypeMessage, String strUrlReturn ) throws SiteMessageException
+    {
+        if ( StringUtils.isNotBlank( strUrlReturn ) )
+        {
+            SiteMessageService.setMessage( request, strMessage, nTypeMessage, strUrlReturn );
+        }
+        else
+        {
+            SiteMessageService.setMessage( request, strMessage, nTypeMessage );
+        }
+    }
+
     @Override
     public FormResponse getFormResponseFromIdHistory( int nIdHistory )
     {
-		FormResponse response = null;
+        FormResponse response = null;
         ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdHistory );
 
         if ( resourceHistory != null && FormResponse.RESOURCE_TYPE.equals( resourceHistory.getResourceType( ) ) )
         {
-        	response = FormResponseHome.findByPrimaryKey( resourceHistory.getIdResource( ) );
+            response = FormResponseHome.findByPrimaryKey( resourceHistory.getIdResource( ) );
         }
 
         return response;

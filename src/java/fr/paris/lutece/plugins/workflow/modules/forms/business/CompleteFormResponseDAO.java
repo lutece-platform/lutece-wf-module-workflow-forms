@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2017, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,7 +50,8 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
             + " FROM workflow_task_complete_response WHERE id_history = ? AND id_task = ? ";
     private static final String SQL_QUERY_SELECT_BY_ID_TASK = " SELECT id_history, id_task, message, is_complete "
             + " FROM workflow_task_complete_response WHERE id_task = ? ";
-    private static final String SQL_QUERY_INSERT = " INSERT INTO workflow_task_complete_response ( id_history, id_task, message, is_complete ) " + " VALUES ( ?,?,?,? ) ";
+    private static final String SQL_QUERY_INSERT = " INSERT INTO workflow_task_complete_response ( id_history, id_task, message, is_complete ) "
+            + " VALUES ( ?,?,?,? ) ";
     private static final String SQL_QUERY_DELETE_BY_ID_HISTORY = " DELETE FROM workflow_task_complete_response WHERE id_history = ? AND id_task = ? ";
     private static final String SQL_QUERY_DELETE_BY_TASK = " DELETE FROM workflow_task_complete_response WHERE id_task = ? ";
     private static final String SQL_QUERY_UPDATE = " UPDATE workflow_task_complete_response SET message = ?, is_complete = ? WHERE id_history = ? AND id_task = ? ";
@@ -63,14 +64,14 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
     {
         int nIndex = 1;
 
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin ) ) 
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin ) )
         {
-	        daoUtil.setInt( nIndex++, completeFormResponse.getIdHistory( ) );
-	        daoUtil.setInt( nIndex++, completeFormResponse.getIdTask( ) );
-	        daoUtil.setString( nIndex++, completeFormResponse.getMessage( ) );
-	        daoUtil.setBoolean( nIndex++, completeFormResponse.isComplete( ) );
-	
-	        daoUtil.executeUpdate( );
+            daoUtil.setInt( nIndex++, completeFormResponse.getIdHistory( ) );
+            daoUtil.setInt( nIndex++, completeFormResponse.getIdTask( ) );
+            daoUtil.setString( nIndex++, completeFormResponse.getMessage( ) );
+            daoUtil.setBoolean( nIndex++, completeFormResponse.isComplete( ) );
+
+            daoUtil.executeUpdate( );
         }
     }
 
@@ -82,15 +83,15 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
     {
         int nIndex = 1;
 
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) ) 
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
         {
-	        daoUtil.setString( nIndex++, completeFormResponse.getMessage( ) );
-	        daoUtil.setBoolean( nIndex++, completeFormResponse.isComplete( ) );
-	
-	        daoUtil.setInt( nIndex++, completeFormResponse.getIdHistory( ) );
-	        daoUtil.setInt( nIndex++, completeFormResponse.getIdTask( ) );
-	
-	        daoUtil.executeUpdate( );
+            daoUtil.setString( nIndex++, completeFormResponse.getMessage( ) );
+            daoUtil.setBoolean( nIndex++, completeFormResponse.isComplete( ) );
+
+            daoUtil.setInt( nIndex++, completeFormResponse.getIdHistory( ) );
+            daoUtil.setInt( nIndex++, completeFormResponse.getIdTask( ) );
+
+            daoUtil.executeUpdate( );
         }
     }
 
@@ -102,24 +103,24 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
     {
         CompleteFormResponse completeFormResponse = null;
 
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) ) 
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
-	        int nIndex = 1;
-	        daoUtil.setInt( nIndex++, nIdHistory );
-	        daoUtil.setInt( nIndex++, nIdTask );
-	
-	        daoUtil.executeQuery( );
-	
-	        if ( daoUtil.next( ) )
-	        {
-	            nIndex = 1;
-	
-	            completeFormResponse = new CompleteFormResponse( );
-	            completeFormResponse.setIdHistory( daoUtil.getInt( nIndex++ ) );
-	            completeFormResponse.setIdTask( daoUtil.getInt( nIndex++ ) );
-	            completeFormResponse.setMessage( daoUtil.getString( nIndex++ ) );
-	            completeFormResponse.setIsComplete( daoUtil.getBoolean( nIndex++ ) );
-	        }
+            int nIndex = 1;
+            daoUtil.setInt( nIndex++, nIdHistory );
+            daoUtil.setInt( nIndex++, nIdTask );
+
+            daoUtil.executeQuery( );
+
+            if ( daoUtil.next( ) )
+            {
+                nIndex = 1;
+
+                completeFormResponse = new CompleteFormResponse( );
+                completeFormResponse.setIdHistory( daoUtil.getInt( nIndex++ ) );
+                completeFormResponse.setIdTask( daoUtil.getInt( nIndex++ ) );
+                completeFormResponse.setMessage( daoUtil.getString( nIndex++ ) );
+                completeFormResponse.setIsComplete( daoUtil.getBoolean( nIndex++ ) );
+            }
 
         }
         return completeFormResponse;
@@ -132,24 +133,24 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
     public List<CompleteFormResponse> loadByIdTask( int nIdTask, Plugin plugin )
     {
         List<CompleteFormResponse> listCompleteFormResponses = new ArrayList<>( );
-       
+
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_ID_TASK, plugin ) )
         {
-	        daoUtil.setInt( 1, nIdTask );
-	
-	        daoUtil.executeQuery( );
-	
-	        while ( daoUtil.next( ) )
-	        {
-	            int nIndex = 1;
-	
-	            CompleteFormResponse completeFormResponse = new CompleteFormResponse( );
-	            completeFormResponse.setIdHistory( daoUtil.getInt( nIndex++ ) );
-	            completeFormResponse.setIdTask( daoUtil.getInt( nIndex++ ) );
-	            completeFormResponse.setMessage( daoUtil.getString( nIndex++ ) );
-	            completeFormResponse.setIsComplete( daoUtil.getBoolean( nIndex++ ) );
-	            listCompleteFormResponses.add( completeFormResponse );
-	        }
+            daoUtil.setInt( 1, nIdTask );
+
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                int nIndex = 1;
+
+                CompleteFormResponse completeFormResponse = new CompleteFormResponse( );
+                completeFormResponse.setIdHistory( daoUtil.getInt( nIndex++ ) );
+                completeFormResponse.setIdTask( daoUtil.getInt( nIndex++ ) );
+                completeFormResponse.setMessage( daoUtil.getString( nIndex++ ) );
+                completeFormResponse.setIsComplete( daoUtil.getBoolean( nIndex++ ) );
+                listCompleteFormResponses.add( completeFormResponse );
+            }
 
         }
         return listCompleteFormResponses;
@@ -163,11 +164,11 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_BY_ID_HISTORY, plugin ) )
         {
-	        int nIndex = 1;
-	        daoUtil.setInt( nIndex++, nIdHistory );
-	        daoUtil.setInt( nIndex++, nIdTask );
-	
-	        daoUtil.executeUpdate( );
+            int nIndex = 1;
+            daoUtil.setInt( nIndex++, nIdHistory );
+            daoUtil.setInt( nIndex++, nIdTask );
+
+            daoUtil.executeUpdate( );
         }
     }
 
@@ -177,10 +178,10 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
     @Override
     public void deleteByIdTask( int nIdTask, Plugin plugin )
     {
-    	try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_BY_TASK, plugin ) )
-    	{
-	        daoUtil.setInt( 1, nIdTask );
-	        daoUtil.executeUpdate( );
-    	}
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_BY_TASK, plugin ) )
+        {
+            daoUtil.setInt( 1, nIdTask );
+            daoUtil.executeUpdate( );
+        }
     }
 }

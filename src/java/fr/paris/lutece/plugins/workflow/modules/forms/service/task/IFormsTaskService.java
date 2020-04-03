@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2018, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -84,7 +84,7 @@ public interface IFormsTaskService
      * @return the form response
      */
     FormResponse findFormResponseFrom( int nIdResource, String strResourceType );
-    
+
     /**
      * Finds a form response from the specified resource id and resource type
      * 
@@ -95,9 +95,10 @@ public interface IFormsTaskService
      * @return the form response
      */
     FormResponse findFormResponseWithoutSteps( int nIdResource, String strResourceType );
-    
-    List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay, FormResponse formResponse, DisplayType displayType );
-    
+
+    List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay, FormResponse formResponse,
+            DisplayType displayType );
+
     /**
      * Finds the responses that have changed
      * 
@@ -106,7 +107,7 @@ public interface IFormsTaskService
      * @return the list of responses that have changed
      */
     List<EditableResponse> findChangedResponses( List<EditableResponse> listEditableResponse );
-    
+
     /**
      * Creates the editable responses from the specified form response and questions
      * 
@@ -119,7 +120,7 @@ public interface IFormsTaskService
      * @return the list of editable responses
      */
     List<EditableResponse> createEditableResponses( FormResponse formResponse, List<Question> listQuestion, HttpServletRequest request );
-    
+
     /**
      * Finds the responses of the specified question from the specified form response
      * 
@@ -139,7 +140,7 @@ public interface IFormsTaskService
      * @return a ReferenceList
      */
     ReferenceList getListStates( int nIdAction );
-    
+
     /**
      * Set the site message
      * 
@@ -155,7 +156,7 @@ public interface IFormsTaskService
      *             the site message
      */
     void setSiteMessage( HttpServletRequest request, String strMessage, int nTypeMessage, String strUrlReturn ) throws SiteMessageException;
-    
+
     /**
      * Get the FormResponse from a given id history
      * 

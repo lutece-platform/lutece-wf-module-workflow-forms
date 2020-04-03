@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2018, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -160,7 +160,7 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
     private String buildErrorUrl( GenericAttributeError error, HttpServletRequest request )
     {
         Object [ ] listMessageParameters = {
-            error.getErrorMessage( ),
+                error.getErrorMessage( ),
         };
 
         return AdminMessageService.getMessageUrl( request, MESSAGE_ERROR, listMessageParameters, AdminMessage.TYPE_STOP );
@@ -196,8 +196,8 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
 
         // Filter only the steps which contains question to edit in BO
         listStepsOrdered.removeIf( stepId -> !listStepId.contains( stepId ) );
-        
-        //Add the steps that are editable but not in the actuel form response flow
+
+        // Add the steps that are editable but not in the actuel form response flow
         for ( Integer nIdStep : listStepId )
         {
             if ( !listStepsOrdered.contains( nIdStep ) && TransitionHome.getTransitionsListFromStep( nIdStep ).isEmpty( ) )
@@ -211,7 +211,8 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
             listStep.add( StepHome.findByPrimaryKey( nIdStep ) );
         }
 
-        List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestion, formResponse, DisplayType.EDITION_BACKOFFICE );
+        List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestion, formResponse,
+                DisplayType.EDITION_BACKOFFICE );
 
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_STEP_LIST, listStepDisplayTree );
@@ -235,11 +236,11 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_FORM_EDITRESPONSE_HISTORY, locale, model );
         return template.getHtml( );
     }
-    
+
     @Override
-    public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task ) 
+    public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
     {
-    	return null;
+        return null;
     }
 
 }

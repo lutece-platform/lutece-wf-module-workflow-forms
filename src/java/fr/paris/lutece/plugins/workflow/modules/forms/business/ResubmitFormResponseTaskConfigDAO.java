@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2017, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,8 @@ public class ResubmitFormResponseTaskConfigDAO implements ITaskConfigDAO<Resubmi
             + " WHERE id_task = ? ";
     private static final String SQL_QUERY_INSERT = " INSERT INTO workflow_task_resubmit_response_cf ( id_task, id_state_after_edition, default_message ) "
             + " VALUES ( ?,?,? ) ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_task_resubmit_response_cf SET id_state_after_edition = ?, default_message = ? " + " WHERE id_task = ? ";
+    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_task_resubmit_response_cf SET id_state_after_edition = ?, default_message = ? "
+            + " WHERE id_task = ? ";
     private static final String SQL_QUERY_DELETE = " DELETE FROM workflow_task_resubmit_response_cf WHERE id_task = ? ";
 
     /**
@@ -57,16 +58,16 @@ public class ResubmitFormResponseTaskConfigDAO implements ITaskConfigDAO<Resubmi
     @Override
     public synchronized void insert( ResubmitFormResponseTaskConfig config )
     {
-    	try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, WorkflowUtils.getPlugin( ) ) )
-    	{
-	        int nIndex = 1;
-	
-	        daoUtil.setInt( nIndex++, config.getIdTask( ) );
-	        daoUtil.setInt( nIndex++, config.getIdStateAfterEdition( ) );
-	        daoUtil.setString( nIndex++, config.getDefaultMessage( ) );
-	
-	        daoUtil.executeUpdate( );
-    	}
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, WorkflowUtils.getPlugin( ) ) )
+        {
+            int nIndex = 1;
+
+            daoUtil.setInt( nIndex++, config.getIdTask( ) );
+            daoUtil.setInt( nIndex++, config.getIdStateAfterEdition( ) );
+            daoUtil.setString( nIndex++, config.getDefaultMessage( ) );
+
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -75,16 +76,16 @@ public class ResubmitFormResponseTaskConfigDAO implements ITaskConfigDAO<Resubmi
     @Override
     public void store( ResubmitFormResponseTaskConfig config )
     {
-    	try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, WorkflowUtils.getPlugin( ) ) )
-    	{
-	        int nIndex = 1;
-	
-	        daoUtil.setInt( nIndex++, config.getIdStateAfterEdition( ) );
-	        daoUtil.setString( nIndex++, config.getDefaultMessage( ) );
-	
-	        daoUtil.setInt( nIndex++, config.getIdTask( ) );
-	        daoUtil.executeUpdate( );
-    	}
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, WorkflowUtils.getPlugin( ) ) )
+        {
+            int nIndex = 1;
+
+            daoUtil.setInt( nIndex++, config.getIdStateAfterEdition( ) );
+            daoUtil.setString( nIndex++, config.getDefaultMessage( ) );
+
+            daoUtil.setInt( nIndex++, config.getIdTask( ) );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -96,17 +97,17 @@ public class ResubmitFormResponseTaskConfigDAO implements ITaskConfigDAO<Resubmi
         ResubmitFormResponseTaskConfig config = null;
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_BY_PRIMARY_KEY, WorkflowUtils.getPlugin( ) ) )
         {
-	        daoUtil.setInt( 1, nIdTask );
-	        daoUtil.executeQuery( );
-	
-	        int nIndex = 1;
-	        if ( daoUtil.next( ) )
-	        {
-	            config = new ResubmitFormResponseTaskConfig( );
-	            config.setIdTask( daoUtil.getInt( nIndex++ ) );
-	            config.setIdStateAfterEdition( daoUtil.getInt( nIndex++ ) );
-	            config.setDefaultMessage( daoUtil.getString( nIndex++ ) );
-	        }
+            daoUtil.setInt( 1, nIdTask );
+            daoUtil.executeQuery( );
+
+            int nIndex = 1;
+            if ( daoUtil.next( ) )
+            {
+                config = new ResubmitFormResponseTaskConfig( );
+                config.setIdTask( daoUtil.getInt( nIndex++ ) );
+                config.setIdStateAfterEdition( daoUtil.getInt( nIndex++ ) );
+                config.setDefaultMessage( daoUtil.getString( nIndex++ ) );
+            }
         }
 
         return config;
@@ -118,10 +119,10 @@ public class ResubmitFormResponseTaskConfigDAO implements ITaskConfigDAO<Resubmi
     @Override
     public void delete( int nIdTask )
     {
-        try (DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, WorkflowUtils.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, WorkflowUtils.getPlugin( ) ) )
         {
-	        daoUtil.setInt( 1, nIdTask );
-	        daoUtil.executeUpdate( );
+            daoUtil.setInt( 1, nIdTask );
+            daoUtil.executeUpdate( );
         }
     }
 }

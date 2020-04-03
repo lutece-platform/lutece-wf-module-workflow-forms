@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2017, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ public interface ICompleteFormResponseDAO
     /**
      * Insert new record
      * 
-     * @param CompleteFormResponse
+     * @param completeFormResponse
      *            the CompleteFormResponse Object
      * @param plugin
      *            the plugin
@@ -57,7 +57,7 @@ public interface ICompleteFormResponseDAO
     /**
      * Insert new record
      * 
-     * @param CompleteFormResponse
+     * @param completeFormResponse
      *            the CompleteFormResponse Object
      * @param plugin
      *            the plugin

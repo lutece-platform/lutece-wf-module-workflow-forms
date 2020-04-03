@@ -31,35 +31,30 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
+package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
 import java.util.List;
 
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
-import fr.paris.lutece.plugins.forms.business.FormResponse;
-import fr.paris.lutece.plugins.forms.business.Question;
+import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
+import fr.paris.lutece.test.LuteceTestCase;
 
-/**
- * This interface represents a service for the task {@link EditFormResponseTask}
- *
- */
-public interface IEditFormResponseTaskService
+public class ResubmitFormResponseValueDAOTest extends LuteceTestCase
 {
-    /**
-     * Finds the questions to edit for the specified form response
-     * 
-     * @param formResponse
-     *            the form response
-     * @return the list of questions
-     */
-    List<Question> findQuestionsToEdit( FormResponse formResponse );
+    private ResubmitFormResponseValueDAO _dao = new ResubmitFormResponseValueDAO( );
 
-    /**
-     * Saves the specified responses
-     * 
-     * @param formResponse
-     * @param listFormQuestionResponse
-     *            the responses to save
-     */
-    void saveResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse );
+    public void testCRUD( )
+    {
+        ResubmitFormResponseValue value = new ResubmitFormResponseValue( );
+        value.setIdEntry( 10 );
+        value.setIdHistory( 11 );
+
+        _dao.insert( value, WorkflowUtils.getPlugin( ) );
+        List<ResubmitFormResponseValue> loaded = _dao.load( 11, WorkflowUtils.getPlugin( ) );
+        assertEquals( 1, loaded.size( ) );
+        assertEquals( value.getIdEntry( ), loaded.get( 0 ).getIdEntry( ) );
+
+        _dao.delete( 11, WorkflowUtils.getPlugin( ) );
+        loaded = _dao.load( 11, WorkflowUtils.getPlugin( ) );
+        assertEquals( 0, loaded.size( ) );
+    }
 }

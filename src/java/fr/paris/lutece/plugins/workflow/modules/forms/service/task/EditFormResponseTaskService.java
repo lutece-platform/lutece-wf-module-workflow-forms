@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2018, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,13 +61,13 @@ import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
  */
 public class EditFormResponseTaskService implements IEditFormResponseTaskService
 {
-	
-	@Inject
-	private IFormsTaskService _formsTaskService;
-	
-	@Inject
-	private FormService _formService;
-	
+
+    @Inject
+    private IFormsTaskService _formsTaskService;
+
+    @Inject
+    private FormService _formService;
+
     /**
      * {@inheritDoc}
      */
@@ -115,7 +115,7 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
 
         return listQuestionIteration;
     }
-    
+
     public void saveResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse )
     {
         for ( FormQuestionResponse formQuestionResponse : listFormQuestionResponse )
@@ -135,8 +135,8 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
     private void saveStep( FormQuestionResponse formQuestionResponse )
     {
         List<FormResponseStep> listFormResponseStep = FormResponseStepHome.findStepsByFormResponse( formQuestionResponse.getIdFormResponse( ) );
-        boolean bFormResponseStepFound = listFormResponseStep.stream( ).anyMatch(
-                formResponseStep -> formResponseStep.getStep( ).getId( ) == formQuestionResponse.getIdStep( ) );
+        boolean bFormResponseStepFound = listFormResponseStep.stream( )
+                .anyMatch( formResponseStep -> formResponseStep.getStep( ).getId( ) == formQuestionResponse.getIdStep( ) );
 
         if ( !bFormResponseStepFound )
         {

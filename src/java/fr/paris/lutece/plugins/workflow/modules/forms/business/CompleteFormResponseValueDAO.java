@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2017, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,10 +60,10 @@ public class CompleteFormResponseValueDAO implements ICompleteFormResponseValueD
 
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin ) )
         {
-	        daoUtil.setInt( nIndex++, completeFormResponseValue.getIdHistory( ) );
-	        daoUtil.setInt( nIndex++, completeFormResponseValue.getIdEntry( ) );
-	
-	        daoUtil.executeUpdate( );
+            daoUtil.setInt( nIndex++, completeFormResponseValue.getIdHistory( ) );
+            daoUtil.setInt( nIndex++, completeFormResponseValue.getIdEntry( ) );
+
+            daoUtil.executeUpdate( );
         }
     }
 
@@ -75,22 +75,22 @@ public class CompleteFormResponseValueDAO implements ICompleteFormResponseValueD
     {
         List<CompleteFormResponseValue> listCompleteFormResponseValues = new ArrayList<>( );
 
-        try (DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
-	        daoUtil.setInt( 1, nIdHistory );
-	
-	        daoUtil.executeQuery( );
-	
-	        while ( daoUtil.next( ) )
-	        {
-	            int nIndex = 1;
-	
-	            CompleteFormResponseValue completeFormResponseValue = new CompleteFormResponseValue( );
-	            completeFormResponseValue.setIdHistory( daoUtil.getInt( nIndex++ ) );
-	            completeFormResponseValue.setIdEntry( daoUtil.getInt( nIndex++ ) );
-	
-	            listCompleteFormResponseValues.add( completeFormResponseValue );
-	        }
+            daoUtil.setInt( 1, nIdHistory );
+
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                int nIndex = 1;
+
+                CompleteFormResponseValue completeFormResponseValue = new CompleteFormResponseValue( );
+                completeFormResponseValue.setIdHistory( daoUtil.getInt( nIndex++ ) );
+                completeFormResponseValue.setIdEntry( daoUtil.getInt( nIndex++ ) );
+
+                listCompleteFormResponseValues.add( completeFormResponseValue );
+            }
 
         }
 
@@ -105,9 +105,9 @@ public class CompleteFormResponseValueDAO implements ICompleteFormResponseValueD
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
         {
-	        daoUtil.setInt( 1, nIdHistory );
-	
-	        daoUtil.executeUpdate( );
+            daoUtil.setInt( 1, nIdHistory );
+
+            daoUtil.executeUpdate( );
         }
     }
 }
