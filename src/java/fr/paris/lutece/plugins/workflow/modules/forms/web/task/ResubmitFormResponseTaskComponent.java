@@ -119,7 +119,7 @@ public class ResubmitFormResponseTaskComponent extends AbstractFormResponseTaskC
         ResubmitFormResponse resubmitFormResponse = _resubmitResponseService.find( nIdHistory, task.getId( ) );
         ResubmitFormResponseTaskConfig config = _taskResubmitResponseConfigService.findByPrimaryKey( task.getId( ) );
 
-        Map<String, Object> model = new HashMap<String, Object>( );
+        Map<String, Object> model = new HashMap<>( );
         model.put( MARK_CONFIG, config );
         model.put( MARK_EDIT_RESPONSE, resubmitFormResponse );
 

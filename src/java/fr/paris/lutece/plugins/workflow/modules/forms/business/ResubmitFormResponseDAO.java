@@ -60,16 +60,16 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
      * {@inheritDoc}
      */
     @Override
-    public synchronized void insert( ResubmitFormResponse ResubmitFormResponse, Plugin plugin )
+    public synchronized void insert( ResubmitFormResponse resubmitFormResponse, Plugin plugin )
     {
         int nIndex = 1;
 
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin ) )
         {
-            daoUtil.setInt( nIndex++, ResubmitFormResponse.getIdHistory( ) );
-            daoUtil.setInt( nIndex++, ResubmitFormResponse.getIdTask( ) );
-            daoUtil.setString( nIndex++, ResubmitFormResponse.getMessage( ) );
-            daoUtil.setBoolean( nIndex++, ResubmitFormResponse.isComplete( ) );
+            daoUtil.setInt( nIndex++, resubmitFormResponse.getIdHistory( ) );
+            daoUtil.setInt( nIndex++, resubmitFormResponse.getIdTask( ) );
+            daoUtil.setString( nIndex++, resubmitFormResponse.getMessage( ) );
+            daoUtil.setBoolean( nIndex++, resubmitFormResponse.isComplete( ) );
 
             daoUtil.executeUpdate( );
         }
@@ -79,17 +79,17 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
      * {@inheritDoc}
      */
     @Override
-    public void store( ResubmitFormResponse ResubmitFormResponse, Plugin plugin )
+    public void store( ResubmitFormResponse resubmitFormResponse, Plugin plugin )
     {
         int nIndex = 1;
 
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
         {
-            daoUtil.setString( nIndex++, ResubmitFormResponse.getMessage( ) );
-            daoUtil.setBoolean( nIndex++, ResubmitFormResponse.isComplete( ) );
+            daoUtil.setString( nIndex++, resubmitFormResponse.getMessage( ) );
+            daoUtil.setBoolean( nIndex++, resubmitFormResponse.isComplete( ) );
 
-            daoUtil.setInt( nIndex++, ResubmitFormResponse.getIdHistory( ) );
-            daoUtil.setInt( nIndex++, ResubmitFormResponse.getIdTask( ) );
+            daoUtil.setInt( nIndex++, resubmitFormResponse.getIdHistory( ) );
+            daoUtil.setInt( nIndex++, resubmitFormResponse.getIdTask( ) );
 
             daoUtil.executeUpdate( );
         }
@@ -101,7 +101,7 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
     @Override
     public ResubmitFormResponse load( int nIdHistory, int nIdTask, Plugin plugin )
     {
-        ResubmitFormResponse ResubmitFormResponse = null;
+        ResubmitFormResponse resubmitFormResponse = null;
 
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
@@ -115,15 +115,15 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
             {
                 nIndex = 1;
 
-                ResubmitFormResponse = new ResubmitFormResponse( );
-                ResubmitFormResponse.setIdHistory( daoUtil.getInt( nIndex++ ) );
-                ResubmitFormResponse.setIdTask( daoUtil.getInt( nIndex++ ) );
-                ResubmitFormResponse.setMessage( daoUtil.getString( nIndex++ ) );
-                ResubmitFormResponse.setIsComplete( daoUtil.getBoolean( nIndex++ ) );
+                resubmitFormResponse = new ResubmitFormResponse( );
+                resubmitFormResponse.setIdHistory( daoUtil.getInt( nIndex++ ) );
+                resubmitFormResponse.setIdTask( daoUtil.getInt( nIndex++ ) );
+                resubmitFormResponse.setMessage( daoUtil.getString( nIndex++ ) );
+                resubmitFormResponse.setIsComplete( daoUtil.getBoolean( nIndex++ ) );
             }
 
         }
-        return ResubmitFormResponse;
+        return resubmitFormResponse;
     }
 
     /**
@@ -144,12 +144,12 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
             {
                 int nIndex = 1;
 
-                ResubmitFormResponse ResubmitFormResponse = new ResubmitFormResponse( );
-                ResubmitFormResponse.setIdHistory( daoUtil.getInt( nIndex++ ) );
-                ResubmitFormResponse.setIdTask( daoUtil.getInt( nIndex++ ) );
-                ResubmitFormResponse.setMessage( daoUtil.getString( nIndex++ ) );
-                ResubmitFormResponse.setIsComplete( daoUtil.getBoolean( nIndex++ ) );
-                listResubmitFormResponses.add( ResubmitFormResponse );
+                ResubmitFormResponse resubmitFormResponse = new ResubmitFormResponse( );
+                resubmitFormResponse.setIdHistory( daoUtil.getInt( nIndex++ ) );
+                resubmitFormResponse.setIdTask( daoUtil.getInt( nIndex++ ) );
+                resubmitFormResponse.setMessage( daoUtil.getString( nIndex++ ) );
+                resubmitFormResponse.setIsComplete( daoUtil.getBoolean( nIndex++ ) );
+                listResubmitFormResponses.add( resubmitFormResponse );
             }
 
         }

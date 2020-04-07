@@ -54,7 +54,6 @@ import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowService;
 import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
-import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.workflow.WorkflowService;
 
 public class AbstractFormResponseService
@@ -97,13 +96,13 @@ public class AbstractFormResponseService
         }
     }
 
-    protected void doEditResponseData( HttpServletRequest request, FormResponse response, List<Question> listQuestions ) throws SiteMessageException
+    protected void doEditResponseData( HttpServletRequest request, FormResponse response, List<Question> listQuestions )
     {
         List<EditableResponse> listEditableResponse = _formsTaskService.createEditableResponses( response, listQuestions, request );
-        List<EditableResponse> _listChangedResponse = _formsTaskService.findChangedResponses( listEditableResponse );
+        List<EditableResponse> listChangedResponse = _formsTaskService.findChangedResponses( listEditableResponse );
         List<FormQuestionResponse> listChangedResponseToSave = new ArrayList<>( );
 
-        for ( EditableResponse editableResponse : _listChangedResponse )
+        for ( EditableResponse editableResponse : listChangedResponse )
         {
             listChangedResponseToSave.add( editableResponse.getResponseFromForm( ) );
         }

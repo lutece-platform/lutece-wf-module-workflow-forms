@@ -146,37 +146,38 @@ public class EditFormResponseTask extends AbstractFormsTask
      */
     private String createPreviousNewValue( FormQuestionResponse responseForm, String value )
     {
-        if ( responseForm != null )
+        if ( responseForm == null )
         {
-            for ( int i = 0; i < responseForm.getEntryResponse( ).size( ); i++ )
+            return value;
+        }
+        for ( int i = 0; i < responseForm.getEntryResponse( ).size( ); i++ )
+        {
+            Response response = responseForm.getEntryResponse( ).get( i );
+
+            if ( response.getFile( ) != null )
             {
-                Response response = responseForm.getEntryResponse( ).get( i );
+                File file = FileHome.findByPrimaryKey( response.getFile( ).getIdFile( ) );
 
-                if ( response.getFile( ) != null )
+                if ( file != null )
                 {
-                    File file = FileHome.findByPrimaryKey( response.getFile( ).getIdFile( ) );
-
-                    if ( file != null )
-                    {
-                        value = response.getFile( ).getTitle( );
-                    }
+                    value = response.getFile( ).getTitle( );
+                }
+            }
+            else
+            {
+                if ( response.getToStringValueResponse( ) == null || response.getToStringValueResponse( ).equalsIgnoreCase( NULL ) )
+                {
+                    value = StringUtils.EMPTY;
                 }
                 else
                 {
-                    if ( response.getToStringValueResponse( ) == null || response.getToStringValueResponse( ).equalsIgnoreCase( NULL ) )
-                    {
-                        value = StringUtils.EMPTY;
-                    }
-                    else
-                    {
-                        value += response.getToStringValueResponse( );
-                    }
+                    value += response.getToStringValueResponse( );
                 }
+            }
 
-                if ( i + 1 != responseForm.getEntryResponse( ).size( ) )
-                {
-                    value += SEPARATOR;
-                }
+            if ( i + 1 != responseForm.getEntryResponse( ).size( ) )
+            {
+                value += SEPARATOR;
             }
         }
         return value;
