@@ -72,11 +72,6 @@ public class ResubmitFormResponseMarkerProvider implements IMarkerProvider
     private static final String MESSAGE_MARKER_MSG_DESCRIPTION = "module.workflow.forms.marker.provider.resubmit_form.msg.description";
     private static final String MESSAGE_MARKER_ENTRIES_DESCRIPTION = "module.workflow.forms.marker.provider.resubmit_form.entries.description";
 
-    // Markers
-    private static final String MARK_RESUBMIT_FORM_URL = "resubmit_form_url";
-    private static final String MARK_RESUBMIT_FORM_MESSAGE = "resubmit_form_message";
-    private static final String MARK_RESUBMIT_FORM_ENTRIES = "resubmit_form__entries";
-
     @Override
     public String getId( )
     {
@@ -94,15 +89,15 @@ public class ResubmitFormResponseMarkerProvider implements IMarkerProvider
     {
         List<InfoMarker> listMarkers = new ArrayList<>( );
 
-        InfoMarker notifyGruMarkerUrl = new InfoMarker( MARK_RESUBMIT_FORM_URL );
+        InfoMarker notifyGruMarkerUrl = new InfoMarker( ResubmitFormResponseTaskInfoProvider.MARK_RESUBMIT_FORM_URL );
         notifyGruMarkerUrl.setDescription( MESSAGE_MARKER_URL_DESCRIPTION );
         listMarkers.add( notifyGruMarkerUrl );
 
-        InfoMarker notifyGruMarkerMsg = new InfoMarker( MARK_RESUBMIT_FORM_MESSAGE );
+        InfoMarker notifyGruMarkerMsg = new InfoMarker( ResubmitFormResponseTaskInfoProvider.MARK_RESUBMIT_FORM_MESSAGE );
         notifyGruMarkerMsg.setDescription( MESSAGE_MARKER_MSG_DESCRIPTION );
         listMarkers.add( notifyGruMarkerMsg );
 
-        InfoMarker notifyGruMarkerEntries = new InfoMarker( MARK_RESUBMIT_FORM_ENTRIES );
+        InfoMarker notifyGruMarkerEntries = new InfoMarker( ResubmitFormResponseTaskInfoProvider.MARK_RESUBMIT_FORM_ENTRIES );
         notifyGruMarkerEntries.setDescription( MESSAGE_MARKER_ENTRIES_DESCRIPTION );
         listMarkers.add( notifyGruMarkerEntries );
 
@@ -127,19 +122,19 @@ public class ResubmitFormResponseMarkerProvider implements IMarkerProvider
                 String strJsonInfos = _resubmitFormResponseTaskInfoProvider.getTaskResourceInfo( resourceHistory.getId( ), taskOther.getId( ), request );
 
                 JSONObject jsonInfos = JSONObject.fromObject( strJsonInfos );
-                String strUrl = jsonInfos.getString( MARK_RESUBMIT_FORM_URL );
-                String strMsg = jsonInfos.getString( MARK_RESUBMIT_FORM_MESSAGE );
-                String strEntries = jsonInfos.getString( MARK_RESUBMIT_FORM_ENTRIES );
+                String strUrl = jsonInfos.getString( ResubmitFormResponseTaskInfoProvider.MARK_RESUBMIT_FORM_URL );
+                String strMsg = jsonInfos.getString( ResubmitFormResponseTaskInfoProvider.MARK_RESUBMIT_FORM_MESSAGE );
+                String strEntries = jsonInfos.getString( ResubmitFormResponseTaskInfoProvider.MARK_RESUBMIT_FORM_ENTRIES );
 
-                InfoMarker notifyGruMarkerUrl = new InfoMarker( MARK_RESUBMIT_FORM_URL );
+                InfoMarker notifyGruMarkerUrl = new InfoMarker( ResubmitFormResponseTaskInfoProvider.MARK_RESUBMIT_FORM_URL );
                 notifyGruMarkerUrl.setValue( strUrl );
                 listMarkers.add( notifyGruMarkerUrl );
 
-                InfoMarker notifyGruMarkerMsg = new InfoMarker( MARK_RESUBMIT_FORM_MESSAGE );
+                InfoMarker notifyGruMarkerMsg = new InfoMarker( ResubmitFormResponseTaskInfoProvider.MARK_RESUBMIT_FORM_MESSAGE );
                 notifyGruMarkerMsg.setValue( strMsg );
                 listMarkers.add( notifyGruMarkerMsg );
 
-                InfoMarker notifyGruMarkerEntries = new InfoMarker( MARK_RESUBMIT_FORM_ENTRIES );
+                InfoMarker notifyGruMarkerEntries = new InfoMarker( ResubmitFormResponseTaskInfoProvider.MARK_RESUBMIT_FORM_ENTRIES );
                 notifyGruMarkerEntries.setValue( strEntries );
                 listMarkers.add( notifyGruMarkerEntries );
 

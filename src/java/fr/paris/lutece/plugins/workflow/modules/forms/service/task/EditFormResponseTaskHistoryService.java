@@ -70,7 +70,7 @@ public class EditFormResponseTaskHistoryService implements IEditFormResponseTask
     {
         List<EditFormResponseTaskHistory> listEditFormResponseTaskHistory = _editFormResponseTaskHistoryDAO
                 .selectEditFormResponseHistoryByIdHistoryAndIdTask( nIdHistory, nIdTask );
-        listEditFormResponseTaskHistory.forEach( history -> {
+        listEditFormResponseTaskHistory.forEach( ( EditFormResponseTaskHistory history ) -> {
             Question question = QuestionHome.findByPrimaryKey( history.getQuestion( ).getId( ) );
             question.setIterationNumber( history.getQuestion( ).getIterationNumber( ) );
             history.setQuestion( question );

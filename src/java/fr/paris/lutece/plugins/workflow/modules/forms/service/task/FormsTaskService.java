@@ -147,7 +147,7 @@ public class FormsTaskService implements IFormsTaskService
         List<String> listFormDisplayTrees = new ArrayList<>( );
 
         List<FormQuestionResponse> listFormQuestionResponse = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
-        List<Integer> listQuestionToDisplayId = listQuestionToDisplay.stream( ).map( question -> question.getId( ) ).collect( Collectors.toList( ) );
+        List<Integer> listQuestionToDisplayId = listQuestionToDisplay.stream( ).map( Question::getId ).collect( Collectors.toList( ) );
 
         listFormQuestionResponse = listFormQuestionResponse.stream( )
                 .filter( formQuestionResponse -> listQuestionToDisplayId.contains( formQuestionResponse.getQuestion( ).getId( ) ) )

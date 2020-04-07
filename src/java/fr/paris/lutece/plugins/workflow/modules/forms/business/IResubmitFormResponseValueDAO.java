@@ -47,12 +47,12 @@ public interface IResubmitFormResponseValueDAO
     /**
      * Insert new record
      * 
-     * @param ResubmitFormResponseValue
+     * @param resubmitFormResponseValue
      *            the ResubmitFormResponseValue Object
      * @param plugin
      *            the plugin
      */
-    void insert( ResubmitFormResponseValue ResubmitFormResponseValue, Plugin plugin );
+    void insert( ResubmitFormResponseValue resubmitFormResponseValue, Plugin plugin );
 
     /**
      * Load a ResubmitFormResponseValue by id edit record

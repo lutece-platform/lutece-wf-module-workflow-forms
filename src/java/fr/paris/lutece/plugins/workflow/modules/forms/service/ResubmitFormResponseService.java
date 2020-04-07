@@ -90,7 +90,7 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
     private IEntryDAO _entryDAO;
 
     @Inject
-    private IFormResponseDAO formResponseDAO;
+    private IFormResponseDAO _formResponseDAO;
 
     @Inject
     @Named( "workflow-forms.taskResubmitResponseConfigService" )
@@ -133,7 +133,7 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
     public List<Entry> getFormListEntries( int nIdRecord, String strResourceType )
     {
         Plugin plugin = WorkflowUtils.getPlugin( );
-        FormResponse response = formResponseDAO.load( nIdRecord, plugin );
+        FormResponse response = _formResponseDAO.load( nIdRecord, plugin );
         return _entryDAO.findEntriesWithoutParent( plugin, response.getFormId( ), Form.RESOURCE_TYPE );
     }
 

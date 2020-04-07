@@ -109,45 +109,44 @@ public class CompleteFormResponseApp implements XPageApplication
     public XPage getPage( HttpServletRequest request, int nMode, Plugin plugin ) throws UserNotSignedException, SiteMessageException
     {
         XPage page = null;
-        if ( CompleteFormResponseRequestAuthenticatorService.getRequestAuthenticator( ).isRequestAuthenticated( request ) )
+        if ( !CompleteFormResponseRequestAuthenticatorService.getRequestAuthenticator( ).isRequestAuthenticated( request ) )
         {
-            String strIdHistory = request.getParameter( PARAMETER_ID_HISTORY );
-            String strIdTask = request.getParameter( PARAMETER_ID_TASK );
+            // Throws Exception
+            _formsTaskService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP, request.getParameter( PARAMETER_URL_RETURN ) );
+            return null;
+        }
+        String strIdHistory = request.getParameter( PARAMETER_ID_HISTORY );
+        String strIdTask = request.getParameter( PARAMETER_ID_TASK );
 
-            if ( StringUtils.isNotBlank( strIdHistory ) && StringUtils.isNumeric( strIdHistory ) && StringUtils.isNotBlank( strIdTask )
-                    && StringUtils.isNumeric( strIdTask ) )
+        if ( StringUtils.isNotBlank( strIdHistory ) && StringUtils.isNumeric( strIdHistory ) && StringUtils.isNotBlank( strIdTask )
+                && StringUtils.isNumeric( strIdTask ) )
+        {
+            int nIdHistory = Integer.parseInt( strIdHistory );
+            int nIdTask = Integer.parseInt( strIdTask );
+
+            CompleteFormResponse completeFormResponse = _completeFormResponseService.find( nIdHistory, nIdTask );
+            if ( completeFormResponse != null && !completeFormResponse.isComplete( ) )
             {
-                int nIdHistory = Integer.parseInt( strIdHistory );
-                int nIdTask = Integer.parseInt( strIdTask );
-
-                CompleteFormResponse completeFormResponse = _completeFormResponseService.find( nIdHistory, nIdTask );
-                if ( completeFormResponse != null && !completeFormResponse.isComplete( ) )
+                if ( _completeFormResponseService.isRecordStateValid( completeFormResponse, request.getLocale( ) ) )
                 {
-                    if ( _completeFormResponseService.isRecordStateValid( completeFormResponse, request.getLocale( ) ) )
-                    {
-                        doAction( request, completeFormResponse );
-                        page = getResubmitFormResponsePage( request, completeFormResponse );
-                    }
-                    else
-                    {
-                        _formsTaskService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP,
-                                request.getParameter( PARAMETER_URL_RETURN ) );
-                    }
+                    doAction( request, completeFormResponse );
+                    page = getResubmitFormResponsePage( request, completeFormResponse );
                 }
                 else
                 {
-                    _formsTaskService.setSiteMessage( request, MESSAGE_RECORD_ALREADY_COMPLETED, SiteMessage.TYPE_INFO,
+                    _formsTaskService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP,
                             request.getParameter( PARAMETER_URL_RETURN ) );
                 }
             }
             else
             {
-                _formsTaskService.setSiteMessage( request, Messages.MANDATORY_FIELDS, SiteMessage.TYPE_STOP, request.getParameter( PARAMETER_URL_RETURN ) );
+                _formsTaskService.setSiteMessage( request, MESSAGE_RECORD_ALREADY_COMPLETED, SiteMessage.TYPE_INFO,
+                        request.getParameter( PARAMETER_URL_RETURN ) );
             }
         }
         else
         {
-            _formsTaskService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP, request.getParameter( PARAMETER_URL_RETURN ) );
+            _formsTaskService.setSiteMessage( request, Messages.MANDATORY_FIELDS, SiteMessage.TYPE_STOP, request.getParameter( PARAMETER_URL_RETURN ) );
         }
 
         return page;
@@ -161,10 +160,8 @@ public class CompleteFormResponseApp implements XPageApplication
      * @param CompleteFormResponse
      *            the CompleteFormResponse
      * @return a XPage
-     * @throws SiteMessageException
-     *             a site message if there is a problem
      */
-    private XPage getResubmitFormResponsePage( HttpServletRequest request, CompleteFormResponse completeFormResponse ) throws SiteMessageException
+    private XPage getResubmitFormResponsePage( HttpServletRequest request, CompleteFormResponse completeFormResponse )
     {
         XPage page = new XPage( );
 
@@ -177,7 +174,7 @@ public class CompleteFormResponseApp implements XPageApplication
         List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse,
                 DisplayType.COMPLETE_FRONTOFFICE );
 
-        Map<String, Object> model = new HashMap<String, Object>( );
+        Map<String, Object> model = new HashMap<>( );
         model.put( MARK_COMPLETE_FORM, completeFormResponse );
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
         model.put( MARK_LOCALE, request.getLocale( ) );
@@ -204,18 +201,17 @@ public class CompleteFormResponseApp implements XPageApplication
     {
         String strAction = request.getParameter( PARAMETER_ACTION );
 
-        if ( StringUtils.isNotBlank( strAction ) )
+        if ( StringUtils.isBlank( strAction ) )
         {
-            if ( ACTION_DO_MODIFY_RESPONSE.equals( strAction ) )
-            {
-                if ( doEditResponse( request, completeFormResponse ) )
-                {
-                    // Back to home page
-                    String strUrlReturn = request.getParameter( PARAMETER_URL_RETURN );
-                    strUrlReturn = StringUtils.isNotBlank( strUrlReturn ) ? strUrlReturn : AppPathService.getBaseUrl( request );
-                    _formsTaskService.setSiteMessage( request, MESSAGE_EDITION_COMPLETE, SiteMessage.TYPE_INFO, strUrlReturn );
-                }
-            }
+            return;
+        }
+
+        if ( ACTION_DO_MODIFY_RESPONSE.equals( strAction ) && doEditResponse( request, completeFormResponse ) )
+        {
+            // Back to home page
+            String strUrlReturn = request.getParameter( PARAMETER_URL_RETURN );
+            strUrlReturn = StringUtils.isNotBlank( strUrlReturn ) ? strUrlReturn : AppPathService.getBaseUrl( request );
+            _formsTaskService.setSiteMessage( request, MESSAGE_EDITION_COMPLETE, SiteMessage.TYPE_INFO, strUrlReturn );
         }
     }
 

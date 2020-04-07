@@ -77,7 +77,7 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
         Form form = FormHome.findByPrimaryKey( formResponse.getFormId( ) );
 
         List<Question> listFormQuestion = QuestionHome.getListQuestionByIdForm( form.getId( ) );
-        listFormQuestion = listFormQuestion.stream( ).filter( question -> question.getEntry( ).isEditableBack( ) == true ).collect( Collectors.toList( ) );
+        listFormQuestion = listFormQuestion.stream( ).filter( question -> question.getEntry( ).isEditableBack( ) ).collect( Collectors.toList( ) );
         listFormQuestion = addIteration( formResponse, listFormQuestion );
 
         return listFormQuestion;
