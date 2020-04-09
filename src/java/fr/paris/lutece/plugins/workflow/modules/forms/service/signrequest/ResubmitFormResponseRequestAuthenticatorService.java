@@ -55,6 +55,6 @@ public final class ResubmitFormResponseRequestAuthenticatorService
      */
     public static AbstractPrivateKeyAuthenticator getRequestAuthenticator( )
     {
-        return (AbstractPrivateKeyAuthenticator) SpringContextService.getBean( BEAN_RESUBMIT_FORM_REQUEST_AUTHENTICATOR );
+        return SpringContextService.getBean( BEAN_RESUBMIT_FORM_REQUEST_AUTHENTICATOR );
     }
 }

@@ -54,14 +54,14 @@ public class ResubmitFormResponseValueDAO implements IResubmitFormResponseValueD
      * {@inheritDoc}
      */
     @Override
-    public synchronized void insert( ResubmitFormResponseValue ResubmitFormResponseValue, Plugin plugin )
+    public synchronized void insert( ResubmitFormResponseValue resubmitFormResponseValue, Plugin plugin )
     {
         int nIndex = 1;
 
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin ) )
         {
-            daoUtil.setInt( nIndex++, ResubmitFormResponseValue.getIdHistory( ) );
-            daoUtil.setInt( nIndex++, ResubmitFormResponseValue.getIdEntry( ) );
+            daoUtil.setInt( nIndex++, resubmitFormResponseValue.getIdHistory( ) );
+            daoUtil.setInt( nIndex++, resubmitFormResponseValue.getIdEntry( ) );
 
             daoUtil.executeUpdate( );
         }
@@ -85,11 +85,11 @@ public class ResubmitFormResponseValueDAO implements IResubmitFormResponseValueD
             {
                 int nIndex = 1;
 
-                ResubmitFormResponseValue ResubmitFormResponseValue = new ResubmitFormResponseValue( );
-                ResubmitFormResponseValue.setIdHistory( daoUtil.getInt( nIndex++ ) );
-                ResubmitFormResponseValue.setIdEntry( daoUtil.getInt( nIndex++ ) );
+                ResubmitFormResponseValue resubmitFormResponseValue = new ResubmitFormResponseValue( );
+                resubmitFormResponseValue.setIdHistory( daoUtil.getInt( nIndex++ ) );
+                resubmitFormResponseValue.setIdEntry( daoUtil.getInt( nIndex++ ) );
 
-                listResubmitFormResponseValues.add( ResubmitFormResponseValue );
+                listResubmitFormResponseValues.add( resubmitFormResponseValue );
             }
 
         }

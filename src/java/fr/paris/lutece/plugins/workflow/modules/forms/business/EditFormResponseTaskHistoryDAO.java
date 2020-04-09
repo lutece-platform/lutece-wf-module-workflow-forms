@@ -103,15 +103,15 @@ public class EditFormResponseTaskHistoryDAO implements IEditFormResponseTaskHist
     {
         EditFormResponseTaskHistory editFormResponseTaskHistory = new EditFormResponseTaskHistory( );
 
-        int nIndex = 1;
-        editFormResponseTaskHistory.setIdHistory( daoUtil.getInt( nIndex++ ) );
-        editFormResponseTaskHistory.setIdTask( daoUtil.getInt( nIndex++ ) );
+        int nIndex = 0;
+        editFormResponseTaskHistory.setIdHistory( daoUtil.getInt( ++nIndex ) );
+        editFormResponseTaskHistory.setIdTask( daoUtil.getInt( ++nIndex ) );
         Question question = new Question( );
-        question.setId( daoUtil.getInt( nIndex++ ) );
-        question.setIterationNumber( daoUtil.getInt( nIndex++ ) );
+        question.setId( daoUtil.getInt( ++nIndex ) );
+        question.setIterationNumber( daoUtil.getInt( ++nIndex ) );
         editFormResponseTaskHistory.setQuestion( question );
-        editFormResponseTaskHistory.setPreviousValue( daoUtil.getString( nIndex++ ) );
-        editFormResponseTaskHistory.setNewValue( daoUtil.getString( nIndex++ ) );
+        editFormResponseTaskHistory.setPreviousValue( daoUtil.getString( ++nIndex ) );
+        editFormResponseTaskHistory.setNewValue( daoUtil.getString( ++nIndex ) );
 
         return editFormResponseTaskHistory;
     }

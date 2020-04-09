@@ -85,7 +85,7 @@ public interface IResubmitFormResponseService
     /**
      * Find the list of question which can be used in the correct form task.
      * 
-     * @param formResponse 
+     * @param formResponse
      * @return list of question
      */
     List<Question> findListQuestionUsedCorrectForm( FormResponse formResponse );
@@ -111,14 +111,16 @@ public interface IResubmitFormResponseService
     /**
      * Create a ResubmitFormResponse
      * 
-     * @param resubmitFormResponse to create
+     * @param resubmitFormResponse
+     *            to create
      */
     void create( ResubmitFormResponse resubmitFormResponse );
 
     /**
      * Update a ResubmitFormResponse
      * 
-     * @param resubmitFormResponse to update
+     * @param resubmitFormResponse
+     *            to update
      */
     void update( ResubmitFormResponse resubmitFormResponse );
 
@@ -136,7 +138,8 @@ public interface IResubmitFormResponseService
     /**
      * Get the list of questions to edit
      * 
-     * @param formResponse the formResponse
+     * @param formResponse
+     *            the formResponse
      * @param listEditRecordValues
      *            the list of edit record values
      * @return a list of entries

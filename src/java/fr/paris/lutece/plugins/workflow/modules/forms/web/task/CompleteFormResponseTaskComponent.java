@@ -119,7 +119,7 @@ public class CompleteFormResponseTaskComponent extends AbstractFormResponseTaskC
         CompleteFormResponse resubmitFormResponse = _completeResponseService.find( nIdHistory, task.getId( ) );
         CompleteFormResponseTaskConfig config = _taskCompleteResponseConfigService.findByPrimaryKey( task.getId( ) );
 
-        Map<String, Object> model = new HashMap<String, Object>( );
+        Map<String, Object> model = new HashMap<>( );
         model.put( MARK_CONFIG, config );
         model.put( MARK_EDIT_RESPONSE, resubmitFormResponse );
 

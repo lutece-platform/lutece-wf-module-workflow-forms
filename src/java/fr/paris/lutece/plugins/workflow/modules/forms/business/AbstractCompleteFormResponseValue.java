@@ -33,80 +33,50 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
-import fr.paris.lutece.portal.service.plugin.Plugin;
-
-import java.util.List;
-
-/**
- *
- * IResubmitFormResponseDAO
- *
- */
-public interface IResubmitFormResponseDAO
+public abstract class AbstractCompleteFormResponseValue
 {
-    /**
-     * Insert new record
-     * 
-     * @param resubmitFormResponse
-     *            the ResubmitFormResponse Object
-     * @param plugin
-     *            the plugin
-     */
-    void insert( ResubmitFormResponse resubmitFormResponse, Plugin plugin );
+    private int _nIdHistory;
+    private int _nIdEntry;
 
     /**
-     * Insert new record
+     * Get the id history
      * 
-     * @param resubmitFormResponse
-     *            the ResubmitFormResponse Object
-     * @param plugin
-     *            the plugin
+     * @return the id history
      */
-    void store( ResubmitFormResponse resubmitFormResponse, Plugin plugin );
+    public int getIdHistory( )
+    {
+        return _nIdHistory;
+    }
 
     /**
-     * Load a ResubmitFormResponse by id history
+     * Set the id history
      * 
      * @param nIdHistory
      *            the id history
-     * @param nIdTask
-     *            the task id
-     * @param plugin
-     *            the plugin
-     * @return ResubmitFormResponse Object
      */
-    ResubmitFormResponse load( int nIdHistory, int nIdTask, Plugin plugin );
+    public void setIdHistory( int nIdHistory )
+    {
+        _nIdHistory = nIdHistory;
+    }
 
     /**
-     * Load a list of ResubmitFormResponse by id task
+     * Get the id entry
      * 
-     * @param nIdTask
-     *            the id task
-     * @param plugin
-     *            the plugin
-     * @return a list of ResubmitFormResponse
+     * @return the id entry
      */
-    List<ResubmitFormResponse> loadByIdTask( int nIdTask, Plugin plugin );
+    public int getIdEntry( )
+    {
+        return _nIdEntry;
+    }
 
     /**
-     * Remove ResubmitFormResponse by id history
+     * Set the id entry
      * 
-     * @param nIdHistory
-     *            the id history
-     * @param nIdTask
-     *            the task id
-     * @param plugin
-     *            the plugin
+     * @param nIdEntry
+     *            the id entry
      */
-    void deleteByIdHistory( int nIdHistory, int nIdTask, Plugin plugin );
-
-    /**
-     * Remove ResubmitFormResponse by id task
-     * 
-     * @param nIdTask
-     *            the task id
-     * @param plugin
-     *            the plugin
-     */
-    void deleteByIdTask( int nIdTask, Plugin plugin );
+    public void setIdEntry( int nIdEntry )
+    {
+        _nIdEntry = nIdEntry;
+    }
 }

@@ -79,14 +79,16 @@ public interface ICompleteFormResponseService
     /**
      * Create a CompleteFormResponse
      * 
-     * @param completeFormResponse to create
+     * @param completeFormResponse
+     *            to create
      */
     void create( CompleteFormResponse completeFormResponse );
 
     /**
      * Update a CompleteFormResponse
      * 
-     * @param completeFormResponse to update
+     * @param completeFormResponse
+     *            to update
      */
     void update( CompleteFormResponse completeFormResponse );
 
@@ -122,7 +124,8 @@ public interface ICompleteFormResponseService
     /**
      * Get the list of questions to edit
      * 
-     * @param formResponse the form response
+     * @param formResponse
+     *            the form response
      * @param listEditRecordValues
      *            the list of edit record values
      * @return a list of entries

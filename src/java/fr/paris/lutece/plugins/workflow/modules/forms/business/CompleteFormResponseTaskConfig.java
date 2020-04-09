@@ -33,62 +33,11 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
-import fr.paris.lutece.plugins.workflowcore.business.config.TaskConfig;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-
 /**
  *
  * TaskCompleteFormResponseConfig
  *
  */
-public class CompleteFormResponseTaskConfig extends TaskConfig
+public class CompleteFormResponseTaskConfig extends AbstractCompleteFormResponseTaskConfig
 {
-    @NotNull
-    @Min( 1 )
-    private int _nIdStateAfterEdition;
-    private String _strDefaultMessage;
-
-    /**
-     * Set the id state after edition
-     * 
-     * @param nIdStateAfterEdition
-     *            the id state after edition
-     */
-    public void setIdStateAfterEdition( int nIdStateAfterEdition )
-    {
-        _nIdStateAfterEdition = nIdStateAfterEdition;
-    }
-
-    /**
-     * Get the id state after edition
-     * 
-     * @return the id state after edition
-     */
-    public int getIdStateAfterEdition( )
-    {
-        return _nIdStateAfterEdition;
-    }
-
-    /**
-     * Set the default message
-     * 
-     * @param strDefaultMessage
-     *            the default message
-     */
-    public void setDefaultMessage( String strDefaultMessage )
-    {
-        _strDefaultMessage = strDefaultMessage;
-    }
-
-    /**
-     * Get the default message
-     * 
-     * @return the default message
-     */
-    public String getDefaultMessage( )
-    {
-        return _strDefaultMessage;
-    }
 }
