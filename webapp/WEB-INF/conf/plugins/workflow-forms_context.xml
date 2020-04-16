@@ -115,6 +115,21 @@
     <bean id="workflow-forms.completeFormResponseMarkerProvider"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.CompleteFormResponseMarkerProvider" />
 
+    <!-- Forms factories  & config  -->
+    <bean id="workflow-forms.workflowState.column.display.factory" class="fr.paris.lutece.plugins.workflow.modules.forms.web.form.column.display.factory.impl.FormColumnDisplayWorkflowStateFactory"/>
+    <bean id="workflow-forms.formColumn.workflowState.queryPart.factory" class="fr.paris.lutece.plugins.workflow.modules.forms.business.form.column.querypart.factory.impl.FormColumnWorkflowStateQueryPartFactory"/>
+    <bean id="workflow-forms.workflowState.filter.display.factory" class="fr.paris.lutece.plugins.workflow.modules.forms.web.form.filter.display.factory.impl.FormFilterDisplayWorkflowStateFactory"/>
+    <bean id="workflow-forms.formFilter.workflowState.queryPart.factory" class="fr.paris.lutece.plugins.workflow.modules.forms.business.form.filter.querypart.factory.impl.FormFilterWorkflowStateQueryPartFactory"/>
+    <bean id="workflow-forms.workflowState.column" class="fr.paris.lutece.plugins.workflow.modules.forms.business.form.column.impl.FormColumnWorkflowState">
+        <constructor-arg name="nFormColumnPosition" type="int" value="3"/>      
+        <constructor-arg name="strFormColumnTitle" type="java.lang.String" value="&#201;tat"/>
+    </bean>
+    <bean id="workflow-forms.workflowState.filterConfiguration" class="fr.paris.lutece.plugins.workflow.modules.forms.business.form.filter.configuration.FormFilterWorkflowConfiguration">
+        <constructor-arg name="nPosition" type="int" value="4"/>
+        <constructor-arg name="strFormFilterLabel" type="java.lang.String" value="-"/>
+        <constructor-arg name="strFormFilterName" type="java.lang.String" value="workflow_state"/>
+    </bean>
+    
     <!-- SignRequest -->
     <bean id="workflow-forms.hashService"
         class="fr.paris.lutece.util.signrequest.security.Sha1HashService" />
