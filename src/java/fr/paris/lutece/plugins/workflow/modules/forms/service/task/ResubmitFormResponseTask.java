@@ -162,5 +162,6 @@ public class ResubmitFormResponseTask extends Task
     @Override
     public void init( )
     {
+     // Nothing to init
     }
 }

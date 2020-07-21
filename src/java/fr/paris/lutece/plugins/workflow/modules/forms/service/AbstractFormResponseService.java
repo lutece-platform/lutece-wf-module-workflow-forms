@@ -89,10 +89,10 @@ public class AbstractFormResponseService
             _resourceWorkflowService.update( resourceWorkflow );
 
             WorkflowService.getInstance( ).doProcessAutomaticReflexiveActions( response.getId( ), FormResponse.RESOURCE_TYPE, action.getStateAfter( ).getId( ),
-                    resourceWorkflow.getExternalParentId( ), locale );
+                    resourceWorkflow.getExternalParentId( ), locale, null );
             // if new state have action automatic
             WorkflowService.getInstance( ).executeActionAutomatic( response.getId( ), FormResponse.RESOURCE_TYPE, action.getWorkflow( ).getId( ),
-                    resourceWorkflow.getExternalParentId( ) );
+                    resourceWorkflow.getExternalParentId( ), null );
         }
     }
 
