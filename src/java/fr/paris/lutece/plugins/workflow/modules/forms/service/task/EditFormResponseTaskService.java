@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -54,6 +55,7 @@ import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.service.FormService;
 import fr.paris.lutece.plugins.forms.util.FormsConstants;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 
 /**
  * This class is a service for the task {@link EditFormResponseTask}
@@ -61,6 +63,10 @@ import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
  */
 public class EditFormResponseTaskService implements IEditFormResponseTaskService
 {
+
+    @Inject
+    @Named( "workflow-forms.editFormResponseConfigService" )
+    private ITaskConfigService _taskEditFormConfigService;
 
     @Inject
     private IFormsTaskService _formsTaskService;

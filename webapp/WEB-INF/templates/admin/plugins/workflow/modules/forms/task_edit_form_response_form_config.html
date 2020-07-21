@@ -1,0 +1,25 @@
+<@row>
+	<@formGroup labelFor="form_select" labelKey="#i18n{module.workflow.forms.task.editFormResponse.config.label}" formStyle='horizontal'>
+		<@select name="form_select" items=form_list default_value='${id_form!}' />
+		<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
+		<#if id_form??>
+			<@select name="step_select" items=list_step default_value='${id_step!}' />
+			<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
+		</#if>
+		<#if id_step??>
+			<@select name="question_select" items=question_list default_value='${id_question!}' />
+			<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' />
+		</#if>
+	</@formGroup>
+</@row>
+<@row>
+	<@input id='mapping_id' type='hidden' name='mapping_id' />
+	<#list mapping_list as mapping>
+		<@formGroup labelFor="" labelKey="#i18n{module.workflow.forms.task.editFormResponse.config.existing}" formStyle='horizontal'>
+			<@staticText>
+				${mapping.form.title} / ${mapping.step.title} / ${mapping.question.title}
+			</@staticText>
+			<@button type='submit' style='danger' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
+		</@formGroup>
+	</#list>
+</@row>
