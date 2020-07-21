@@ -35,7 +35,6 @@ package fr.paris.lutece.plugins.workflow.modules.forms.web.task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -140,7 +139,7 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
         String strErrorUrl = null;
 
         FormResponse formResponse = _formsTaskService.findFormResponseFrom( nIdResource, strResourceType );
-        List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( formResponse );
+        List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( task, formResponse );
         GenericAttributeError error = validateQuestions( listQuestion, request );
 
         if ( error != null )
@@ -203,18 +202,10 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
     public String getDisplayTaskForm( int nIdResource, String strResourceType, HttpServletRequest request, Locale locale, ITask task )
     {
         FormResponse formResponse = _formsTaskService.findFormResponseFrom( nIdResource, strResourceType );
-        List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( formResponse );
+        List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( task, formResponse );
 
-        Set<Integer> listStepId = new HashSet<>( );
+        Set<Integer> listStepId = listQuestion.stream( ).map( Question::getIdStep ).distinct( ).collect( Collectors.toSet( ) );
         List<Step> listStep = new ArrayList<>( );
-
-        for ( Question question : listQuestion )
-        {
-            if ( !listStepId.contains( question.getIdStep( ) ) )
-            {
-                listStepId.add( question.getIdStep( ) );
-            }
-        }
 
         List<FormResponseStep> listFormResponseStep = formResponse.getSteps( );
         List<Integer> listStepsOrdered = new ArrayList<>( );

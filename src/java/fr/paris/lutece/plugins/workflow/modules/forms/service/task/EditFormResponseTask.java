@@ -104,7 +104,7 @@ public class EditFormResponseTask extends AbstractFormsTask
     @Override
     public void processTask( FormResponse formResponse, HttpServletRequest request, Locale locale )
     {
-        List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( formResponse );
+        List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( this, formResponse );
         List<EditableResponse> listEditableResponse = _formsTaskService.createEditableResponses( formResponse, listQuestion, request );
         _listChangedResponse = _formsTaskService.findChangedResponses( listEditableResponse );
         List<FormQuestionResponse> listChangedResponseToSave = new ArrayList<>( );

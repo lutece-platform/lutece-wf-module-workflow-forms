@@ -42,20 +42,20 @@ import javax.inject.Named;
 
 import org.apache.commons.collections.CollectionUtils;
 
-import fr.paris.lutece.plugins.forms.business.Form;
-import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponseStep;
 import fr.paris.lutece.plugins.forms.business.FormResponseStepHome;
 import fr.paris.lutece.plugins.forms.business.Question;
-import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.service.FormService;
 import fr.paris.lutece.plugins.forms.util.FormsConstants;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfig;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValue;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 
 /**
  * This class is a service for the task {@link EditFormResponseTask}
@@ -78,14 +78,13 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
      * {@inheritDoc}
      */
     @Override
-    public List<Question> findQuestionsToEdit( FormResponse formResponse )
+    public List<Question> findQuestionsToEdit( ITask task, FormResponse formResponse )
     {
-        Form form = FormHome.findByPrimaryKey( formResponse.getFormId( ) );
+        EditFormResponseConfig config = _taskEditFormConfigService.findByPrimaryKey( task.getId( ) );
 
-        List<Question> listFormQuestion = QuestionHome.getListQuestionByIdForm( form.getId( ) );
-        listFormQuestion = listFormQuestion.stream( ).filter( question -> question.getEntry( ).isEditableBack( ) ).collect( Collectors.toList( ) );
+        List<Question> listFormQuestion = config.getListConfigValues( ).stream( ).filter( cv -> cv.getForm( ).getId( ) == formResponse.getFormId( ) )
+                .map( EditFormResponseConfigValue::getQuestion ).collect( Collectors.toList( ) );
         listFormQuestion = addIteration( formResponse, listFormQuestion );
-
         return listFormQuestion;
     }
 
