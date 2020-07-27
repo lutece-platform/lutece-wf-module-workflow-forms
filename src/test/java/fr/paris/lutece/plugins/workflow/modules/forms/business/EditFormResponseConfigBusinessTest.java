@@ -31,36 +31,36 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
+package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
-import java.util.List;
+import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
+import fr.paris.lutece.test.LuteceTestCase;
 
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
-import fr.paris.lutece.plugins.forms.business.FormResponse;
-import fr.paris.lutece.plugins.forms.business.Question;
-import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
-
-/**
- * This interface represents a service for the task {@link EditFormResponseTask}
- *
- */
-public interface IEditFormResponseTaskService
+public class EditFormResponseConfigBusinessTest extends LuteceTestCase
 {
-    /**
-     * Finds the questions to edit for the specified form response
-     * 
-     * @param formResponse
-     *            the form response
-     * @return the list of questions
-     */
-    List<Question> findQuestionsToEdit( ITask task, FormResponse formResponse );
 
-    /**
-     * Saves the specified responses
-     * 
-     * @param formResponse
-     * @param listFormQuestionResponse
-     *            the responses to save
-     */
-    void saveResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse );
+    private ITaskConfigDAO<EditFormResponseConfig> _dao = new EditFormResponseConfigDao( );
+
+    public void testCRUD( )
+    {
+        EditFormResponseConfig config = new EditFormResponseConfig( );
+        config.setIdTask( 22 );
+
+        _dao.insert( config );
+
+        EditFormResponseConfig loaded = _dao.load( config.getIdTask( ) );
+        assertEquals( config.getIdConfig( ), loaded.getIdConfig( ) );
+        assertEquals( config.getIdTask( ), loaded.getIdTask( ) );
+
+        config.setIdTask( 44 );
+        _dao.store( config );
+
+        loaded = _dao.load( config.getIdTask( ) );
+        assertEquals( config.getIdConfig( ), loaded.getIdConfig( ) );
+        assertEquals( config.getIdTask( ), loaded.getIdTask( ) );
+
+        _dao.delete( config.getIdTask( ) );
+        loaded = _dao.load( config.getIdTask( ) );
+        assertNull( loaded );
+    }
 }

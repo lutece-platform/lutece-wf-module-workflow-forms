@@ -38,14 +38,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponseStep;
 import fr.paris.lutece.plugins.forms.business.Question;
+import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.business.TransitionHome;
@@ -54,6 +58,8 @@ import fr.paris.lutece.plugins.forms.util.FormsConstants;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
 import fr.paris.lutece.plugins.genericattributes.business.GenericAttributeError;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfig;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValue;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskHistoryService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
@@ -62,9 +68,8 @@ import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * This class represents a component for the task {@link fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTask EditFormResponseTask}
@@ -72,15 +77,39 @@ import java.util.Set;
  */
 public class EditFormResponseTaskComponent extends AbstractFormResponseTaskComponent
 {
+    // Mark
+    private static final String MARK_FORM_LIST = "form_list";
+    private static final String MARK_ID_FORM = "id_form";
+    private static final String MARK_ID_STEP = "id_step";
+    private static final String MARK_QUESTION_LIST = "question_list";
+    private static final String MARK_MAPPING_LIST = "mapping_list";
+
+    // Parameters
+    private static final String PARAMETER_ACTION = "apply";
+    private static final String PARAMETER_FORM = "form_select";
+    private static final String PARAMETER_STEP = "step_select";
+    private static final String PARAMETER_QUESTION = "question_select";
+    private static final String PARAMETER_MAPPING_ID = "mapping_id";
+
+    // Action
+    private static final String ACTION_SELECT_FORM = "select_form_config";
+    private static final String ACTION_SELECT_STEP = "select_step_config";
+    private static final String ACTION_SELECT_QUESTION = "select_question_config";
+    private static final String ACTION_REMOVE_MAPPING = "delete_mapping";
+
     // Messages
     private static final String MESSAGE_ERROR = "module.workflow.forms.error.task.editFormResponse";
 
     // Templates
     private static final String TEMPLATE_TASK_FORM_EDITRESPONSE_HISTORY = "admin/plugins/workflow/modules/forms/task_forms_editresponse_history.html";
+    private static final String TEMPLATE_TASK_FORM_EDITRESPONSE_CONFIG = "admin/plugins/workflow/modules/forms/task_edit_form_response_form_config.html";
 
     private final IFormsTaskService _formsTaskService;
     private final IEditFormResponseTaskService _editFormResponseTaskService;
     private final IEditFormResponseTaskHistoryService _editFormResponseTaskHistoryService;
+
+    private EditFormResponseConfigValue _configValue;
+    private EditFormResponseConfig _config;
 
     /**
      * Constructor
@@ -110,7 +139,7 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
         String strErrorUrl = null;
 
         FormResponse formResponse = _formsTaskService.findFormResponseFrom( nIdResource, strResourceType );
-        List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( formResponse );
+        List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( task, formResponse );
         GenericAttributeError error = validateQuestions( listQuestion, request );
 
         if ( error != null )
@@ -173,18 +202,10 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
     public String getDisplayTaskForm( int nIdResource, String strResourceType, HttpServletRequest request, Locale locale, ITask task )
     {
         FormResponse formResponse = _formsTaskService.findFormResponseFrom( nIdResource, strResourceType );
-        List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( formResponse );
+        List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( task, formResponse );
 
-        Set<Integer> listStepId = new HashSet<>( );
+        Set<Integer> listStepId = listQuestion.stream( ).map( Question::getIdStep ).distinct( ).collect( Collectors.toSet( ) );
         List<Step> listStep = new ArrayList<>( );
-
-        for ( Question question : listQuestion )
-        {
-            if ( !listStepId.contains( question.getIdStep( ) ) )
-            {
-                listStepId.add( question.getIdStep( ) );
-            }
-        }
 
         List<FormResponseStep> listFormResponseStep = formResponse.getSteps( );
         List<Integer> listStepsOrdered = new ArrayList<>( );
@@ -240,7 +261,107 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
     @Override
     public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
     {
+        _config = getTaskConfigService( ).findByPrimaryKey( task.getId( ) );
+        if ( _config == null )
+        {
+            _config = new EditFormResponseConfig( );
+        }
+        if ( _configValue == null )
+        {
+            _configValue = new EditFormResponseConfigValue( );
+        }
+
+        Map<String, Object> model = new HashMap<>( );
+        model.put( MARK_FORM_LIST, FormHome.getFormsReferenceList( ) );
+        model.put( MARK_MAPPING_LIST, _config.getListConfigValues( ) );
+
+        if ( _configValue.getForm( ) != null )
+        {
+            model.put( MARK_ID_FORM, _configValue.getForm( ).getId( ) );
+            model.put( MARK_STEP_LIST, StepHome.getStepReferenceListByForm( _configValue.getForm( ).getId( ) ) );
+        }
+        if ( _configValue.getStep( ) != null )
+        {
+            model.put( MARK_ID_STEP, _configValue.getStep( ).getId( ) );
+            model.put( MARK_QUESTION_LIST, getQuestionReferenceList( _configValue.getStep( ).getId( ) ) );
+        }
+
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_FORM_EDITRESPONSE_CONFIG, locale, model );
+        return template.getHtml( );
+    }
+
+    private ReferenceList getQuestionReferenceList( int idStep )
+    {
+        ReferenceList refList = new ReferenceList( );
+        refList.addItem( -1, "" );
+        if ( idStep != -1 )
+        {
+            List<Question> questionList = QuestionHome.getQuestionsListByStep( idStep );
+            for ( Question question : questionList )
+            {
+                if ( question.getEntry( ).isEditableBack( ) )
+                {
+                    refList.addItem( question.getId( ), question.getTitle( ) );
+                }
+            }
+        }
+
+        return refList;
+    }
+
+    @Override
+    public String doSaveConfig( HttpServletRequest request, Locale locale, ITask task )
+    {
+        _config = getTaskConfigService( ).findByPrimaryKey( task.getId( ) );
+        boolean create = _config == null;
+        if ( create )
+        {
+            _config = new EditFormResponseConfig( );
+            _config.setIdTask( task.getId( ) );
+        }
+
+        String action = request.getParameter( PARAMETER_ACTION );
+        if ( action != null )
+        {
+            doProcessAction( action, request );
+        }
+
+        if ( create )
+        {
+            getTaskConfigService( ).create( _config );
+        }
+        else
+        {
+            getTaskConfigService( ).update( _config );
+        }
         return null;
     }
 
+    private void doProcessAction( String action, HttpServletRequest request )
+    {
+        switch( action )
+        {
+            case ACTION_SELECT_FORM:
+                _configValue = new EditFormResponseConfigValue( );
+                _configValue.setForm( FormHome.findByPrimaryKey( Integer.valueOf( request.getParameter( PARAMETER_FORM ) ) ) );
+                break;
+            case ACTION_SELECT_STEP:
+                _configValue.setStep( StepHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_STEP ) ) ) );
+                _configValue.setQuestion( null );
+                break;
+            case ACTION_SELECT_QUESTION:
+                _configValue.setQuestion( QuestionHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_QUESTION ) ) ) );
+                _config.addConfigValue( _configValue );
+                _configValue = new EditFormResponseConfigValue( );
+                break;
+            case ACTION_REMOVE_MAPPING:
+                int idToRemove = Integer.parseInt( request.getParameter( PARAMETER_MAPPING_ID ) );
+                List<EditFormResponseConfigValue> newList = _config.getListConfigValues( ).stream( )
+                        .filter( configValue -> configValue.getIdConfigValue( ) != idToRemove ).collect( Collectors.toList( ) );
+                _config.setListConfigValues( newList );
+                break;
+            default:
+                break;
+        }
+    }
 }

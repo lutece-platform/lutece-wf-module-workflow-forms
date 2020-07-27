@@ -162,5 +162,6 @@ public class CompleteFormResponseTask extends Task
     @Override
     public void init( )
     {
+        // Nothing to init
     }
 }

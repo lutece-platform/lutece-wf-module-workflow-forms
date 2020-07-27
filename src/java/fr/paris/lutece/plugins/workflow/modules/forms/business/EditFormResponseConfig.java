@@ -31,36 +31,54 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
+package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
-import fr.paris.lutece.plugins.forms.business.FormResponse;
-import fr.paris.lutece.plugins.forms.business.Question;
-import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.plugins.workflowcore.business.config.TaskConfig;
 
-/**
- * This interface represents a service for the task {@link EditFormResponseTask}
- *
- */
-public interface IEditFormResponseTaskService
+public class EditFormResponseConfig extends TaskConfig
 {
-    /**
-     * Finds the questions to edit for the specified form response
-     * 
-     * @param formResponse
-     *            the form response
-     * @return the list of questions
-     */
-    List<Question> findQuestionsToEdit( ITask task, FormResponse formResponse );
+    private int _nIdConfig = -1;
+    private List<EditFormResponseConfigValue> _listConfigValues = new ArrayList<>( );
 
     /**
-     * Saves the specified responses
-     * 
-     * @param formResponse
-     * @param listFormQuestionResponse
-     *            the responses to save
+     * @return the nIdConfig
      */
-    void saveResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse );
+    public int getIdConfig( )
+    {
+        return _nIdConfig;
+    }
+
+    /**
+     * @param nIdConfig
+     *            the nIdConfig to set
+     */
+    public void setIdConfig( int nIdConfig )
+    {
+        _nIdConfig = nIdConfig;
+    }
+
+    /**
+     * @return the listConfigValues
+     */
+    public List<EditFormResponseConfigValue> getListConfigValues( )
+    {
+        return new ArrayList<>( _listConfigValues );
+    }
+
+    /**
+     * @param listConfigValues
+     *            the listConfigValues to set
+     */
+    public void setListConfigValues( List<EditFormResponseConfigValue> listConfigValues )
+    {
+        this._listConfigValues = new ArrayList<>( listConfigValues );
+    }
+
+    public void addConfigValue( EditFormResponseConfigValue configValue )
+    {
+        this._listConfigValues.add( configValue );
+    }
 }

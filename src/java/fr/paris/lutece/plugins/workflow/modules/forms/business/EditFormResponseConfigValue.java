@@ -31,36 +31,95 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
+package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
-import java.util.List;
-
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
-import fr.paris.lutece.plugins.forms.business.FormResponse;
+import fr.paris.lutece.plugins.forms.business.Form;
 import fr.paris.lutece.plugins.forms.business.Question;
-import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.plugins.forms.business.Step;
 
-/**
- * This interface represents a service for the task {@link EditFormResponseTask}
- *
- */
-public interface IEditFormResponseTaskService
+public class EditFormResponseConfigValue
 {
-    /**
-     * Finds the questions to edit for the specified form response
-     * 
-     * @param formResponse
-     *            the form response
-     * @return the list of questions
-     */
-    List<Question> findQuestionsToEdit( ITask task, FormResponse formResponse );
+    private int _nIdConfigValue;
+    private int _nIdConfig;
+    private Form _form;
+    private Step _step;
+    private Question _question;
 
     /**
-     * Saves the specified responses
-     * 
-     * @param formResponse
-     * @param listFormQuestionResponse
-     *            the responses to save
+     * @return the nIdConfigValue
      */
-    void saveResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse );
+    public int getIdConfigValue( )
+    {
+        return _nIdConfigValue;
+    }
+
+    /**
+     * @param nIdConfigValue
+     *            the nIdConfigValue to set
+     */
+    public void setIdConfigValue( int nIdConfigValue )
+    {
+        _nIdConfigValue = nIdConfigValue;
+    }
+
+    /**
+     * @return the nIdConfig
+     */
+    public int getIdConfig( )
+    {
+        return _nIdConfig;
+    }
+
+    /**
+     * @param nIdConfig
+     *            the nIdConfig to set
+     */
+    public void setIdConfig( int nIdConfig )
+    {
+        _nIdConfig = nIdConfig;
+    }
+
+    /**
+     * @return the step
+     */
+    public Step getStep( )
+    {
+        return _step;
+    }
+
+    /**
+     * @param step
+     *            the step to set
+     */
+    public void setStep( Step step )
+    {
+        _step = step;
+    }
+
+    /**
+     * @return the question
+     */
+    public Question getQuestion( )
+    {
+        return _question;
+    }
+
+    /**
+     * @param question
+     *            the question to set
+     */
+    public void setQuestion( Question question )
+    {
+        _question = question;
+    }
+
+    public Form getForm( )
+    {
+        return _form;
+    }
+
+    public void setForm( Form form )
+    {
+        _form = form;
+    }
 }

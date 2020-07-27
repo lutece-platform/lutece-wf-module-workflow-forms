@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +49,7 @@ import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
 import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.portal.business.file.File;
 import fr.paris.lutece.portal.business.file.FileHome;
 import fr.paris.lutece.portal.service.i18n.I18nService;
@@ -64,6 +66,10 @@ public class EditFormResponseTask extends AbstractFormsTask
     private static final String NULL = "null";
     private static final String SEPARATOR = ", ";
 
+    @Inject
+    @Named( "workflow-forms.editFormResponseConfigService" )
+    private ITaskConfigService _taskEditFormConfigService;
+    
     private final IEditFormResponseTaskService _editFormResponseTaskService;
     private final IEditFormResponseTaskHistoryService _editFormResponseTaskHistoryService;
 
@@ -104,7 +110,7 @@ public class EditFormResponseTask extends AbstractFormsTask
     @Override
     public void processTask( FormResponse formResponse, HttpServletRequest request, Locale locale )
     {
-        List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( formResponse );
+        List<Question> listQuestion = _editFormResponseTaskService.findQuestionsToEdit( this, formResponse );
         List<EditableResponse> listEditableResponse = _formsTaskService.createEditableResponses( formResponse, listQuestion, request );
         _listChangedResponse = _formsTaskService.findChangedResponses( listEditableResponse );
         List<FormQuestionResponse> listChangedResponseToSave = new ArrayList<>( );
@@ -181,5 +187,11 @@ public class EditFormResponseTask extends AbstractFormsTask
             }
         }
         return value;
+    }
+    
+    @Override
+    public void doRemoveConfig( )
+    {
+        _taskEditFormConfigService.remove( getId() );
     }
 }

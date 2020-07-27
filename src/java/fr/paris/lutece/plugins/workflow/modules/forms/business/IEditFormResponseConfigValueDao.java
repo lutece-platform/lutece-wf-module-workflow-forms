@@ -31,36 +31,64 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
+package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
 import java.util.List;
 
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
-import fr.paris.lutece.plugins.forms.business.FormResponse;
-import fr.paris.lutece.plugins.forms.business.Question;
-import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.portal.service.plugin.Plugin;
 
 /**
- * This interface represents a service for the task {@link EditFormResponseTask}
- *
+ * Dao Interface for {@link EditFormResponseConfigValue}
  */
-public interface IEditFormResponseTaskService
+public interface IEditFormResponseConfigValueDao
 {
     /**
-     * Finds the questions to edit for the specified form response
+     * Insert a new record in the table.
      * 
-     * @param formResponse
-     *            the form response
-     * @return the list of questions
+     * @param configValue
+     * @param plugin
      */
-    List<Question> findQuestionsToEdit( ITask task, FormResponse formResponse );
+    void insert( EditFormResponseConfigValue configValue, Plugin plugin );
 
     /**
-     * Saves the specified responses
+     * Update the record in the table.
      * 
-     * @param formResponse
-     * @param listFormQuestionResponse
-     *            the responses to save
+     * @param configValue
+     * @param plugin
      */
-    void saveResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse );
+    void store( EditFormResponseConfigValue configValue, Plugin plugin );
+
+    /**
+     * Delete a record from the table
+     * 
+     * @param nKey
+     * @param plugin
+     */
+    void delete( int nKey, Plugin plugin );
+
+    /**
+     * Delete records from the table
+     * 
+     * @param nConfigId
+     * @param plugin
+     */
+    void deleteByConfigId( int nConfigId, Plugin plugin );
+
+    /**
+     * Load all {@link EditFormResponseConfigValue} with the given nConfigId.
+     * 
+     * @param nConfigId
+     * @param plugin
+     * @return
+     */
+    List<EditFormResponseConfigValue> selectByConfigId( int nConfigId, Plugin plugin );
+
+    /**
+     * Load the data from the table.
+     * 
+     * @param nKey
+     * @param plugin
+     * @return
+     */
+    EditFormResponseConfigValue load( int nKey, Plugin plugin );
 }

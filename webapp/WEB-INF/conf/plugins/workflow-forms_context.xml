@@ -22,7 +22,10 @@
         p:taskConfigDAO-ref="worklow-forms.taskCompleteFormResponseConfigDAO" />
     <bean id="workflow-forms.taskCompleteResponseService"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.CompleteFormResponseService" />
-
+    <bean id="workflow-forms.editFormResponseConfigService"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseConfigService"
+        p:taskConfigDAO-ref="worklow-forms.editFormResponseConfigDao" />
+        
     <!-- DAO -->
     <bean id="worklow-forms.editFormResponseTaskHistoryDAO"
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistoryDAO" />
@@ -38,10 +41,17 @@
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseValueDAO" />
     <bean id="worklow-forms.taskCompleteFormResponseConfigDAO"
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskConfigDAO" />
-
+    <bean id="worklow-forms.editFormResponseConfigValueDao"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValueDao" />
+    <bean id="worklow-forms.editFormResponseConfigDao"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigDao" />
+    
     <!-- Task edit form response -->
     <bean id="workflow-forms.editFormResponseTask"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTask"
+        scope="prototype" />
+    <bean id="workflow-forms.editFormResponseConfig"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfig"
         scope="prototype" />
 
     <bean id="workflow-forms.editFormResponseTypeTask"
@@ -49,11 +59,14 @@
         p:key="editFormResponseTypeTask"
         p:titleI18nKey="module.workflow.forms.task.editFormResponse.title"
         p:beanName="workflow-forms.editFormResponseTask"
-        p:formTaskRequired="true" />
+        p:formTaskRequired="true"
+        p:configBeanName="workflow-forms.editFormResponseConfig"
+        p:configRequired="true" />
 
     <bean id="workflow-forms.editFormResponseTaskComponent"
         class="fr.paris.lutece.plugins.workflow.modules.forms.web.task.EditFormResponseTaskComponent"
         p:taskType-ref="workflow-forms.editFormResponseTypeTask"
+        p:taskConfigService-ref="workflow-forms.editFormResponseConfigService"
         scope="prototype" />
 
     <!-- Task Resubmit Form Response -->
