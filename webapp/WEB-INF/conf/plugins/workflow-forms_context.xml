@@ -112,7 +112,24 @@
         class="fr.paris.lutece.plugins.workflow.modules.forms.web.task.CompleteFormResponseTaskComponent"
         p:taskType-ref="workflow-forms.completeFormResponseTypeTask"
         p:taskConfigService-ref="workflow-forms.taskCompleteResponseConfigService" />
-
+    
+    <!-- Task Update date -->
+    <bean id="workflow-forms.modifyUpdateDateTask"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.ModifyFormResponseUpdateDateTask"
+        scope="prototype" />
+        
+    <bean id="workflow-forms.modifyUpdateDateTypeTask"
+        class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+        p:key="modifyUpdateDateTypeTask"
+        p:titleI18nKey="module.workflow.forms.task.modifyUpdateDate.title"
+        p:beanName="workflow-forms.modifyUpdateDateTask"
+        p:taskForAutomaticAction="true" p:configRequired="false"
+        p:formTaskRequired="false" />
+        
+    <bean id="workflow-forms.modifyUpdateDateTaskComponent"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.web.task.ModifyFormResponseUpdateDateTaskComponent"
+        p:taskType-ref="workflow-forms.modifyUpdateDateTypeTask" />
+        
     <!-- TaskInfoProvider -->
     <bean id="workflow-forms.resubmitFormResponseTaskInfoProvider"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.ResubmitFormResponseTaskInfoProvider"

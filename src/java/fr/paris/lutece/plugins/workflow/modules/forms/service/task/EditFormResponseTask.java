@@ -69,7 +69,7 @@ public class EditFormResponseTask extends AbstractFormsTask
     @Inject
     @Named( "workflow-forms.editFormResponseConfigService" )
     private ITaskConfigService _taskEditFormConfigService;
-    
+
     private final IEditFormResponseTaskService _editFormResponseTaskService;
     private final IEditFormResponseTaskHistoryService _editFormResponseTaskHistoryService;
 
@@ -188,10 +188,10 @@ public class EditFormResponseTask extends AbstractFormsTask
         }
         return value;
     }
-    
+
     @Override
     public void doRemoveConfig( )
     {
-        _taskEditFormConfigService.remove( getId() );
+        _taskEditFormConfigService.remove( getId( ) );
     }
 }
