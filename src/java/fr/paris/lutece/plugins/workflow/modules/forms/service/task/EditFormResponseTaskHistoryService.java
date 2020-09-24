@@ -41,10 +41,12 @@ import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.IEditFormResponseTaskHistoryDAO;
+import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 
 public class EditFormResponseTaskHistoryService implements IEditFormResponseTaskHistoryService
 {
-
+    public static final String BEAN_NAME = "workflow-forms.editFormResponseTaskHistoryService";
     private final IEditFormResponseTaskHistoryDAO _editFormResponseTaskHistoryDAO;
 
     /**
@@ -78,4 +80,9 @@ public class EditFormResponseTaskHistoryService implements IEditFormResponseTask
         return listEditFormResponseTaskHistory;
     }
 
+    @Override
+    public void removeAllByHistoryAndTask( ResourceHistory history, ITask task )
+    {
+        _editFormResponseTaskHistoryDAO.deleteByIdHistoryAndTask( history.getId( ), task.getId( ) );
+    }
 }

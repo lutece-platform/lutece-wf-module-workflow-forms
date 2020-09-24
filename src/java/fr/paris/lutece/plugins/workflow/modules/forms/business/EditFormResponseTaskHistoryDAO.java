@@ -47,7 +47,8 @@ public class EditFormResponseTaskHistoryDAO implements IEditFormResponseTaskHist
     private static final String SQL_QUERY_INSERT = "INSERT INTO  workflow_task_forms_editresponse_history "
             + "(id_history, id_task, id_question, iteration_number, previous_value, new_value)VALUES(?,?,?,?,?,?)";
     private static final String SQL_FILTER_IDHISTORY_IDTASK = SQL_QUERY_SELECT + "WHERE id_history = ? AND id_task = ?";
-
+    private static final String SQL_QUERY_DELETE = "DELETE FROM workflow_task_forms_editresponse_history WHERE id_history = ? AND id_task = ? ";
+    
     /**
      * {@inheritDoc}
      */
@@ -114,5 +115,16 @@ public class EditFormResponseTaskHistoryDAO implements IEditFormResponseTaskHist
         editFormResponseTaskHistory.setNewValue( daoUtil.getString( ++nIndex ) );
 
         return editFormResponseTaskHistory;
+    }
+    
+    @Override
+    public void deleteByIdHistoryAndTask( int nIdHistory, int nIdTask )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, WorkflowUtils.getPlugin( ) ) )
+        {
+            daoUtil.setInt( 1, nIdHistory );
+            daoUtil.setInt( 2, nIdTask );
+            daoUtil.executeUpdate( );
+        }
     }
 }

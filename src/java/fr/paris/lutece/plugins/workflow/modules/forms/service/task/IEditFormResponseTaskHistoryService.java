@@ -36,6 +36,8 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 import java.util.List;
 
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
+import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 
 public interface IEditFormResponseTaskHistoryService
 {
@@ -56,4 +58,11 @@ public interface IEditFormResponseTaskHistoryService
      * @return a list of EditFormResponseTaskHistory
      */
     List<EditFormResponseTaskHistory> load( int nIdHistory, int nIdTask );
+    
+    /**
+     * Deletes all EditFormResponseTaskHistory with an History and Task
+     * @param history
+     * @param task
+     */
+    void removeAllByHistoryAndTask( ResourceHistory history, ITask task );
 }
