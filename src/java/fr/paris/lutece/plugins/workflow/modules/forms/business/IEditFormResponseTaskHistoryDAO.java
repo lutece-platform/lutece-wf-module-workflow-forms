@@ -44,7 +44,7 @@ public interface IEditFormResponseTaskHistoryDAO
      * @param editFormResponseTaskHistory
      *            to insert
      */
-    public void insert( EditFormResponseTaskHistory editFormResponseTaskHistory );
+    void insert( EditFormResponseTaskHistory editFormResponseTaskHistory );
 
     /**
      * select some EditFormResponseHistory with an idHistory and an idTask
@@ -55,7 +55,7 @@ public interface IEditFormResponseTaskHistoryDAO
      *            id
      * @return a list of EditFormResponseHistory
      */
-    public List<EditFormResponseTaskHistory> selectEditFormResponseHistoryByIdHistoryAndIdTask( int nIdHistory, int nIdTask );
+    List<EditFormResponseTaskHistory> selectEditFormResponseHistoryByIdHistoryAndIdTask( int nIdHistory, int nIdTask );
     
     /**
      * Deletes EditFormResponseHistory with an idHistory and an idTask

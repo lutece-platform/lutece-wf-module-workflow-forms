@@ -55,8 +55,7 @@ public class EditFormResponseTaskHistoryDAO implements IEditFormResponseTaskHist
     @Override
     public synchronized void insert( EditFormResponseTaskHistory editFormResponseTaskHistory )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, WorkflowUtils.getPlugin( ) );
-        try
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, WorkflowUtils.getPlugin( ) ) )
         {
             int nPos = 0;
             daoUtil.setInt( ++nPos, editFormResponseTaskHistory.getIdHistory( ) );
@@ -68,10 +67,6 @@ public class EditFormResponseTaskHistoryDAO implements IEditFormResponseTaskHist
 
             daoUtil.executeUpdate( );
         }
-        finally
-        {
-            daoUtil.close( );
-        }
     }
 
     @Override
@@ -79,18 +74,17 @@ public class EditFormResponseTaskHistoryDAO implements IEditFormResponseTaskHist
     {
 
         List<EditFormResponseTaskHistory> listResult = new ArrayList<>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_FILTER_IDHISTORY_IDTASK, WorkflowUtils.getPlugin( ) );
-        daoUtil.setInt( 1, nIdHistory );
-        daoUtil.setInt( 2, nIdTask );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_FILTER_IDHISTORY_IDTASK, WorkflowUtils.getPlugin( ) ) )
         {
-            listResult.add( getEditFormResponseTaskHistoryValues( daoUtil ) );
+            daoUtil.setInt( 1, nIdHistory );
+            daoUtil.setInt( 2, nIdTask );
+            daoUtil.executeQuery( );
+    
+            while ( daoUtil.next( ) )
+            {
+                listResult.add( getEditFormResponseTaskHistoryValues( daoUtil ) );
+            }
         }
-
-        daoUtil.close( );
-
         return listResult;
     }
 
