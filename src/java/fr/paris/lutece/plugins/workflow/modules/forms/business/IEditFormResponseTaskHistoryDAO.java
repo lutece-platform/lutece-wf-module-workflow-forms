@@ -56,4 +56,15 @@ public interface IEditFormResponseTaskHistoryDAO
      * @return a list of EditFormResponseHistory
      */
     public List<EditFormResponseTaskHistory> selectEditFormResponseHistoryByIdHistoryAndIdTask( int nIdHistory, int nIdTask );
+    
+    /**
+     * Deletes EditFormResponseHistory with an idHistory and an idTask
+     * 
+     * @param nIdHistory
+     *            id
+     * @param nIdTask
+     *            id
+     * @return a list of EditFormResponseHistory
+     */
+    void deleteByIdHistoryAndTask( int nIdHistory, int nIdTask );
 }

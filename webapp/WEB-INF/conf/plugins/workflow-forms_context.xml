@@ -140,6 +140,12 @@
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.ResubmitFormResponseMarkerProvider" />
     <bean id="workflow-forms.completeFormResponseMarkerProvider"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.CompleteFormResponseMarkerProvider" />
+        
+    <!-- Archivers -->
+    <bean id="workflow-forms.workflowFormsResourceArchiver"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.archiver.WorkflowFormsResourceArchiver" />
+    <bean id="workflow-forms.workflowFormsDeleteArchiveProcessingService"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.archiver.WorkflowFormsDeleteArchiveProcessingService" />
 
     <!-- SignRequest -->
     <bean id="workflow-forms.hashService"
