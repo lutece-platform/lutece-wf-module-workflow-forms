@@ -46,7 +46,6 @@ import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 
 public class EditFormResponseTaskHistoryService implements IEditFormResponseTaskHistoryService
 {
-    public static final String BEAN_NAME = "workflow-forms.editFormResponseTaskHistoryService";
     private final IEditFormResponseTaskHistoryDAO _editFormResponseTaskHistoryDAO;
 
     /**
