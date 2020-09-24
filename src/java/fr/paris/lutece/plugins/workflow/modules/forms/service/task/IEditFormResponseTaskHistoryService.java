@@ -58,9 +58,10 @@ public interface IEditFormResponseTaskHistoryService
      * @return a list of EditFormResponseTaskHistory
      */
     List<EditFormResponseTaskHistory> load( int nIdHistory, int nIdTask );
-    
+
     /**
      * Deletes all EditFormResponseTaskHistory with an History and Task
+     * 
      * @param history
      * @param task
      */
