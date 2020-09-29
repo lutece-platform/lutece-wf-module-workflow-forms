@@ -108,7 +108,7 @@ public abstract class AbstractCompleteFormResponseTaskInfoProvider extends Abstr
             url.addParameter( PARAMETER_TIMESTAMP, strTimestamp );
             url.addParameter( PARAMETER_URL_RETURN, AppPropertiesService.getProperty( PROPERTY_URL_RETURN ) );
 
-            strInfoUrl = url.getUrl( );
+            strInfoUrl = url.getUrlWithEntity( );
         }
 
         String strInfoEntries = getInfoEntries( nIdHistory );
