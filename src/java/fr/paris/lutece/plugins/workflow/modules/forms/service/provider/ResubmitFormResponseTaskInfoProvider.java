@@ -49,6 +49,7 @@ import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 
 public class ResubmitFormResponseTaskInfoProvider extends AbstractCompleteFormResponseTaskInfoProvider
 {
+    private static final String PAGE_NAME = "workflow-resubmit-form";
     public static final String MARK_RESUBMIT_FORM_URL = "resubmit_form_url";
     public static final String MARK_RESUBMIT_FORM_MESSAGE = "resubmit_form_message";
     public static final String MARK_RESUBMIT_FORM_ENTRIES = "resubmit_form__entries";
@@ -97,5 +98,11 @@ public class ResubmitFormResponseTaskInfoProvider extends AbstractCompleteFormRe
     protected String getMarkUrl( )
     {
         return MARK_RESUBMIT_FORM_URL;
+    }
+    
+    @Override
+    public String getPageName( )
+    {
+        return PAGE_NAME;
     }
 }

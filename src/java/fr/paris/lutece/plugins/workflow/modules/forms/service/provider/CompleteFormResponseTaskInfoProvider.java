@@ -49,7 +49,7 @@ import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 
 public class CompleteFormResponseTaskInfoProvider extends AbstractCompleteFormResponseTaskInfoProvider
 {
-
+    private static final String PAGE_NAME = "workflow-complete-form";
     public static final String MARK_COMPLETE_FORM_URL = "complete_form_url";
     public static final String MARK_COMPLETE_FORM_MESSAGE = "complete_form_message";
     public static final String MARK_COMPLETE_FORM_ENTRIES = "complete_form__entries";
@@ -98,5 +98,11 @@ public class CompleteFormResponseTaskInfoProvider extends AbstractCompleteFormRe
     protected String getMarkUrl( )
     {
         return MARK_COMPLETE_FORM_URL;
+    }
+    
+    @Override
+    public String getPageName( )
+    {
+        return PAGE_NAME;
     }
 }

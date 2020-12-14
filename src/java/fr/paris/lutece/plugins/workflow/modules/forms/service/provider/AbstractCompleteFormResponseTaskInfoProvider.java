@@ -56,7 +56,6 @@ import net.sf.json.JSONObject;
 public abstract class AbstractCompleteFormResponseTaskInfoProvider extends AbstractTaskInfoProvider
 {
     private static final String PROPERTY_URL_RETURN = "workflow-forms.url_return";
-    private static final String PLUGIN_NAME = "workflow-resubmit-form";
 
     private static final String PROPERTY_BASE_URL_USE_PROPERTY = "workflow-forms.base_url.use_property";
     private static final String PROPERTY_LUTECE_BASE_URL = "lutece.base.url";
@@ -77,6 +76,8 @@ public abstract class AbstractCompleteFormResponseTaskInfoProvider extends Abstr
     {
         return WorkflowPlugin.PLUGIN_NAME;
     }
+    
+    public abstract String getPageName( );
 
     @Override
     public String getTaskResourceInfo( int nIdHistory, int nIdTask, HttpServletRequest request )
@@ -101,7 +102,7 @@ public abstract class AbstractCompleteFormResponseTaskInfoProvider extends Abstr
             }
 
             UrlItem url = new UrlItem( sbUrl.toString( ) + AppPathService.getPortalUrl( ) );
-            url.addParameter( XPageAppService.PARAM_XPAGE_APP, PLUGIN_NAME );
+            url.addParameter( XPageAppService.PARAM_XPAGE_APP, getPageName( ) );
             url.addParameter( PARAMETER_ID_HISTORY, nIdHistory );
             url.addParameter( PARAMETER_ID_TASK, nIdTask );
             url.addParameter( PARAMETER_SIGNATURE, strSignature );
