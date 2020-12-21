@@ -6,17 +6,11 @@
 		<#assign defaultMessage = config.defaultMessage>
 	</#if>
 </#if>
-<p class="lead">#i18n{module.workflow.forms.task_complete_response_config.title}</p>
-<div class="control-group">
-	<label class="control-label" for="idStateAfterEdition">#i18n{module.workflow.forms.task_complete_response_config.label_state_after_edition} *</label>
-		<div class="controls">
-		<@comboWithParams name="idStateAfterEdition" default_value=idStateAfterEdition?string additionalParameters="class=\"input-xxlarge\"" items=list_states />
-		<span class="help-text">#i18n{module.workflow.forms.task_complete_response_config.label_state_after_edition_comment}</span>
-	</div>
-</div>	
-<div class="control-group">
-	<label class="control-label" for="defaultMessage">#i18n{module.workflow.forms.task_complete_response_config.label_default_message}</label>
-	<div class="controls">	
-		<textarea name="defaultMessage" rows="4" style="width:50%;">${defaultMessage}</textarea>
-		</div>
-</div>	
+<@fieldSet legend='#i18n{module.workflow.forms.task_complete_response_config.title}'>
+	<@formGroup labelFor='idStateAfterEdition' labelKey='#i18n{module.workflow.forms.task_complete_response_config.label_state_after_edition}' helpKey='#i18n{module.workflow.forms.task_complete_response_config.label_state_after_edition_comment}' mandatory=true>
+		<@select name='idStateAfterEdition' default_value=idStateAfterEdition?string items=list_states />
+	</@formGroup>
+	<@formGroup labelFor='defaultMessage' labelKey='#i18n{module.workflow.forms.task_complete_response_config.label_default_message}'>
+		<@input type='textarea' name='defaultMessage' rows=4>${defaultMessage}</@input>
+	</@formGroup>
+</@fieldSet>

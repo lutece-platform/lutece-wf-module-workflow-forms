@@ -1,11 +1,11 @@
 <#if config?exists>
     <#if edit_response?exists>
-	    <#if edit_response.message??>${edit_response.message}</#if></p>
+	    <#if edit_response.message??>${edit_response.message}</#if>
 		<p>#i18n{module.workflow.forms.task_resubmit_response_information.label_is_complete}</p>
 	    <#if edit_response.isComplete(  )>
-	    	<div class="alert alert-success">#i18n{module.workflow.forms.task_resubmit_response_information.label_completed}</div>
+	    	<@alert color='success'>#i18n{module.workflow.forms.task_resubmit_response_information.label_completed}</@alert>
 		<#else>
-	    	<div class="alert alert-warning">#i18n{module.workflow.forms.task_resubmit_response_information.label_not_completed}</div>
+	    	<@alert color='warning'>#i18n{module.workflow.forms.task_resubmit_response_information.label_not_completed}</@alert>
 		</#if>
 	</#if>
     <#if list_entries?exists && list_entries?has_content>

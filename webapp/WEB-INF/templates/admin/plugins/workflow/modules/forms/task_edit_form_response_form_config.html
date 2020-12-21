@@ -1,25 +1,35 @@
-<@row>
-	<@formGroup labelFor="form_select" labelKey="#i18n{module.workflow.forms.task.editFormResponse.config.label}" formStyle='horizontal'>
-		<@select name="form_select" items=form_list default_value='${id_form!}' />
-		<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
+	<@formGroup labelFor='form_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
+		<@inputGroup>
+			<@select name='form_select' items=form_list default_value='${id_form!}' />
+			<@inputGroupItem>
+				<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
+			</@inputGroupItem>
+		</@inputGroup>
 		<#if id_form??>
-			<@select name="step_select" items=list_step default_value='${id_step!}' />
-			<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
+			<@inputGroup params='style="margin-top:1rem;"'>
+				<@select name='step_select' items=list_step default_value='${id_step!}' />
+				<@inputGroupItem>
+					<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
+				</@inputGroupItem>
+			</@inputGroup>
 		</#if>
 		<#if id_step??>
-			<@select name="question_select" items=question_list default_value='${id_question!}' />
-			<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' />
+			<@inputGroup params='style="margin-top:1rem;"'>
+				<@select name='question_select' items=question_list default_value='${id_question!}' />
+				<@inputGroupItem>
+					<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' />
+				</@inputGroupItem>
+			</@inputGroup>
 		</#if>
 	</@formGroup>
-</@row>
-<@row>
-	<@input id='mapping_id' type='hidden' name='mapping_id' />
+
+	<@input type='hidden' id='mapping_id' name='mapping_id' />
 	<#list mapping_list as mapping>
-		<@formGroup labelFor="" labelKey="#i18n{module.workflow.forms.task.editFormResponse.config.existing}" formStyle='horizontal'>
+		<@formGroup labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.existing}'>
 			<@staticText>
 				${mapping.form.title} / ${mapping.step.title} / ${mapping.question.title}
 			</@staticText>
-			<@button type='submit' style='danger' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' />
+			<@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' color='danger' size='sm' />
 		</@formGroup>
 	</#list>
-</@row>
+
