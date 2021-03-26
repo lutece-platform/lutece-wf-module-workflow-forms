@@ -299,7 +299,7 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
             List<Question> questionList = QuestionHome.getQuestionsListByStep( idStep );
             for ( Question question : questionList )
             {
-                if ( question.getEntry( ).isEditableBack( ) )
+                if ( question.getEntry( ).isOnlyDisplayInBack( ) )
                 {
                     refList.addItem( question.getId( ), question.getTitle( ) );
                 }
