@@ -49,6 +49,7 @@ import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
 import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
+import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.portal.business.file.File;
 import fr.paris.lutece.portal.business.file.FileHome;
@@ -193,5 +194,13 @@ public class EditFormResponseTask extends AbstractFormsTask
     public void doRemoveConfig( )
     {
         _taskEditFormConfigService.remove( getId( ) );
+    }
+    
+    @Override
+    public void doRemoveTaskInformation( int nIdHistory )
+    {
+        ResourceHistory history = new ResourceHistory( );
+        history.setId( nIdHistory );
+        _editFormResponseTaskHistoryService.removeAllByHistoryAndTask( history, this );
     }
 }
