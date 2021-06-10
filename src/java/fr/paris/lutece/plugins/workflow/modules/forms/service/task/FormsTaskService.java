@@ -51,9 +51,13 @@ import fr.paris.lutece.plugins.forms.business.FormResponseStep;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
+import fr.paris.lutece.plugins.forms.service.entrytype.EntryTypeDate;
 import fr.paris.lutece.plugins.forms.web.StepDisplayTree;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
+import fr.paris.lutece.plugins.genericattributes.business.Response;
+import fr.paris.lutece.plugins.genericattributes.service.entrytype.EntryTypeServiceManager;
+import fr.paris.lutece.plugins.genericattributes.service.entrytype.IEntryTypeService;
 import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
 import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
@@ -152,6 +156,18 @@ public class FormsTaskService implements IFormsTaskService
         listFormQuestionResponse = listFormQuestionResponse.stream( )
                 .filter( formQuestionResponse -> listQuestionToDisplayId.contains( formQuestionResponse.getQuestion( ).getId( ) ) )
                 .collect( Collectors.toList( ) );
+        
+        for ( FormQuestionResponse formQuestionResponse : listFormQuestionResponse )
+        {
+            IEntryTypeService entryTypeService = EntryTypeServiceManager.getEntryTypeService( formQuestionResponse.getQuestion( ).getEntry( ) );
+            if ( entryTypeService instanceof EntryTypeDate )
+            {
+                for ( Response response : formQuestionResponse.getEntryResponse( ) )
+                {
+                    response.setToStringValueResponse( entryTypeService.getResponseValueForRecap( formQuestionResponse.getQuestion( ).getEntry( ), request, response, request.getLocale( ) ) );
+                }
+            }
+        }
 
         if ( !CollectionUtils.isEmpty( listStep ) )
         {
@@ -197,7 +213,18 @@ public class FormsTaskService implements IFormsTaskService
             FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, false );
             responseFromForm.setIdFormResponse( formResponse.getId( ) );
             FormQuestionResponse responseSaved = findSavedResponse( formResponse, question );
-
+            
+            if ( responseSaved != null )
+            {
+                IEntryTypeService entryTypeService = EntryTypeServiceManager.getEntryTypeService( question.getEntry( ) );
+                if ( entryTypeService instanceof EntryTypeDate )
+                {
+                    for ( Response response : responseSaved.getEntryResponse( ) )
+                    {
+                        response.setToStringValueResponse( entryTypeService.getResponseValueForRecap( question.getEntry( ), request, response, request.getLocale( ) ) );
+                    }
+                }
+            }
             EditableResponse editableResponse = new EditableResponse( responseSaved, responseFromForm );
             listEditableResponse.add( editableResponse );
         }
