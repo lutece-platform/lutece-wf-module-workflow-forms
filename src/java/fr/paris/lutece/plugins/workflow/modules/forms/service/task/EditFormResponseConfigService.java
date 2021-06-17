@@ -82,7 +82,10 @@ public class EditFormResponseConfigService extends TaskConfigService
     public void remove( int nIdTask )
     {
         EditFormResponseConfig config = super.findByPrimaryKey( nIdTask );
-        EditFormResponseConfigValueHome.removeByConfig( config.getIdConfig( ) );
+        if ( config != null )
+        {
+            EditFormResponseConfigValueHome.removeByConfig( config.getIdConfig( ) );
+        }
         super.remove( nIdTask );
     }
 }
