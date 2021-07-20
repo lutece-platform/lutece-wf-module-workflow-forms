@@ -149,6 +149,9 @@
     <bean id="workflow-forms.workflowFormsDeleteArchiveProcessingService"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.archiver.WorkflowFormsDeleteArchiveProcessingService" />
 
+    <!-- Controllers  -->
+    <bean id="workflow-forms.formResponseValueStateController" class="fr.paris.lutece.plugins.workflow.modules.forms.service.FormResponseValueStateController" />
+    
     <!-- SignRequest -->
     <bean id="workflow-forms.hashService"
         class="fr.paris.lutece.util.signrequest.security.Sha1HashService" />
