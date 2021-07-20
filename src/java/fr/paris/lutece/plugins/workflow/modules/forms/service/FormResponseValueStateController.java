@@ -230,4 +230,10 @@ public class FormResponseValueStateController implements IChooseStateController
         }
         return refList;
     }
+    
+    @Override
+    public void doRemoveConfig( ITask task )
+    {
+        FormResponseValueStateControllerConfigHome.removeByTask( task.getId( ) );
+    }
 }
