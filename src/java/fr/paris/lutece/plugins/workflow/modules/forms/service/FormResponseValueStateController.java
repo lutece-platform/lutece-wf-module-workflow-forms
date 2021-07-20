@@ -7,9 +7,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.forms.business.FormHome;
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.forms.business.StepHome;
@@ -17,6 +20,7 @@ import fr.paris.lutece.plugins.forms.service.entrytype.EntryTypeCheckBox;
 import fr.paris.lutece.plugins.forms.service.entrytype.EntryTypeRadioButton;
 import fr.paris.lutece.plugins.forms.service.entrytype.EntryTypeSelect;
 import fr.paris.lutece.plugins.genericattributes.business.Field;
+import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.genericattributes.service.entrytype.EntryTypeServiceManager;
 import fr.paris.lutece.plugins.genericattributes.service.entrytype.IEntryTypeService;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.FormResponseValueStateControllerConfig;
@@ -80,7 +84,29 @@ public class FormResponseValueStateController implements IChooseStateController
     @Override
     public boolean control( ITask task, int nIdResource, String strResourceType )
     {
-        return false;
+        FormResponseValueStateControllerConfig config = loadConfig( task.getId( ) );
+        if ( StringUtils.isEmpty( config.getValue( ) ) )
+        {
+            return false;
+        }
+        List<FormQuestionResponse> responseList = FormQuestionResponseHome.findFormQuestionResponseByResponseQuestion( nIdResource,
+                config.getQuestion( ).getId( ) );
+        
+        if ( CollectionUtils.isEmpty( responseList ) )
+        {
+            return false;
+        }
+        List<Response> entryResponseList = responseList.get( 0 ).getEntryResponse( );
+        if ( CollectionUtils.isEmpty( entryResponseList ) )
+        {
+            return false;
+        }
+        Response response = entryResponseList.get( 0 );
+        if ( response == null )
+        {
+            return false;
+        }
+        return config.getValue( ).equals( response.getResponseValue( ) );
     }
     
     @Override
