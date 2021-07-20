@@ -45,6 +45,8 @@
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValueDao" />
     <bean id="worklow-forms.editFormResponseConfigDao"
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigDao" />
+    <bean id="worklow-forms.formResponseValueStateControllerConfigDao"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.business.FormResponseValueStateControllerConfigDao" />
     
     <!-- Task edit form response -->
     <bean id="workflow-forms.editFormResponseTask"
