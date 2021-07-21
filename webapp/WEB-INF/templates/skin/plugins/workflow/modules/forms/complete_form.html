@@ -41,25 +41,3 @@
 	</div>
 </div>
 <@initEditor />
-
-<script type="text/javascript">
-	//for datepicker questions
-	$( document ).ready( function (  ) {
-		var locale = "en-US";
-		if( document.getElementById( "locale" ) != null ) {
-			locale = document.getElementById( "locale" ).innerHTML;
-		}
-		$.datepicker.setDefaults( {
-			showOn: 'button', 
-			buttonImageOnly: true, 
-			buttonImage: 'js/jquery/plugins/ui/datepicker/calendar.png', 
-			buttonText: 'Calendar', 
-			showAnim: 'slideDown', 
-			speed: 'fast'
-		} );
-	
-		$( ".datepicker-element" ).each( function( i ) {
-			$( this ).datepicker(  );
-		} );
-	});
-</script>
