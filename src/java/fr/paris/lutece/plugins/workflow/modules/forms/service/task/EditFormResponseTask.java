@@ -195,7 +195,7 @@ public class EditFormResponseTask extends AbstractFormsTask
     {
         _taskEditFormConfigService.remove( getId( ) );
     }
-    
+
     @Override
     public void doRemoveTaskInformation( int nIdHistory )
     {

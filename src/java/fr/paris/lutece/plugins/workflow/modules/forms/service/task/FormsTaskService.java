@@ -156,7 +156,7 @@ public class FormsTaskService implements IFormsTaskService
         listFormQuestionResponse = listFormQuestionResponse.stream( )
                 .filter( formQuestionResponse -> listQuestionToDisplayId.contains( formQuestionResponse.getQuestion( ).getId( ) ) )
                 .collect( Collectors.toList( ) );
-        
+
         for ( FormQuestionResponse formQuestionResponse : listFormQuestionResponse )
         {
             IEntryTypeService entryTypeService = EntryTypeServiceManager.getEntryTypeService( formQuestionResponse.getQuestion( ).getEntry( ) );
@@ -164,7 +164,8 @@ public class FormsTaskService implements IFormsTaskService
             {
                 for ( Response response : formQuestionResponse.getEntryResponse( ) )
                 {
-                    response.setToStringValueResponse( entryTypeService.getResponseValueForRecap( formQuestionResponse.getQuestion( ).getEntry( ), request, response, request.getLocale( ) ) );
+                    response.setToStringValueResponse( entryTypeService.getResponseValueForRecap( formQuestionResponse.getQuestion( ).getEntry( ), request,
+                            response, request.getLocale( ) ) );
                 }
             }
         }
@@ -213,7 +214,7 @@ public class FormsTaskService implements IFormsTaskService
             FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, false );
             responseFromForm.setIdFormResponse( formResponse.getId( ) );
             FormQuestionResponse responseSaved = findSavedResponse( formResponse, question );
-            
+
             if ( responseSaved != null )
             {
                 IEntryTypeService entryTypeService = EntryTypeServiceManager.getEntryTypeService( question.getEntry( ) );
@@ -221,7 +222,8 @@ public class FormsTaskService implements IFormsTaskService
                 {
                     for ( Response response : responseSaved.getEntryResponse( ) )
                     {
-                        response.setToStringValueResponse( entryTypeService.getResponseValueForRecap( question.getEntry( ), request, response, request.getLocale( ) ) );
+                        response.setToStringValueResponse(
+                                entryTypeService.getResponseValueForRecap( question.getEntry( ), request, response, request.getLocale( ) ) );
                     }
                 }
             }
