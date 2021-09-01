@@ -53,6 +53,10 @@ public class WorkflowFormsResourceArchiver implements IResourceArchiver
     @Named( WorkflowFormsDeleteArchiveProcessingService.BEAN_NAME )
     private IArchiveProcessingService _deleteArchiveProcessingService;
 
+    @Inject
+    @Named( WorkflowFormsAnonymizeArchiveProcessingService.BEAN_NAME )
+    private IArchiveProcessingService _anonymizeArchiveProcessingService;
+
     @Override
     public void archiveResource( ArchivalType archivalType, ResourceWorkflow resourceWorkflow )
     {
@@ -64,6 +68,9 @@ public class WorkflowFormsResourceArchiver implements IResourceArchiver
         {
             case DELETE:
                 _deleteArchiveProcessingService.archiveResource( resourceWorkflow );
+                break;
+            case ANONYMIZE:
+                _anonymizeArchiveProcessingService.archiveResource( resourceWorkflow );
                 break;
             default:
                 break;

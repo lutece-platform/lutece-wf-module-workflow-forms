@@ -148,6 +148,8 @@
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.archiver.WorkflowFormsResourceArchiver" />
     <bean id="workflow-forms.workflowFormsDeleteArchiveProcessingService"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.archiver.WorkflowFormsDeleteArchiveProcessingService" />
+    <bean id="workflow-forms.workflowFormsAnonymizeArchiveProcessingService"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.archiver.WorkflowFormsAnonymizeArchiveProcessingService" />
 
     <!-- Controllers  -->
     <bean id="workflow-forms.formResponseValueStateController" class="fr.paris.lutece.plugins.workflow.modules.forms.service.FormResponseValueStateController" />
