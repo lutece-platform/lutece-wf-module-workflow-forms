@@ -25,7 +25,11 @@
     <bean id="workflow-forms.editFormResponseConfigService"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseConfigService"
         p:taskConfigDAO-ref="worklow-forms.editFormResponseConfigDao" />
-        
+    <bean id="workflow-forms.resubmitFormResponseTaskHistoryService"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.ResubmitFormResponseTaskHistoryService" />
+    <bean id="workflow-forms.completeFormResponseTaskHistoryService"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.CompleteFormResponseTaskHistoryService" />
+
     <!-- DAO -->
     <bean id="worklow-forms.editFormResponseTaskHistoryDAO"
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistoryDAO" />
