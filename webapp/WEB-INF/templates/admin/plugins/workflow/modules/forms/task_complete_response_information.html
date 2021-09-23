@@ -11,7 +11,14 @@
     <#if list_entries?exists && list_entries?has_content>
     	<p>#i18n{module.workflow.forms.task_complete_response_information.label_list_entries}</p>
 	    <#list list_entries as entry>
-	   		<span>${entry.title}</span>
+	   		<b>${entry.title}</b>
+	   		<#if list_history?exists && list_history?has_content>
+		   		<#list list_history as history>
+		   			<#if history.question.idEntry==entry.idEntry>
+		   				<@icon style='arrow-right' />${history.newValue}
+		   			</#if>
+		   		</#list>
+	   		</#if>
 	   		<#if entry_has_next>
 	   			<br />
 	   		</#if>

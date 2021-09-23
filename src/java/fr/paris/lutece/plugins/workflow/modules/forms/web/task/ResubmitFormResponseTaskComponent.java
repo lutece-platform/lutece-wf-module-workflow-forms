@@ -50,8 +50,10 @@ import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseTaskConfig;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseTaskHistory;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.IResubmitFormResponseService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IResubmitFormResponseTaskHistoryService;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
@@ -69,6 +71,7 @@ public class ResubmitFormResponseTaskComponent extends AbstractFormResponseTaskC
     private static final String MARK_LIST_STATES = "list_states";
     private static final String MARK_EDIT_RESPONSE = "edit_response";
     private static final String MARK_LIST_ENTRIES = "list_entries";
+    private static final String MARK_LIST_HISTORIES = "list_history";
 
     @Inject
     @Named( "workflow-forms.taskResubmitResponseConfigService" )
@@ -79,6 +82,9 @@ public class ResubmitFormResponseTaskComponent extends AbstractFormResponseTaskC
 
     @Inject
     private IFormsTaskService _formsTaskService;
+    
+    @Inject
+    private IResubmitFormResponseTaskHistoryService _resubmitFormResponseTaskHistoryService;
 
     @Override
     public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
@@ -126,6 +132,11 @@ public class ResubmitFormResponseTaskComponent extends AbstractFormResponseTaskC
         if ( resubmitFormResponse != null )
         {
             model.put( MARK_LIST_ENTRIES, _resubmitResponseService.getInformationListEntries( nIdHistory ) );
+            if ( resubmitFormResponse.isComplete( ) )
+            {
+                List<ResubmitFormResponseTaskHistory> historyList = _resubmitFormResponseTaskHistoryService.load( nIdHistory, task.getId( ) );
+                model.put( MARK_LIST_HISTORIES, historyList );
+            }
         }
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_RESUBMIT_RESPONSE_INFORMATION, locale, model );

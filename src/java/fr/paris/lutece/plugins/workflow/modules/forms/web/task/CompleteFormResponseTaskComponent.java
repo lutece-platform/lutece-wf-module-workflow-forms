@@ -50,7 +50,9 @@ import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskConfig;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskHistory;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.ICompleteFormResponseService;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.ICompleteFormResponseTaskHistoryService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
@@ -69,6 +71,7 @@ public class CompleteFormResponseTaskComponent extends AbstractFormResponseTaskC
     private static final String MARK_LIST_STATES = "list_states";
     private static final String MARK_EDIT_RESPONSE = "edit_response";
     private static final String MARK_LIST_ENTRIES = "list_entries";
+    private static final String MARK_LIST_HISTORIES = "list_history";
 
     @Inject
     @Named( "workflow-forms.taskCompleteResponseConfigService" )
@@ -79,6 +82,9 @@ public class CompleteFormResponseTaskComponent extends AbstractFormResponseTaskC
 
     @Inject
     private IFormsTaskService _formsTaskService;
+    
+    @Inject
+    private ICompleteFormResponseTaskHistoryService _completeFormResponseTaskHistoryService;
 
     @Override
     public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
@@ -126,6 +132,11 @@ public class CompleteFormResponseTaskComponent extends AbstractFormResponseTaskC
         if ( resubmitFormResponse != null )
         {
             model.put( MARK_LIST_ENTRIES, _completeResponseService.getInformationListEntries( nIdHistory ) );
+            if ( resubmitFormResponse.isComplete( ) )
+            {
+                List<CompleteFormResponseTaskHistory> historyList = _completeFormResponseTaskHistoryService.load( nIdHistory, task.getId( ) );
+                model.put( MARK_LIST_HISTORIES, historyList );
+            }
         }
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_RESUBMIT_RESPONSE_INFORMATION, locale, model );
