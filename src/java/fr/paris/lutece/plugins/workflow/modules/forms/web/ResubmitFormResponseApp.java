@@ -117,8 +117,7 @@ public class ResubmitFormResponseApp implements XPageApplication
         String strIdHistory = request.getParameter( PARAMETER_ID_HISTORY );
         String strIdTask = request.getParameter( PARAMETER_ID_TASK );
 
-        if ( StringUtils.isNotBlank( strIdHistory ) && StringUtils.isNumeric( strIdHistory ) && StringUtils.isNotBlank( strIdTask )
-                && StringUtils.isNumeric( strIdTask ) )
+        if ( StringUtils.isNumeric( strIdHistory ) && StringUtils.isNumeric( strIdTask ) )
         {
             int nIdHistory = Integer.parseInt( strIdHistory );
             int nIdTask = Integer.parseInt( strIdTask );
@@ -128,7 +127,7 @@ public class ResubmitFormResponseApp implements XPageApplication
             {
                 if ( _resubmitFormResponseService.isRecordStateValid( resubmitFormResponse, request.getLocale( ) ) )
                 {
-                    doAction( request, resubmitFormResponse );
+                    doAction( request, resubmitFormResponse, nIdTask, nIdHistory );
                     page = getResubmitFormResponsePage( request, resubmitFormResponse );
                 }
                 else
@@ -196,7 +195,7 @@ public class ResubmitFormResponseApp implements XPageApplication
         return page;
     }
 
-    private void doAction( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse ) throws SiteMessageException
+    private void doAction( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse, int idTask, int idHistory ) throws SiteMessageException
     {
         String strAction = request.getParameter( PARAMETER_ACTION );
 
@@ -205,7 +204,7 @@ public class ResubmitFormResponseApp implements XPageApplication
             return;
         }
 
-        if ( ACTION_DO_MODIFY_RESPONSE.equals( strAction ) && doEditResponse( request, resubmitFormResponse ) )
+        if ( ACTION_DO_MODIFY_RESPONSE.equals( strAction ) && doEditResponse( request, resubmitFormResponse, idTask, idHistory ) )
         {
             // Back to home page
             String strUrlReturn = request.getParameter( PARAMETER_URL_RETURN );
@@ -225,11 +224,11 @@ public class ResubmitFormResponseApp implements XPageApplication
      * @throws SiteMessageException
      *             a site message if there is a problem
      */
-    private boolean doEditResponse( HttpServletRequest request, ResubmitFormResponse response ) throws SiteMessageException
+    private boolean doEditResponse( HttpServletRequest request, ResubmitFormResponse response, int idTask, int idHistory ) throws SiteMessageException
     {
         if ( _resubmitFormResponseService.isRecordStateValid( response, request.getLocale( ) ) )
         {
-            if ( _resubmitFormResponseService.doEditResponseData( request, response ) )
+            if ( _resubmitFormResponseService.doEditResponseData( request, response, idTask, idHistory ) )
             {
                 _resubmitFormResponseService.doChangeResponseState( response, request.getLocale( ) );
 

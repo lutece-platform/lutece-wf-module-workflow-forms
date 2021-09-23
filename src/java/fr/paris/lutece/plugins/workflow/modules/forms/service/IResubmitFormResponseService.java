@@ -157,7 +157,7 @@ public interface IResubmitFormResponseService
      * @throws SiteMessageException
      *             site message if there is a problem
      */
-    boolean doEditResponseData( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse ) throws SiteMessageException;
+    boolean doEditResponseData( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse, int idTask, int idHistory ) throws SiteMessageException;
 
     /**
      * Do change the Response

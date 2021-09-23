@@ -59,7 +59,10 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.IResubmitFormResp
 import fr.paris.lutece.plugins.workflow.modules.forms.business.IResubmitFormResponseValueDAO;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseTaskConfig;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseTaskHistory;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseValue;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IResubmitFormResponseTaskHistoryService;
+import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
@@ -96,6 +99,9 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
     @Named( "workflow-forms.taskResubmitResponseConfigService" )
     private ITaskConfigService _taskResubmitResponseConfigService;
 
+    @Inject
+    private IResubmitFormResponseTaskHistoryService _resubmitFormResponseTaskHistoryService;
+    
     @Override
     public ResubmitFormResponse find( int nIdHistory, int nIdTask )
     {
@@ -247,7 +253,7 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
     }
 
     @Override
-    public boolean doEditResponseData( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse ) throws SiteMessageException
+    public boolean doEditResponseData( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse, int idTask, int idHistory ) throws SiteMessageException
     {
         FormResponse response = _formsTaskService.getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
         if ( response == null )
@@ -258,8 +264,21 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
         }
         List<Question> listQuestions = getListQuestionToEdit( response, resubmitFormResponse.getListResubmitReponseValues( ) );
 
-        doEditResponseData( request, response, listQuestions );
+        doEditResponseData( request, response, listQuestions, idTask, idHistory );
         return true;
+    }
+    
+    @Override
+    protected void createTaskHistory( EditableResponse editableResponse, int idTask, int idHistory )
+    {
+        ResubmitFormResponseTaskHistory history = new ResubmitFormResponseTaskHistory( );
+        history.setIdTask( idTask );
+        history.setIdHistory( idHistory );
+        history.setQuestion( editableResponse.getQuestion( ) );
+        history.setPreviousValue( createPreviousNewValue( editableResponse.getResponseSaved( ) ) );
+        history.setNewValue( createPreviousNewValue( editableResponse.getResponseFromForm( ) ) );
+        
+        _resubmitFormResponseTaskHistoryService.create( history );
     }
 
     @Override

@@ -50,9 +50,12 @@ import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
 import fr.paris.lutece.plugins.genericattributes.business.IEntryDAO;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskConfig;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskHistory;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseValue;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ICompleteFormResponseDAO;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ICompleteFormResponseValueDAO;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.ICompleteFormResponseTaskHistoryService;
+import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
@@ -82,6 +85,9 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
 
     @Inject
     private ITaskService _taskService;
+    
+    @Inject
+    private ICompleteFormResponseTaskHistoryService _completeFormResponseTaskHistoryService;
 
     @Override
     public List<Question> findListQuestionUsedCorrectForm( FormResponse formResponse )
@@ -203,7 +209,7 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
     }
 
     @Override
-    public boolean doEditResponseData( HttpServletRequest request, CompleteFormResponse completeFormResponse ) throws SiteMessageException
+    public boolean doEditResponseData( HttpServletRequest request, CompleteFormResponse completeFormResponse, int idTask, int idHistory ) throws SiteMessageException
     {
         FormResponse response = _formsTaskService.getFormResponseFromIdHistory( completeFormResponse.getIdHistory( ) );
         if ( response == null )
@@ -214,7 +220,7 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
         }
         List<Question> listQuestions = getListQuestionToEdit( response, completeFormResponse.getListCompleteReponseValues( ) );
 
-        doEditResponseData( request, response, listQuestions );
+        doEditResponseData( request, response, listQuestions, idTask, idHistory );
         return true;
     }
 
@@ -235,5 +241,17 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
     {
         completeFormResponse.setIsComplete( true );
         update( completeFormResponse );
+    }
+    
+    @Override
+    protected void createTaskHistory( EditableResponse editableResponse, int idTask, int idHistory )
+    {
+        CompleteFormResponseTaskHistory history = new CompleteFormResponseTaskHistory( );
+        history.setIdTask( idTask );
+        history.setIdHistory( idHistory );
+        history.setQuestion( editableResponse.getQuestion( ) );
+        history.setNewValue( createPreviousNewValue( editableResponse.getResponseFromForm( ) ) );
+
+        _completeFormResponseTaskHistoryService.create( history );
     }
 }

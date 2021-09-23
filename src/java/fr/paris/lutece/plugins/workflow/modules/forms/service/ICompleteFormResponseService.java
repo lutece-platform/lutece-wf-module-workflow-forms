@@ -143,7 +143,7 @@ public interface ICompleteFormResponseService
      * @throws SiteMessageException
      *             site message if there is a problem
      */
-    boolean doEditResponseData( HttpServletRequest request, CompleteFormResponse completeFormResponse ) throws SiteMessageException;
+    boolean doEditResponseData( HttpServletRequest request, CompleteFormResponse completeFormResponse, int idTask, int idHistory ) throws SiteMessageException;
 
     /**
      * Do change the Response

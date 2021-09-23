@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
@@ -118,8 +118,7 @@ public class CompleteFormResponseApp implements XPageApplication
         String strIdHistory = request.getParameter( PARAMETER_ID_HISTORY );
         String strIdTask = request.getParameter( PARAMETER_ID_TASK );
 
-        if ( StringUtils.isNotBlank( strIdHistory ) && StringUtils.isNumeric( strIdHistory ) && StringUtils.isNotBlank( strIdTask )
-                && StringUtils.isNumeric( strIdTask ) )
+        if ( StringUtils.isNumeric( strIdHistory ) && StringUtils.isNumeric( strIdTask ) )
         {
             int nIdHistory = Integer.parseInt( strIdHistory );
             int nIdTask = Integer.parseInt( strIdTask );
@@ -129,7 +128,7 @@ public class CompleteFormResponseApp implements XPageApplication
             {
                 if ( _completeFormResponseService.isRecordStateValid( completeFormResponse, request.getLocale( ) ) )
                 {
-                    doAction( request, completeFormResponse );
+                    doAction( request, completeFormResponse, nIdTask, nIdHistory );
                     page = getResubmitFormResponsePage( request, completeFormResponse );
                 }
                 else
@@ -197,7 +196,7 @@ public class CompleteFormResponseApp implements XPageApplication
         return page;
     }
 
-    private void doAction( HttpServletRequest request, CompleteFormResponse completeFormResponse ) throws SiteMessageException
+    private void doAction( HttpServletRequest request, CompleteFormResponse completeFormResponse, int idTask, int idHistory ) throws SiteMessageException
     {
         String strAction = request.getParameter( PARAMETER_ACTION );
 
@@ -206,7 +205,7 @@ public class CompleteFormResponseApp implements XPageApplication
             return;
         }
 
-        if ( ACTION_DO_MODIFY_RESPONSE.equals( strAction ) && doEditResponse( request, completeFormResponse ) )
+        if ( ACTION_DO_MODIFY_RESPONSE.equals( strAction ) && doEditResponse( request, completeFormResponse, idTask, idHistory ) )
         {
             // Back to home page
             String strUrlReturn = request.getParameter( PARAMETER_URL_RETURN );
@@ -226,11 +225,11 @@ public class CompleteFormResponseApp implements XPageApplication
      * @throws SiteMessageException
      *             a site message if there is a problem
      */
-    private boolean doEditResponse( HttpServletRequest request, CompleteFormResponse response ) throws SiteMessageException
+    private boolean doEditResponse( HttpServletRequest request, CompleteFormResponse response, int idTask, int idHistory ) throws SiteMessageException
     {
         if ( _completeFormResponseService.isRecordStateValid( response, request.getLocale( ) ) )
         {
-            if ( _completeFormResponseService.doEditResponseData( request, response ) )
+            if ( _completeFormResponseService.doEditResponseData( request, response, idTask, idHistory ) )
             {
                 _completeFormResponseService.doChangeResponseState( response, request.getLocale( ) );
 
