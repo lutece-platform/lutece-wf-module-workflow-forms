@@ -33,7 +33,7 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
-public class EditFormResponseTaskHistory extends AbstractFormResponseTaskHistory
+public class ResubmitFormResponseTaskHistory extends AbstractFormResponseTaskHistory
 {
 
     private String _strPreviousValue;

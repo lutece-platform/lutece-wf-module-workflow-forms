@@ -33,25 +33,81 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
-public class EditFormResponseTaskHistory extends AbstractFormResponseTaskHistory
+import fr.paris.lutece.plugins.forms.business.Question;
+
+public abstract class AbstractFormResponseTaskHistory
 {
 
-    private String _strPreviousValue;
+    private int _nIdHistory;
+    private Question _question;
+    private int _nIdTask;
+    private String _strNewValue;
 
     /**
-     * @return the previousValue
+     * @return the idHistory
      */
-    public String getPreviousValue( )
+    public int getIdHistory( )
     {
-        return _strPreviousValue;
+        return _nIdHistory;
     }
 
     /**
-     * @param previousValue
-     *            the previousValue to set
+     * @param idHistory
+     *            the idHistory to set
      */
-    public void setPreviousValue( String previousValue )
+    public void setIdHistory( int idHistory )
     {
-        _strPreviousValue = previousValue;
+        _nIdHistory = idHistory;
+    }
+
+    /**
+     * @return the _question
+     */
+    public Question getQuestion( )
+    {
+        return _question;
+    }
+
+    /**
+     * @param question
+     *            the _question to set
+     */
+    public void setQuestion( Question question )
+    {
+        _question = question;
+    }
+
+    /**
+     * @return the idTask
+     */
+    public int getIdTask( )
+    {
+        return _nIdTask;
+    }
+
+    /**
+     * @param idTask
+     *            the idTask to set
+     */
+    public void setIdTask( int idTask )
+    {
+        _nIdTask = idTask;
+    }
+
+    /**
+     * @return the newValue
+     */
+    public String getNewValue( )
+    {
+        return _strNewValue;
+    }
+
+    /**
+     * @param newValue
+     *            the newValue to set
+     */
+    public void setNewValue( String newValue )
+    {
+        _strNewValue = newValue;
     }
 }

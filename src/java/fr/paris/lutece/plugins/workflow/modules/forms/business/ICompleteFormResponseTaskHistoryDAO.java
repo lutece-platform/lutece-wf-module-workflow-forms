@@ -33,25 +33,37 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
-public class EditFormResponseTaskHistory extends AbstractFormResponseTaskHistory
+import java.util.List;
+
+public interface ICompleteFormResponseTaskHistoryDAO
 {
 
-    private String _strPreviousValue;
+    /**
+     * insert an completeFormResponseTaskHistory
+     * 
+     * @param completeFormResponseTaskHistory
+     *            to insert
+     */
+    void insert( CompleteFormResponseTaskHistory completeFormResponseTaskHistory );
 
     /**
-     * @return the previousValue
+     * select some completeFormResponseTaskHistory with an idHistory and an idTask
+     * 
+     * @param nIdHistory
+     *            id
+     * @param nIdTask
+     *            id
+     * @return a list of EditFormResponseHistory
      */
-    public String getPreviousValue( )
-    {
-        return _strPreviousValue;
-    }
+    List<CompleteFormResponseTaskHistory> selectEditFormResponseHistoryByIdHistoryAndIdTask( int nIdHistory, int nIdTask );
 
     /**
-     * @param previousValue
-     *            the previousValue to set
+     * Deletes completeFormResponseTaskHistory with an idHistory and an idTask
+     * 
+     * @param nIdHistory
+     *            id
+     * @param nIdTask
+     *            id
      */
-    public void setPreviousValue( String previousValue )
-    {
-        _strPreviousValue = previousValue;
-    }
+    void deleteByIdHistoryAndTask( int nIdHistory, int nIdTask );
 }
