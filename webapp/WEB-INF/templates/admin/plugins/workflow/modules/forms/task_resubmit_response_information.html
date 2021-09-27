@@ -3,7 +3,7 @@
 	    <#if edit_response.message??>${edit_response.message}</#if>
 		<p>#i18n{module.workflow.forms.task_resubmit_response_information.label_is_complete}</p>
 	    <#if edit_response.isComplete(  )>
-	    	<@alert color='success'>#i18n{module.workflow.forms.task_resubmit_response_information.label_completed}</@alert>
+	    	<@alert color='success'>#i18n{module.workflow.forms.task_resubmit_response_information.label_completed} <#if edit_response.dateCompleted??>(${edit_response.dateCompleted})</#if></@alert>
 		<#else>
 	    	<@alert color='warning'>#i18n{module.workflow.forms.task_resubmit_response_information.label_not_completed}</@alert>
 		</#if>

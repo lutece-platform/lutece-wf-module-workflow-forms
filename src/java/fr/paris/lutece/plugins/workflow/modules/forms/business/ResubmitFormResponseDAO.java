@@ -36,6 +36,9 @@ package fr.paris.lutece.plugins.workflow.modules.forms.business;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,15 +49,15 @@ import java.util.List;
  */
 public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
 {
-    private static final String SQL_QUERY_SELECT = " SELECT id_history, id_task, message, is_complete "
-            + " FROM workflow_task_resubmit_response WHERE id_history = ? AND id_task = ? ";
-    private static final String SQL_QUERY_SELECT_BY_ID_TASK = " SELECT id_history, id_task, message, is_complete "
-            + " FROM workflow_task_resubmit_response WHERE id_task = ? ";
-    private static final String SQL_QUERY_INSERT = " INSERT INTO workflow_task_resubmit_response ( id_history, id_task, message, is_complete ) "
-            + " VALUES ( ?,?,?,? ) ";
+    private static final String SQL_QUERY_SELECT_ALL = " SELECT id_history, id_task, message, is_complete, date_completed "
+            + " FROM workflow_task_resubmit_response ";
+    private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE id_history = ? AND id_task = ? ";
+    private static final String SQL_QUERY_SELECT_BY_ID_TASK = SQL_QUERY_SELECT_ALL + " WHERE id_task = ? ";
+    private static final String SQL_QUERY_INSERT = " INSERT INTO workflow_task_resubmit_response ( id_history, id_task, message, is_complete, date_completed ) "
+            + " VALUES ( ?,?,?,?,? ) ";
     private static final String SQL_QUERY_DELETE_BY_ID_HISTORY = " DELETE FROM workflow_task_resubmit_response WHERE id_history = ? AND id_task = ? ";
     private static final String SQL_QUERY_DELETE_BY_TASK = " DELETE FROM workflow_task_resubmit_response WHERE id_task = ? ";
-    private static final String SQL_QUERY_UPDATE = " UPDATE workflow_task_resubmit_response SET message = ?, is_complete = ? WHERE id_history = ? AND id_task = ? ";
+    private static final String SQL_QUERY_UPDATE = " UPDATE workflow_task_resubmit_response SET message = ?, is_complete = ?, date_completed = ? WHERE id_history = ? AND id_task = ? ";
 
     /**
      * {@inheritDoc}
@@ -70,7 +73,15 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
             daoUtil.setInt( nIndex++, resubmitFormResponse.getIdTask( ) );
             daoUtil.setString( nIndex++, resubmitFormResponse.getMessage( ) );
             daoUtil.setBoolean( nIndex++, resubmitFormResponse.isComplete( ) );
-
+            if ( resubmitFormResponse.getDateCompleted( ) != null )
+            {
+                daoUtil.setTimestamp( nIndex++, new Timestamp(  resubmitFormResponse.getDateCompleted( ).getTime( ) ) );
+            }
+            else
+            {
+                daoUtil.setNull( nIndex++, Types.TIMESTAMP );
+            }
+            
             daoUtil.executeUpdate( );
         }
     }
@@ -87,7 +98,15 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
         {
             daoUtil.setString( nIndex++, resubmitFormResponse.getMessage( ) );
             daoUtil.setBoolean( nIndex++, resubmitFormResponse.isComplete( ) );
-
+            if ( resubmitFormResponse.getDateCompleted( ) != null )
+            {
+                daoUtil.setTimestamp( nIndex++, new Timestamp(  resubmitFormResponse.getDateCompleted( ).getTime( ) ) );
+            }
+            else
+            {
+                daoUtil.setNull( nIndex++, Types.TIMESTAMP );
+            }
+            
             daoUtil.setInt( nIndex++, resubmitFormResponse.getIdHistory( ) );
             daoUtil.setInt( nIndex++, resubmitFormResponse.getIdTask( ) );
 
@@ -115,11 +134,7 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
             {
                 nIndex = 1;
 
-                resubmitFormResponse = new ResubmitFormResponse( );
-                resubmitFormResponse.setIdHistory( daoUtil.getInt( nIndex++ ) );
-                resubmitFormResponse.setIdTask( daoUtil.getInt( nIndex++ ) );
-                resubmitFormResponse.setMessage( daoUtil.getString( nIndex++ ) );
-                resubmitFormResponse.setIsComplete( daoUtil.getBoolean( nIndex++ ) );
+                resubmitFormResponse = dataToObject( daoUtil );
             }
 
         }
@@ -142,13 +157,7 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
 
             while ( daoUtil.next( ) )
             {
-                int nIndex = 1;
-
-                ResubmitFormResponse resubmitFormResponse = new ResubmitFormResponse( );
-                resubmitFormResponse.setIdHistory( daoUtil.getInt( nIndex++ ) );
-                resubmitFormResponse.setIdTask( daoUtil.getInt( nIndex++ ) );
-                resubmitFormResponse.setMessage( daoUtil.getString( nIndex++ ) );
-                resubmitFormResponse.setIsComplete( daoUtil.getBoolean( nIndex++ ) );
+                ResubmitFormResponse resubmitFormResponse = dataToObject( daoUtil );
                 listResubmitFormResponses.add( resubmitFormResponse );
             }
 
@@ -183,5 +192,21 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
             daoUtil.setInt( 1, nIdTask );
             daoUtil.executeUpdate( );
         }
+    }
+    
+    private ResubmitFormResponse dataToObject(DAOUtil daoUtil )
+    {
+        int nIndex = 0;
+
+        ResubmitFormResponse resubmitFormResponse = new ResubmitFormResponse( );
+        resubmitFormResponse.setIdHistory( daoUtil.getInt( ++nIndex ) );
+        resubmitFormResponse.setIdTask( daoUtil.getInt( ++nIndex ) );
+        resubmitFormResponse.setMessage( daoUtil.getString( ++nIndex ) );
+        resubmitFormResponse.setIsComplete( daoUtil.getBoolean( ++nIndex ) );
+        if ( daoUtil.getObject( ++nIndex ) != null )
+        {
+            resubmitFormResponse.setDateCompleted( new Date( daoUtil.getTimestamp( nIndex ).getTime( ) ) );
+        }
+        return resubmitFormResponse;
     }
 }

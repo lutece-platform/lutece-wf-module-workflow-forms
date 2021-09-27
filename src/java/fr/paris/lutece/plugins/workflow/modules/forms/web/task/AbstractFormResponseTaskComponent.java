@@ -33,12 +33,7 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.web.task;
 
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-
 import fr.paris.lutece.plugins.workflow.web.task.AbstractTaskComponent;
-import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 
 public abstract class AbstractFormResponseTaskComponent extends AbstractTaskComponent
 {

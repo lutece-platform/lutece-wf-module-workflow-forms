@@ -20,3 +20,6 @@ CREATE TABLE workflow_task_resubmit_response_history
 	new_value long VARCHAR DEFAULT NULL,
 	PRIMARY KEY (id_history, id_task, id_question, iteration_number)
 );
+
+ALTER TABLE workflow_task_complete_response ADD COLUMN date_completed TIMESTAMP NULL;
+ALTER TABLE workflow_task_resubmit_response ADD COLUMN date_completed TIMESTAMP NULL;

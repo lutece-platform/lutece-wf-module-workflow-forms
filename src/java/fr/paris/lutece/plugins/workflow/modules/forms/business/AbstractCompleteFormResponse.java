@@ -33,11 +33,14 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
+import java.sql.Date;
+
 public abstract class AbstractCompleteFormResponse
 {
     private int _nIdHistory;
     private int _nIdTask;
     private String _strMessage;
+    private Date _dateCompleted;
     private boolean _bIsComplete;
 
     /**
@@ -122,5 +125,21 @@ public abstract class AbstractCompleteFormResponse
     public boolean isComplete( )
     {
         return _bIsComplete;
+    }
+
+    /**
+     * @return the dateComplete
+     */
+    public Date getDateCompleted( )
+    {
+        return _dateCompleted;
+    }
+
+    /**
+     * @param dateComplete the dateComplete to set
+     */
+    public void setDateCompleted( Date dateComplete )
+    {
+        _dateCompleted = dateComplete;
     }
 }

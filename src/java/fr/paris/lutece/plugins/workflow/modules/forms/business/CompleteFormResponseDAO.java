@@ -36,6 +36,9 @@ package fr.paris.lutece.plugins.workflow.modules.forms.business;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,15 +49,15 @@ import java.util.List;
  */
 public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
 {
-    private static final String SQL_QUERY_SELECT = " SELECT id_history, id_task, message, is_complete "
-            + " FROM workflow_task_complete_response WHERE id_history = ? AND id_task = ? ";
-    private static final String SQL_QUERY_SELECT_BY_ID_TASK = " SELECT id_history, id_task, message, is_complete "
-            + " FROM workflow_task_complete_response WHERE id_task = ? ";
-    private static final String SQL_QUERY_INSERT = " INSERT INTO workflow_task_complete_response ( id_history, id_task, message, is_complete ) "
-            + " VALUES ( ?,?,?,? ) ";
+    private static final String SQL_QUERY_SELECT_ALL = " SELECT id_history, id_task, message, is_complete, date_completed "
+            + " FROM workflow_task_complete_response ";
+    private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE id_history = ? AND id_task = ? ";
+    private static final String SQL_QUERY_SELECT_BY_ID_TASK = SQL_QUERY_SELECT_ALL + " WHERE id_task = ? ";
+    private static final String SQL_QUERY_INSERT = " INSERT INTO workflow_task_complete_response ( id_history, id_task, message, is_complete, date_completed ) "
+            + " VALUES ( ?,?,?,?,? ) ";
     private static final String SQL_QUERY_DELETE_BY_ID_HISTORY = " DELETE FROM workflow_task_complete_response WHERE id_history = ? AND id_task = ? ";
     private static final String SQL_QUERY_DELETE_BY_TASK = " DELETE FROM workflow_task_complete_response WHERE id_task = ? ";
-    private static final String SQL_QUERY_UPDATE = " UPDATE workflow_task_complete_response SET message = ?, is_complete = ? WHERE id_history = ? AND id_task = ? ";
+    private static final String SQL_QUERY_UPDATE = " UPDATE workflow_task_complete_response SET message = ?, is_complete = ?, date_completed = ? WHERE id_history = ? AND id_task = ? ";
 
     /**
      * {@inheritDoc}
@@ -70,6 +73,14 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
             daoUtil.setInt( nIndex++, completeFormResponse.getIdTask( ) );
             daoUtil.setString( nIndex++, completeFormResponse.getMessage( ) );
             daoUtil.setBoolean( nIndex++, completeFormResponse.isComplete( ) );
+            if ( completeFormResponse.getDateCompleted( ) != null )
+            {
+                daoUtil.setTimestamp( nIndex++, new Timestamp(  completeFormResponse.getDateCompleted( ).getTime( ) ) );
+            }
+            else
+            {
+                daoUtil.setNull( nIndex++, Types.TIMESTAMP );
+            }
 
             daoUtil.executeUpdate( );
         }
@@ -87,6 +98,14 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
         {
             daoUtil.setString( nIndex++, completeFormResponse.getMessage( ) );
             daoUtil.setBoolean( nIndex++, completeFormResponse.isComplete( ) );
+            if ( completeFormResponse.getDateCompleted( ) != null )
+            {
+                daoUtil.setTimestamp( nIndex++, new Timestamp(  completeFormResponse.getDateCompleted( ).getTime( ) ) );
+            }
+            else
+            {
+                daoUtil.setNull( nIndex++, Types.TIMESTAMP );
+            }
 
             daoUtil.setInt( nIndex++, completeFormResponse.getIdHistory( ) );
             daoUtil.setInt( nIndex++, completeFormResponse.getIdTask( ) );
@@ -113,13 +132,7 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
 
             if ( daoUtil.next( ) )
             {
-                nIndex = 1;
-
-                completeFormResponse = new CompleteFormResponse( );
-                completeFormResponse.setIdHistory( daoUtil.getInt( nIndex++ ) );
-                completeFormResponse.setIdTask( daoUtil.getInt( nIndex++ ) );
-                completeFormResponse.setMessage( daoUtil.getString( nIndex++ ) );
-                completeFormResponse.setIsComplete( daoUtil.getBoolean( nIndex++ ) );
+                completeFormResponse = dataToObject( daoUtil );
             }
 
         }
@@ -142,13 +155,7 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
 
             while ( daoUtil.next( ) )
             {
-                int nIndex = 1;
-
-                CompleteFormResponse completeFormResponse = new CompleteFormResponse( );
-                completeFormResponse.setIdHistory( daoUtil.getInt( nIndex++ ) );
-                completeFormResponse.setIdTask( daoUtil.getInt( nIndex++ ) );
-                completeFormResponse.setMessage( daoUtil.getString( nIndex++ ) );
-                completeFormResponse.setIsComplete( daoUtil.getBoolean( nIndex++ ) );
+                CompleteFormResponse completeFormResponse = dataToObject( daoUtil );
                 listCompleteFormResponses.add( completeFormResponse );
             }
 
@@ -183,5 +190,21 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
             daoUtil.setInt( 1, nIdTask );
             daoUtil.executeUpdate( );
         }
+    }
+    
+    private CompleteFormResponse dataToObject(DAOUtil daoUtil )
+    {
+        int nIndex = 0;
+
+        CompleteFormResponse completeFormResponse = new CompleteFormResponse( );
+        completeFormResponse.setIdHistory( daoUtil.getInt( ++nIndex ) );
+        completeFormResponse.setIdTask( daoUtil.getInt( ++nIndex ) );
+        completeFormResponse.setMessage( daoUtil.getString( ++nIndex ) );
+        completeFormResponse.setIsComplete( daoUtil.getBoolean( ++nIndex ) );
+        if ( daoUtil.getObject( ++nIndex ) != null )
+        {
+            completeFormResponse.setDateCompleted( new Date( daoUtil.getTimestamp( nIndex ).getTime( ) ) );
+        }
+        return completeFormResponse;
     }
 }

@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -240,6 +241,7 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
     public void doCompleteResponse( CompleteFormResponse completeFormResponse )
     {
         completeFormResponse.setIsComplete( true );
+        completeFormResponse.setDateCompleted( new Date( System.currentTimeMillis( ) ) );
         update( completeFormResponse );
     }
     
