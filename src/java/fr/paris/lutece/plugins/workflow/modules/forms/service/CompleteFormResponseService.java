@@ -250,7 +250,7 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
         history.setIdTask( idTask );
         history.setIdHistory( idHistory );
         history.setQuestion( editableResponse.getQuestion( ) );
-        history.setNewValue( createPreviousNewValue( editableResponse.getResponseFromForm( ) ) );
+        history.setNewValue( _formsTaskService.createPreviousNewValue( editableResponse.getResponseFromForm( ) ) );
 
         _completeFormResponseTaskHistoryService.create( history );
     }

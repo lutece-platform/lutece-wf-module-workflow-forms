@@ -40,12 +40,9 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
-
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
-import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
 import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
@@ -57,15 +54,10 @@ import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowService;
 import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
-import fr.paris.lutece.portal.business.file.File;
-import fr.paris.lutece.portal.business.file.FileHome;
 import fr.paris.lutece.portal.service.workflow.WorkflowService;
 
 public abstract class AbstractFormResponseService
 {
-    private static final String NULL = "null";
-    private static final String SEPARATOR = ", ";
-    
     @Inject
     private IStateService _stateService;
 
@@ -144,52 +136,5 @@ public abstract class AbstractFormResponseService
             }
         }
         return bIsValid;
-    }
-    
-    /**
-     * Create a string with previous or new value to set in history
-     * 
-     * @param responseForm
-     * @param value
-     * @return a value ready to be inserted in history
-     */
-    protected String createPreviousNewValue( FormQuestionResponse responseForm )
-    {
-        String value = StringUtils.EMPTY;
-        if ( responseForm == null )
-        {
-            return value;
-        }
-        for ( int i = 0; i < responseForm.getEntryResponse( ).size( ); i++ )
-        {
-            Response response = responseForm.getEntryResponse( ).get( i );
-
-            if ( response.getFile( ) != null )
-            {
-                File file = FileHome.findByPrimaryKey( response.getFile( ).getIdFile( ) );
-
-                if ( file != null )
-                {
-                    value = response.getFile( ).getTitle( );
-                }
-            }
-            else
-            {
-                if ( response.getToStringValueResponse( ) == null || response.getToStringValueResponse( ).equalsIgnoreCase( NULL ) )
-                {
-                    value = StringUtils.EMPTY;
-                }
-                else
-                {
-                    value += response.getToStringValueResponse( );
-                }
-            }
-
-            if ( i + 1 != responseForm.getEntryResponse( ).size( ) )
-            {
-                value += SEPARATOR;
-            }
-        }
-        return value;
     }
 }

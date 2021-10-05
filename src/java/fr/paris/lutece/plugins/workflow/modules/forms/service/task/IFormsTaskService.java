@@ -165,4 +165,13 @@ public interface IFormsTaskService
      * @return the FormResponse
      */
     FormResponse getFormResponseFromIdHistory( int nIdHistory );
+    
+    /**
+     * Create a string with previous or new value to set in history
+     * 
+     * @param responseForm
+     * @param value
+     * @return a value ready to be inserted in history
+     */
+    String createPreviousNewValue( FormQuestionResponse responseForm );
 }

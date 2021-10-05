@@ -41,18 +41,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
-
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
-import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
 import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
-import fr.paris.lutece.portal.business.file.File;
-import fr.paris.lutece.portal.business.file.FileHome;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 
 /**
@@ -63,9 +58,6 @@ public class EditFormResponseTask extends AbstractFormsTask
 {
     // Message
     private static final String MESSAGE_TASK_TITLE = "module.workflow.forms.task.editFormResponse.title";
-
-    private static final String NULL = "null";
-    private static final String SEPARATOR = ", ";
 
     @Inject
     @Named( "workflow-forms.editFormResponseConfigService" )
@@ -134,60 +126,11 @@ public class EditFormResponseTask extends AbstractFormsTask
             editFormResponseTaskHistory.setIdTask( getId( ) );
             editFormResponseTaskHistory.setIdHistory( nIdHistory );
 
-            String previousValue = StringUtils.EMPTY;
-            editFormResponseTaskHistory.setPreviousValue( createPreviousNewValue( editableResponse.getResponseSaved( ), previousValue ) );
-
-            String newValue = StringUtils.EMPTY;
-            editFormResponseTaskHistory.setNewValue( createPreviousNewValue( editableResponse.getResponseFromForm( ), newValue ) );
+            editFormResponseTaskHistory.setPreviousValue( _formsTaskService.createPreviousNewValue( editableResponse.getResponseSaved( ) ) );
+            editFormResponseTaskHistory.setNewValue( _formsTaskService.createPreviousNewValue( editableResponse.getResponseFromForm( ) ) );
 
             _editFormResponseTaskHistoryService.create( editFormResponseTaskHistory );
         }
-    }
-
-    /**
-     * Create a string with previous or new value to set in history
-     * 
-     * @param responseForm
-     * @param value
-     * @return a value ready to be inserted in history
-     */
-    private String createPreviousNewValue( FormQuestionResponse responseForm, String value )
-    {
-        if ( responseForm == null )
-        {
-            return value;
-        }
-        for ( int i = 0; i < responseForm.getEntryResponse( ).size( ); i++ )
-        {
-            Response response = responseForm.getEntryResponse( ).get( i );
-
-            if ( response.getFile( ) != null )
-            {
-                File file = FileHome.findByPrimaryKey( response.getFile( ).getIdFile( ) );
-
-                if ( file != null )
-                {
-                    value = response.getFile( ).getTitle( );
-                }
-            }
-            else
-            {
-                if ( response.getToStringValueResponse( ) == null || response.getToStringValueResponse( ).equalsIgnoreCase( NULL ) )
-                {
-                    value = StringUtils.EMPTY;
-                }
-                else
-                {
-                    value += response.getToStringValueResponse( );
-                }
-            }
-
-            if ( i + 1 != responseForm.getEntryResponse( ).size( ) )
-            {
-                value += SEPARATOR;
-            }
-        }
-        return value;
     }
 
     @Override

@@ -41,7 +41,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
@@ -56,6 +56,7 @@ import fr.paris.lutece.plugins.forms.web.StepDisplayTree;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
+import fr.paris.lutece.plugins.genericattributes.service.entrytype.AbstractEntryTypeUpload;
 import fr.paris.lutece.plugins.genericattributes.service.entrytype.EntryTypeServiceManager;
 import fr.paris.lutece.plugins.genericattributes.service.entrytype.IEntryTypeService;
 import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
@@ -66,6 +67,7 @@ import fr.paris.lutece.plugins.workflowcore.business.state.StateFilter;
 import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
+import fr.paris.lutece.portal.business.file.FileHome;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.message.SiteMessageService;
 import fr.paris.lutece.portal.service.util.AppException;
@@ -77,25 +79,17 @@ import fr.paris.lutece.util.ReferenceList;
  */
 public class FormsTaskService implements IFormsTaskService
 {
-    private final IResourceHistoryService _resourceHistoryService;
+    private static final String NULL = "null";
+    private static final String SEPARATOR = ", ";
+    
+    @Inject
+    private IResourceHistoryService _resourceHistoryService;
 
     @Inject
     private IActionService _actionService;
 
     @Inject
     private IStateService _stateService;
-
-    /**
-     * Constructor
-     * 
-     * @param resourceHistoryService
-     *            the resource history service
-     */
-    @Inject
-    public FormsTaskService( IResourceHistoryService resourceHistoryService )
-    {
-        _resourceHistoryService = resourceHistoryService;
-    }
 
     /**
      * {@inheritDoc}
@@ -214,16 +208,30 @@ public class FormsTaskService implements IFormsTaskService
             FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, false );
             responseFromForm.setIdFormResponse( formResponse.getId( ) );
             FormQuestionResponse responseSaved = findSavedResponse( formResponse, question );
-
-            if ( responseSaved != null )
+            
+            if ( responseSaved == null )
             {
-                IEntryTypeService entryTypeService = EntryTypeServiceManager.getEntryTypeService( question.getEntry( ) );
-                if ( entryTypeService instanceof EntryTypeDate )
+                EditableResponse editableResponse = new EditableResponse( responseSaved, responseFromForm );
+                listEditableResponse.add( editableResponse );
+                continue;
+            }
+
+            IEntryTypeService entryTypeService = EntryTypeServiceManager.getEntryTypeService( question.getEntry( ) );
+            if ( entryTypeService instanceof EntryTypeDate )
+            {
+                for ( Response response : responseSaved.getEntryResponse( ) )
                 {
-                    for ( Response response : responseSaved.getEntryResponse( ) )
+                    response.setToStringValueResponse(
+                            entryTypeService.getResponseValueForRecap( question.getEntry( ), request, response, request.getLocale( ) ) );
+                }
+            }
+            if ( entryTypeService instanceof AbstractEntryTypeUpload )
+            {
+                for ( Response response : responseSaved.getEntryResponse( ) )
+                {
+                    if ( response.getFile( ) != null )
                     {
-                        response.setToStringValueResponse(
-                                entryTypeService.getResponseValueForRecap( question.getEntry( ), request, response, request.getLocale( ) ) );
+                        response.setFile( FileHome.findByPrimaryKey( response.getFile( ).getIdFile( ) ) );
                     }
                 }
             }
@@ -319,5 +327,41 @@ public class FormsTaskService implements IFormsTaskService
         }
 
         return response;
+    }
+    
+    @Override
+    public String createPreviousNewValue( FormQuestionResponse responseForm )
+    {
+        String value = StringUtils.EMPTY;
+        if ( responseForm == null )
+        {
+            return value;
+        }
+        for ( int i = 0; i < responseForm.getEntryResponse( ).size( ); i++ )
+        {
+            Response response = responseForm.getEntryResponse( ).get( i );
+
+            if ( response.getFile( ) != null )
+            {
+                value = response.getFile( ).getTitle( );
+            }
+            else
+            {
+                if ( response.getToStringValueResponse( ) == null || response.getToStringValueResponse( ).equalsIgnoreCase( NULL ) )
+                {
+                    value = StringUtils.EMPTY;
+                }
+                else
+                {
+                    value += response.getToStringValueResponse( );
+                }
+            }
+
+            if ( i + 1 != responseForm.getEntryResponse( ).size( ) )
+            {
+                value += SEPARATOR;
+            }
+        }
+        return value;
     }
 }

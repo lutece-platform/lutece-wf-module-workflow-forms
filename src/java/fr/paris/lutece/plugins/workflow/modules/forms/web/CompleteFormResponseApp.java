@@ -129,7 +129,7 @@ public class CompleteFormResponseApp implements XPageApplication
                 if ( _completeFormResponseService.isRecordStateValid( completeFormResponse, request.getLocale( ) ) )
                 {
                     doAction( request, completeFormResponse, nIdTask, nIdHistory );
-                    page = getResubmitFormResponsePage( request, completeFormResponse );
+                    page = getCompleteFormResponsePage( request, completeFormResponse );
                 }
                 else
                 {
@@ -160,7 +160,7 @@ public class CompleteFormResponseApp implements XPageApplication
      *            the CompleteFormResponse
      * @return a XPage
      */
-    private XPage getResubmitFormResponsePage( HttpServletRequest request, CompleteFormResponse completeFormResponse )
+    private XPage getCompleteFormResponsePage( HttpServletRequest request, CompleteFormResponse completeFormResponse )
     {
         XPage page = new XPage( );
 

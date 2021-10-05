@@ -275,8 +275,8 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
         history.setIdTask( idTask );
         history.setIdHistory( idHistory );
         history.setQuestion( editableResponse.getQuestion( ) );
-        history.setPreviousValue( createPreviousNewValue( editableResponse.getResponseSaved( ) ) );
-        history.setNewValue( createPreviousNewValue( editableResponse.getResponseFromForm( ) ) );
+        history.setPreviousValue( _formsTaskService.createPreviousNewValue( editableResponse.getResponseSaved( ) ) );
+        history.setNewValue( _formsTaskService.createPreviousNewValue( editableResponse.getResponseFromForm( ) ) );
         
         _resubmitFormResponseTaskHistoryService.create( history );
     }
