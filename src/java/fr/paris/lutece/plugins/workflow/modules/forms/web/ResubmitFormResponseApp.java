@@ -33,8 +33,8 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.web;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -51,7 +51,6 @@ import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.IResubmitFormResponseService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.signrequest.ResubmitFormResponseRequestAuthenticatorService;
-import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.SiteMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
@@ -59,56 +58,39 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.security.UserNotSignedException;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
-import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.web.constants.Messages;
 import fr.paris.lutece.portal.web.xpages.XPage;
-import fr.paris.lutece.portal.web.xpages.XPageApplication;
 import fr.paris.lutece.util.html.HtmlTemplate;
+import fr.paris.lutece.util.signrequest.AbstractPrivateKeyAuthenticator;
 
-public class ResubmitFormResponseApp implements XPageApplication
+public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFormResponse>
 {
     private static final long serialVersionUID = -6753642997148910492L;
 
     // TEMPLATES
     private static final String TEMPLATE_RESUBMIT_FORM = "skin/plugins/workflow/modules/forms/resubmit_form.html";
 
-    // ACTIONS
-    private static final String ACTION_DO_MODIFY_RESPONSE = "do_modify_response";
-
     // MESSAGES
     private static final String MESSAGE_RECORD_ALREADY_COMPLETED = "module.workflow.forms.message.response_already_completed";
     private static final String PROPERTY_XPAGE_RESUBMIT_FORM_PAGETITLE = "module.workflow.forms.resubmit_form.page_title";
     private static final String PROPERTY_XPAGE_RESUBMIT_FORM_PATHLABEL = "module.workflow.forms.resubmit_form.page_label";
-    private static final String MESSAGE_EDITION_COMPLETE = "module.workflow.forms.message.edition_complete";
 
     // PARAMETERS
-    private static final String PARAMETER_URL_RETURN = "url_return";
     private static final String PARAMETER_ID_HISTORY = "id_history";
     private static final String PARAMETER_ID_TASK = "id_task";
-    private static final String PARAMETER_SIGNATURE = "signature";
-    private static final String PARAMETER_TIMESTAMP = "timestamp";
-    private static final String PARAMETER_ACTION = "action";
 
     // MARKS
-    private static final String MARK_STEP_LIST = "list_step";
     private static final String MARK_RESUBMIT_FORM = "resubmit_form";
-    private static final String MARK_ID_RESPONSE = "id_response";
-    private static final String MARK_WEBAPP_URL = "webapp_url";
-    private static final String MARK_LOCALE = "locale";
-    private static final String MARK_URL_RETURN = "url_return";
-    private static final String MARK_SIGNATURE = "signature";
-    private static final String MARK_TIMESTAMP = "timestamp";
 
     // SERVICES
     @Inject
     private IResubmitFormResponseService _resubmitFormResponseService = SpringContextService.getBean( "workflow-forms.taskResubmitResponseService" );
-    private IFormsTaskService _formsTaskService = SpringContextService.getBean( "workflow-forms.formsTaskService" );
 
     @Override
     public XPage getPage( HttpServletRequest request, int nMode, Plugin plugin ) throws UserNotSignedException, SiteMessageException
     {
         XPage page = null;
-        if ( !ResubmitFormResponseRequestAuthenticatorService.getRequestAuthenticator( ).isRequestAuthenticated( request ) )
+        if ( !getRequestAuthenticator( ).isRequestAuthenticated( request ) )
         {
             // Throws Exception
             _formsTaskService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP, request.getParameter( PARAMETER_URL_RETURN ) );
@@ -125,10 +107,10 @@ public class ResubmitFormResponseApp implements XPageApplication
             ResubmitFormResponse resubmitFormResponse = _resubmitFormResponseService.find( nIdHistory, nIdTask );
             if ( resubmitFormResponse != null && !resubmitFormResponse.isComplete( ) )
             {
-                if ( _resubmitFormResponseService.isRecordStateValid( resubmitFormResponse, request.getLocale( ) ) )
+                if ( isRecordStateValid( resubmitFormResponse, request.getLocale( ) ) )
                 {
                     doAction( request, resubmitFormResponse, nIdTask, nIdHistory );
-                    page = getResubmitFormResponsePage( request, resubmitFormResponse );
+                    page = getFormResponseXPage( request, resubmitFormResponse );
                 }
                 else
                 {
@@ -159,7 +141,8 @@ public class ResubmitFormResponseApp implements XPageApplication
      *            the ResubmitFormResponse
      * @return a XPage
      */
-    private XPage getResubmitFormResponsePage( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse )
+    @Override
+    protected XPage getFormResponseXPage( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse )
     {
         XPage page = new XPage( );
 
@@ -172,19 +155,8 @@ public class ResubmitFormResponseApp implements XPageApplication
         List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse,
                 DisplayType.RESUBMIT_FRONTOFFICE );
 
-        Map<String, Object> model = new HashMap<>( );
+        Map<String, Object> model = initModelFormPage( request, formResponse, listStepDisplayTree );
         model.put( MARK_RESUBMIT_FORM, resubmitFormResponse );
-        model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
-        model.put( MARK_LOCALE, request.getLocale( ) );
-        model.put( MARK_URL_RETURN, request.getParameter( PARAMETER_URL_RETURN ) );
-        model.put( MARK_SIGNATURE, request.getParameter( PARAMETER_SIGNATURE ) );
-        model.put( MARK_TIMESTAMP, request.getParameter( PARAMETER_TIMESTAMP ) );
-        model.put( MARK_STEP_LIST, listStepDisplayTree );
-
-        if ( formResponse != null )
-        {
-            model.put( MARK_ID_RESPONSE, formResponse.getId( ) );
-        }
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_RESUBMIT_FORM, request.getLocale( ), model );
 
@@ -193,24 +165,6 @@ public class ResubmitFormResponseApp implements XPageApplication
         page.setContent( template.getHtml( ) );
 
         return page;
-    }
-
-    private void doAction( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse, int idTask, int idHistory ) throws SiteMessageException
-    {
-        String strAction = request.getParameter( PARAMETER_ACTION );
-
-        if ( StringUtils.isBlank( strAction ) )
-        {
-            return;
-        }
-
-        if ( ACTION_DO_MODIFY_RESPONSE.equals( strAction ) && doEditResponse( request, resubmitFormResponse, idTask, idHistory ) )
-        {
-            // Back to home page
-            String strUrlReturn = request.getParameter( PARAMETER_URL_RETURN );
-            strUrlReturn = StringUtils.isNotBlank( strUrlReturn ) ? strUrlReturn : AppPathService.getBaseUrl( request );
-            _formsTaskService.setSiteMessage( request, MESSAGE_EDITION_COMPLETE, SiteMessage.TYPE_INFO, strUrlReturn );
-        }
     }
 
     /**
@@ -224,9 +178,10 @@ public class ResubmitFormResponseApp implements XPageApplication
      * @throws SiteMessageException
      *             a site message if there is a problem
      */
-    private boolean doEditResponse( HttpServletRequest request, ResubmitFormResponse response, int idTask, int idHistory ) throws SiteMessageException
+    @Override
+    protected boolean doEditResponse( HttpServletRequest request, ResubmitFormResponse response, int idTask, int idHistory ) throws SiteMessageException
     {
-        if ( _resubmitFormResponseService.isRecordStateValid( response, request.getLocale( ) ) )
+        if ( isRecordStateValid( response, request.getLocale( ) ) )
         {
             if ( _resubmitFormResponseService.doEditResponseData( request, response, idTask, idHistory ) )
             {
@@ -243,5 +198,23 @@ public class ResubmitFormResponseApp implements XPageApplication
             _formsTaskService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP, request.getParameter( PARAMETER_URL_RETURN ) );
         }
         return false;
+    }
+    
+    @Override
+    protected ResubmitFormResponse findAbstractCompleteFormResponse( int nIdHistory, int nIdTask )
+    {
+        return _resubmitFormResponseService.find( nIdHistory, nIdTask );
+    }
+    
+    @Override
+    protected AbstractPrivateKeyAuthenticator getRequestAuthenticator( )
+    {
+        return ResubmitFormResponseRequestAuthenticatorService.getRequestAuthenticator( );
+    }
+    
+    @Override
+    protected boolean isRecordStateValid( ResubmitFormResponse resubmitFormResponse, Locale locale )
+    {
+        return _resubmitFormResponseService.isRecordStateValid( resubmitFormResponse, locale );
     }
 }
