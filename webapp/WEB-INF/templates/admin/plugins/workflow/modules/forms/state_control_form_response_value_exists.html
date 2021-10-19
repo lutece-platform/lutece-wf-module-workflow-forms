@@ -1,0 +1,21 @@
+<@formGroup labelFor='form_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
+	<@inputGroup>
+		<@select name='form_select' items=form_list default_value='${id_form!}' />
+		<@inputGroupItem>
+			<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
+		</@inputGroupItem>
+	</@inputGroup>
+	<#if id_form??>
+		<@inputGroup params='style="margin-top:1rem;"'>
+			<@select name='step_select' items=list_step default_value='${id_step!}' />
+			<@inputGroupItem>
+				<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
+			</@inputGroupItem>
+		</@inputGroup>
+	</#if>
+	<#if id_step??>
+		<@inputGroup params='style="margin-top:1rem;"'>
+			<@select name='question_select' items=question_list default_value='${id_question!}' />
+		</@inputGroup>
+	</#if>
+</@formGroup>

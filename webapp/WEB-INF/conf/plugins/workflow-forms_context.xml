@@ -161,6 +161,7 @@
 
     <!-- Controllers  -->
     <bean id="workflow-forms.formResponseValueStateController" class="fr.paris.lutece.plugins.workflow.modules.forms.service.FormResponseValueStateController" />
+    <bean id="workflow-forms.formResponseValueExistsStateController" class="fr.paris.lutece.plugins.workflow.modules.forms.service.FormResponseValueExistsStateController" />
     
     <!-- SignRequest -->
     <bean id="workflow-forms.hashService"
