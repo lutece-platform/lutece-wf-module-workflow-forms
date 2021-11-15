@@ -102,7 +102,7 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
 
     @Inject
     private IResubmitFormResponseTaskHistoryService _resubmitFormResponseTaskHistoryService;
-    
+
     @Override
     public ResubmitFormResponse find( int nIdHistory, int nIdTask )
     {
@@ -254,7 +254,8 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
     }
 
     @Override
-    public boolean doEditResponseData( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse, int idTask, int idHistory ) throws SiteMessageException
+    public boolean doEditResponseData( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse, int idTask, int idHistory )
+            throws SiteMessageException
     {
         FormResponse response = _formsTaskService.getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
         if ( response == null )
@@ -268,7 +269,7 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
         doEditResponseData( request, response, listQuestions, idTask, idHistory );
         return true;
     }
-    
+
     @Override
     protected void createTaskHistory( EditableResponse editableResponse, int idTask, int idHistory )
     {
@@ -278,7 +279,7 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
         history.setQuestion( editableResponse.getQuestion( ) );
         history.setPreviousValue( _formsTaskService.createPreviousNewValue( editableResponse.getResponseSaved( ) ) );
         history.setNewValue( _formsTaskService.createPreviousNewValue( editableResponse.getResponseFromForm( ) ) );
-        
+
         _resubmitFormResponseTaskHistoryService.create( history );
     }
 

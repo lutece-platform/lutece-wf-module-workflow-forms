@@ -81,7 +81,7 @@ public class FormsTaskService implements IFormsTaskService
 {
     private static final String NULL = "null";
     private static final String SEPARATOR = ", ";
-    
+
     @Inject
     private IResourceHistoryService _resourceHistoryService;
 
@@ -208,7 +208,7 @@ public class FormsTaskService implements IFormsTaskService
             FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, false );
             responseFromForm.setIdFormResponse( formResponse.getId( ) );
             FormQuestionResponse responseSaved = findSavedResponse( formResponse, question );
-            
+
             if ( responseSaved == null )
             {
                 EditableResponse editableResponse = new EditableResponse( responseSaved, responseFromForm );
@@ -328,7 +328,7 @@ public class FormsTaskService implements IFormsTaskService
 
         return response;
     }
-    
+
     @Override
     public String createPreviousNewValue( FormQuestionResponse responseForm )
     {

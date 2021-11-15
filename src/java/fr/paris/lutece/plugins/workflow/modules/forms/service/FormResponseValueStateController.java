@@ -117,7 +117,7 @@ public class FormResponseValueStateController extends AbstractFormResponseStateC
         {
             return false;
         }
-        
+
         Response response = getResponseFromQuestionAndFormResponse( config.getQuestion( ).getId( ), nIdResource );
         if ( response == null )
         {

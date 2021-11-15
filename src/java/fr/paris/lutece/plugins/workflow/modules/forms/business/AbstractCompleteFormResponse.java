@@ -136,7 +136,8 @@ public abstract class AbstractCompleteFormResponse
     }
 
     /**
-     * @param dateComplete the dateComplete to set
+     * @param dateComplete
+     *            the dateComplete to set
      */
     public void setDateCompleted( Date dateComplete )
     {

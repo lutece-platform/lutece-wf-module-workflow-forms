@@ -86,7 +86,7 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
 
     @Inject
     private ITaskService _taskService;
-    
+
     @Inject
     private ICompleteFormResponseTaskHistoryService _completeFormResponseTaskHistoryService;
 
@@ -210,7 +210,8 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
     }
 
     @Override
-    public boolean doEditResponseData( HttpServletRequest request, CompleteFormResponse completeFormResponse, int idTask, int idHistory ) throws SiteMessageException
+    public boolean doEditResponseData( HttpServletRequest request, CompleteFormResponse completeFormResponse, int idTask, int idHistory )
+            throws SiteMessageException
     {
         FormResponse response = _formsTaskService.getFormResponseFromIdHistory( completeFormResponse.getIdHistory( ) );
         if ( response == null )
@@ -244,7 +245,7 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
         completeFormResponse.setDateCompleted( new Date( System.currentTimeMillis( ) ) );
         update( completeFormResponse );
     }
-    
+
     @Override
     protected void createTaskHistory( EditableResponse editableResponse, int idTask, int idHistory )
     {

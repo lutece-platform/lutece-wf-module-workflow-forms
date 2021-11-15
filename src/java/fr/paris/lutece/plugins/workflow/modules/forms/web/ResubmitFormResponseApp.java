@@ -199,19 +199,19 @@ public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFor
         }
         return false;
     }
-    
+
     @Override
     protected ResubmitFormResponse findAbstractCompleteFormResponse( int nIdHistory, int nIdTask )
     {
         return _resubmitFormResponseService.find( nIdHistory, nIdTask );
     }
-    
+
     @Override
     protected AbstractPrivateKeyAuthenticator getRequestAuthenticator( )
     {
         return ResubmitFormResponseRequestAuthenticatorService.getRequestAuthenticator( );
     }
-    
+
     @Override
     protected boolean isRecordStateValid( ResubmitFormResponse resubmitFormResponse, Locale locale )
     {

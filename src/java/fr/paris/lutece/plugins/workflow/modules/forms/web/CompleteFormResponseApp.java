@@ -65,7 +65,6 @@ public class CompleteFormResponseApp extends AbstractFormResponseApp<CompleteFor
     // TEMPLATES
     private static final String TEMPLATE_COMPLETE_FORM = "skin/plugins/workflow/modules/forms/complete_form.html";
 
-
     // MESSAGES
     private static final String PROPERTY_XPAGE_RESUBMIT_FORM_PAGETITLE = "module.workflow.forms.resubmit_form.page_title";
     private static final String PROPERTY_XPAGE_RESUBMIT_FORM_PATHLABEL = "module.workflow.forms.resubmit_form.page_label";
@@ -143,19 +142,19 @@ public class CompleteFormResponseApp extends AbstractFormResponseApp<CompleteFor
         }
         return false;
     }
-    
+
     @Override
     protected CompleteFormResponse findAbstractCompleteFormResponse( int nIdHistory, int nIdTask )
     {
         return _completeFormResponseService.find( nIdHistory, nIdTask );
     }
-    
+
     @Override
     protected AbstractPrivateKeyAuthenticator getRequestAuthenticator( )
     {
         return CompleteFormResponseRequestAuthenticatorService.getRequestAuthenticator( );
     }
-    
+
     @Override
     protected boolean isRecordStateValid( CompleteFormResponse completeFormResponse, Locale locale )
     {

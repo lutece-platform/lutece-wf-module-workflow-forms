@@ -110,9 +110,9 @@ public abstract class AbstractFormResponseService
 
         _editFormResponseTaskService.saveResponses( response, listChangedResponseToSave );
     }
-    
+
     protected abstract void createTaskHistory( EditableResponse editableResponse, int idTask, int idHistory );
-    
+
     protected boolean isRecordStateValid( ITask task, TaskConfig config, int idHistory )
     {
         boolean bIsValid = false;

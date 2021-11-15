@@ -1,3 +1,36 @@
+/*
+ * Copyright (c) 2002-2021, City of Paris
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice
+ *     and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice
+ *     and the following disclaimer in the documentation and/or other materials
+ *     provided with the distribution.
+ *
+ *  3. Neither the name of 'Mairie de Paris' nor 'Lutece' nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * License 1.0
+ */
 package fr.paris.lutece.plugins.workflow.modules.forms.web;
 
 import java.util.HashMap;
@@ -24,16 +57,16 @@ import fr.paris.lutece.portal.web.xpages.XPageApplication;
 import fr.paris.lutece.util.signrequest.AbstractPrivateKeyAuthenticator;
 
 /**
- *  abstract class for Complete & Resubmit Form Response FO action
+ * abstract class for Complete & Resubmit Form Response FO action
  */
 public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResponse> implements XPageApplication
 {
 
     private static final long serialVersionUID = 2628844288485204790L;
-    
+
     // ACTIONS
     private static final String ACTION_DO_MODIFY_RESPONSE = "do_modify_response";
-    
+
     // MARKS
     private static final String MARK_STEP_LIST = "list_step";
     private static final String MARK_ID_RESPONSE = "id_response";
@@ -42,7 +75,7 @@ public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResp
     private static final String MARK_URL_RETURN = "url_return";
     private static final String MARK_SIGNATURE = "signature";
     private static final String MARK_TIMESTAMP = "timestamp";
-    
+
     // PARAMETERS
     private static final String PARAMETER_ACTION = "action";
     private static final String PARAMETER_SIGNATURE = "signature";
@@ -50,13 +83,13 @@ public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResp
     protected static final String PARAMETER_URL_RETURN = "url_return";
     private static final String PARAMETER_ID_HISTORY = "id_history";
     private static final String PARAMETER_ID_TASK = "id_task";
-    
+
     // MESSAGES
     private static final String MESSAGE_EDITION_COMPLETE = "module.workflow.forms.message.edition_complete";
     private static final String MESSAGE_RECORD_ALREADY_COMPLETED = "module.workflow.forms.message.response_already_completed";
-    
+
     protected IFormsTaskService _formsTaskService = SpringContextService.getBean( "workflow-forms.formsTaskService" );
-    
+
     @Override
     public XPage getPage( HttpServletRequest request, int nMode, Plugin plugin ) throws UserNotSignedException, SiteMessageException
     {
@@ -120,7 +153,7 @@ public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResp
             _formsTaskService.setSiteMessage( request, MESSAGE_EDITION_COMPLETE, SiteMessage.TYPE_INFO, strUrlReturn );
         }
     }
-    
+
     protected Map<String, Object> initModelFormPage( HttpServletRequest request, FormResponse formResponse, List<String> listStepDisplayTree )
     {
         Map<String, Object> model = new HashMap<>( );
@@ -138,7 +171,7 @@ public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResp
 
         return model;
     }
-    
+
     /**
      * Do edit a response
      * 
@@ -151,21 +184,21 @@ public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResp
      *             a site message if there is a problem
      */
     protected abstract boolean doEditResponse( HttpServletRequest request, R response, int idTask, int idHistory ) throws SiteMessageException;
-    
+
     protected abstract AbstractPrivateKeyAuthenticator getRequestAuthenticator( );
-    
+
     protected abstract boolean isRecordStateValid( R resubmitFormResponse, Locale locale );
-    
+
     /**
-    * Get the Xpage
-    * 
-    * @param request
-    *            the HTTP request
-    * @param CompleteFormResponse
-    *            the CompleteFormResponse
-    * @return a XPage
-    */
+     * Get the Xpage
+     * 
+     * @param request
+     *            the HTTP request
+     * @param CompleteFormResponse
+     *            the CompleteFormResponse
+     * @return a XPage
+     */
     protected abstract XPage getFormResponseXPage( HttpServletRequest request, R completeFormResponse );
-    
+
     protected abstract R findAbstractCompleteFormResponse( int nIdHistory, int nIdTask );
 }

@@ -75,13 +75,13 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
             daoUtil.setBoolean( nIndex++, resubmitFormResponse.isComplete( ) );
             if ( resubmitFormResponse.getDateCompleted( ) != null )
             {
-                daoUtil.setTimestamp( nIndex++, new Timestamp(  resubmitFormResponse.getDateCompleted( ).getTime( ) ) );
+                daoUtil.setTimestamp( nIndex++, new Timestamp( resubmitFormResponse.getDateCompleted( ).getTime( ) ) );
             }
             else
             {
                 daoUtil.setNull( nIndex++, Types.TIMESTAMP );
             }
-            
+
             daoUtil.executeUpdate( );
         }
     }
@@ -100,13 +100,13 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
             daoUtil.setBoolean( nIndex++, resubmitFormResponse.isComplete( ) );
             if ( resubmitFormResponse.getDateCompleted( ) != null )
             {
-                daoUtil.setTimestamp( nIndex++, new Timestamp(  resubmitFormResponse.getDateCompleted( ).getTime( ) ) );
+                daoUtil.setTimestamp( nIndex++, new Timestamp( resubmitFormResponse.getDateCompleted( ).getTime( ) ) );
             }
             else
             {
                 daoUtil.setNull( nIndex++, Types.TIMESTAMP );
             }
-            
+
             daoUtil.setInt( nIndex++, resubmitFormResponse.getIdHistory( ) );
             daoUtil.setInt( nIndex++, resubmitFormResponse.getIdTask( ) );
 
@@ -193,8 +193,8 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
             daoUtil.executeUpdate( );
         }
     }
-    
-    private ResubmitFormResponse dataToObject(DAOUtil daoUtil )
+
+    private ResubmitFormResponse dataToObject( DAOUtil daoUtil )
     {
         int nIndex = 0;
 

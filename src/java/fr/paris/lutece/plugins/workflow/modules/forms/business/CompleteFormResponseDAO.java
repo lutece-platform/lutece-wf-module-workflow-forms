@@ -75,7 +75,7 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
             daoUtil.setBoolean( nIndex++, completeFormResponse.isComplete( ) );
             if ( completeFormResponse.getDateCompleted( ) != null )
             {
-                daoUtil.setTimestamp( nIndex++, new Timestamp(  completeFormResponse.getDateCompleted( ).getTime( ) ) );
+                daoUtil.setTimestamp( nIndex++, new Timestamp( completeFormResponse.getDateCompleted( ).getTime( ) ) );
             }
             else
             {
@@ -100,7 +100,7 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
             daoUtil.setBoolean( nIndex++, completeFormResponse.isComplete( ) );
             if ( completeFormResponse.getDateCompleted( ) != null )
             {
-                daoUtil.setTimestamp( nIndex++, new Timestamp(  completeFormResponse.getDateCompleted( ).getTime( ) ) );
+                daoUtil.setTimestamp( nIndex++, new Timestamp( completeFormResponse.getDateCompleted( ).getTime( ) ) );
             }
             else
             {
@@ -191,8 +191,8 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
             daoUtil.executeUpdate( );
         }
     }
-    
-    private CompleteFormResponse dataToObject(DAOUtil daoUtil )
+
+    private CompleteFormResponse dataToObject( DAOUtil daoUtil )
     {
         int nIndex = 0;
 

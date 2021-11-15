@@ -82,7 +82,7 @@ public class CompleteFormResponseTaskComponent extends AbstractFormResponseTaskC
 
     @Inject
     private IFormsTaskService _formsTaskService;
-    
+
     @Inject
     private ICompleteFormResponseTaskHistoryService _completeFormResponseTaskHistoryService;
 

@@ -82,7 +82,7 @@ public class ResubmitFormResponseTaskComponent extends AbstractFormResponseTaskC
 
     @Inject
     private IFormsTaskService _formsTaskService;
-    
+
     @Inject
     private IResubmitFormResponseTaskHistoryService _resubmitFormResponseTaskHistoryService;
 
