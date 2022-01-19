@@ -39,8 +39,12 @@ import org.apache.commons.collections.CollectionUtils;
 
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
+import fr.paris.lutece.plugins.forms.business.FormResponse;
+import fr.paris.lutece.plugins.forms.business.FormResponseHome;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
+import fr.paris.lutece.plugins.forms.business.Step;
+import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.FormResponseValueStateControllerConfig;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.FormResponseValueStateControllerConfigHome;
@@ -96,9 +100,32 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
 
     protected abstract boolean canQuestionBeCondition( Question question );
 
-    protected Response getResponseFromQuestionAndFormResponse( int IdQuestion, int idResponse )
+    protected Response getResponseFromConfigAndFormResponse(  FormResponseValueStateControllerConfig config, int idResponse )
     {
-        List<FormQuestionResponse> responseList = FormQuestionResponseHome.findFormQuestionResponseByResponseQuestion( idResponse, IdQuestion );
+        Question question = null;
+        if ( config.isMultiform( ) )
+        {
+            FormResponse formResponse = FormResponseHome.findByPrimaryKey( idResponse );
+            for ( Question q : QuestionHome.findByCode( config.getCode( ) ) )
+            {
+                Step step = StepHome.findByPrimaryKey( q.getIdStep( ) );
+                if ( step.getIdForm( ) == formResponse.getFormId( ) )
+                {
+                    question = q;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            question = config.getQuestion( );
+        }
+        
+        if ( question == null )
+        {
+            return null;
+        }
+        List<FormQuestionResponse> responseList = FormQuestionResponseHome.findFormQuestionResponseByResponseQuestion( idResponse, question.getId( ) );
 
         if ( CollectionUtils.isEmpty( responseList ) )
         {
@@ -109,6 +136,6 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
         {
             return null;
         }
-        return entryResponseList.get( 0 );
+       return entryResponseList.get( 0 );
     }
 }

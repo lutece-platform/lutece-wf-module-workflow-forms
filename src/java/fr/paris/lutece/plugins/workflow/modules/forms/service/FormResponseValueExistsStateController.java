@@ -104,7 +104,7 @@ public class FormResponseValueExistsStateController extends AbstractFormResponse
     public boolean control( ITask task, int nIdResource, String strResourceType )
     {
         FormResponseValueStateControllerConfig config = loadConfig( task.getId( ) );
-        Response response = getResponseFromQuestionAndFormResponse( config.getQuestion( ).getId( ), nIdResource );
+        Response response = getResponseFromConfigAndFormResponse( config, nIdResource );
         if ( response == null )
         {
             return false;
