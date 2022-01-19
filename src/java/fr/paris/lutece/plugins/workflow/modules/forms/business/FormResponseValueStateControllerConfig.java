@@ -41,10 +41,12 @@ public class FormResponseValueStateControllerConfig
 {
     private int _id;
     private int _idTask;
+    private boolean _multiform;
     private Form _form;
     private Step _step;
     private Question _question;
     private String _value;
+    private String _code;
 
     /**
      * @return the id
@@ -146,5 +148,37 @@ public class FormResponseValueStateControllerConfig
     public void setValue( String value )
     {
         _value = value;
+    }
+
+    /**
+     * @return the multiform
+     */
+    public boolean isMultiform( )
+    {
+        return _multiform;
+    }
+
+    /**
+     * @param multiform the multiform to set
+     */
+    public void setMultiform( boolean multiform )
+    {
+        this._multiform = multiform;
+    }
+
+    /**
+     * @return the code
+     */
+    public String getCode( )
+    {
+        return _code;
+    }
+
+    /**
+     * @param code the code to set
+     */
+    public void setCode( String code )
+    {
+        _code = code;
     }
 }

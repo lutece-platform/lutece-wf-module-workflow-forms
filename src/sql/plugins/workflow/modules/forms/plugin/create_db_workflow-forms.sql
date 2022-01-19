@@ -88,9 +88,11 @@ CREATE TABLE workflow_state_controller_form_response_value
 (
 	id INT AUTO_INCREMENT,
 	id_task INT DEFAULT 0 NOT NULL,
-	id_form INT DEFAULT 0 NOT NULL,
-	id_step INT DEFAULT 0 NOT NULL,
-	id_question INT DEFAULT 0 NOT NULL,
+	is_multiform SMALLINT DEFAULT 0 NOT NULL,
+	id_form INT NULL,
+	id_step INT NULL,
+	id_question INT NULL,
+	code VARCHAR(100),
 	response_value	VARCHAR(255),
 	PRIMARY KEY (id)
 );

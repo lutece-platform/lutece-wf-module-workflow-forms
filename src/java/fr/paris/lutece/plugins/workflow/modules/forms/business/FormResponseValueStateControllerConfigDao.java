@@ -43,10 +43,10 @@ import fr.paris.lutece.util.sql.DAOUtil;
 
 public class FormResponseValueStateControllerConfigDao implements IFormResponseValueStateControllerConfigDao
 {
-    private static final String SQL_QUERY_SELECT_ALL = "SELECT id, id_task, id_form, id_step, id_question, response_value FROM workflow_state_controller_form_response_value ";
+    private static final String SQL_QUERY_SELECT_ALL = "SELECT id, id_task, id_form, id_step, id_question, response_value,is_multiform,code FROM workflow_state_controller_form_response_value ";
     private static final String SQL_QUERY_SELECT_BY_TASK = SQL_QUERY_SELECT_ALL + " WHERE id_task = ? ";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_state_controller_form_response_value ( id_task, id_form, id_step, id_question, response_value ) VALUES ( ?, ?, ?, ?, ? )";
-    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_state_controller_form_response_value SET id_task = ?, id_form = ?, id_step = ?, id_question = ?, response_value = ? WHERE id = ? ";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_state_controller_form_response_value ( id_task, id_form, id_step, id_question, response_value,is_multiform,code ) VALUES ( ?, ?, ?, ?, ?, ?, ? )";
+    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_state_controller_form_response_value SET id_task = ?, id_form = ?, id_step = ?, id_question = ?, response_value = ?, is_multiform = ?, code = ? WHERE id = ? ";
     private static final String SQL_QUERY_DELETE_BY_TASK = "DELETE FROM workflow_state_controller_form_response_value WHERE id_task = ? ";
 
     @Override
@@ -81,6 +81,8 @@ public class FormResponseValueStateControllerConfigDao implements IFormResponseV
                 daoUtil.setInt( ++index, -1 );
             }
             daoUtil.setString( ++index, config.getValue( ) );
+            daoUtil.setBoolean( ++index, config.isMultiform( ) );
+            daoUtil.setString( ++index, config.getCode( ) );
 
             daoUtil.executeUpdate( );
         }
@@ -118,7 +120,9 @@ public class FormResponseValueStateControllerConfigDao implements IFormResponseV
                 daoUtil.setInt( ++index, -1 );
             }
             daoUtil.setString( ++index, config.getValue( ) );
-
+            daoUtil.setBoolean( ++index, config.isMultiform( ) );
+            daoUtil.setString( ++index, config.getCode( ) );
+            
             daoUtil.setInt( ++index, config.getId( ) );
             daoUtil.executeUpdate( );
         }
@@ -162,6 +166,8 @@ public class FormResponseValueStateControllerConfigDao implements IFormResponseV
         config.setStep( StepHome.findByPrimaryKey( daoUtil.getInt( ++index ) ) );
         config.setQuestion( QuestionHome.findByPrimaryKey( daoUtil.getInt( ++index ) ) );
         config.setValue( daoUtil.getString( ++index ) );
+        config.setMultiform( daoUtil.getBoolean( ++index ) );
+        config.setCode( daoUtil.getString( ++index ) );
         return config;
     }
 }
