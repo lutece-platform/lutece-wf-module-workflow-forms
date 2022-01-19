@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,13 +51,13 @@ public class EditFormResponseConfigValueDao implements IEditFormResponseConfigVa
 {
     public static final String BEAN_NAME = "worklow-forms.editFormResponseConfigValueDao";
 
-    private static final String SQL_QUERY_SELECT_ALL = "SELECT id_config_value,id_config,id_form,id_step,id_question FROM workflow_task_editformresponse_config_value ";
+    private static final String SQL_QUERY_SELECT_ALL = "SELECT id_config_value,id_config,id_form,id_step,id_question,code FROM workflow_task_editformresponse_config_value ";
     private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE id_config_value = ?";
     private static final String SQL_QUERY_SELECT_BY_CONFIG = SQL_QUERY_SELECT_ALL + " WHERE id_config = ? ";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_task_editformresponse_config_value ( id_config,id_form,id_step,id_question ) VALUES ( ?, ?, ?, ? )";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_task_editformresponse_config_value ( id_config,id_form,id_step,id_question,code ) VALUES ( ?, ?, ?, ?, ? )";
     private static final String SQL_QUERY_DELETE = "DELETE FROM workflow_task_editformresponse_config_value WHERE id_config_value = ?";
     private static final String SQL_QUERY_DELETE_BY_CONFIG = "DELETE FROM workflow_task_editformresponse_config_value WHERE id_config = ?";
-    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_task_editformresponse_config_value SET id_config_value=?, id_config=?, id_form = ?, id_step=?, id_question=? WHERE id_config_value = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_task_editformresponse_config_value SET id_config_value=?, id_config=?, id_form = ?, id_step=?, id_question=?, code=? WHERE id_config_value = ?";
 
     @Override
     public void insert( EditFormResponseConfigValue configValue, Plugin plugin )
@@ -65,9 +66,31 @@ public class EditFormResponseConfigValueDao implements IEditFormResponseConfigVa
         {
             int nIndex = 0;
             daoUtil.setInt( ++nIndex, configValue.getIdConfig( ) );
-            daoUtil.setInt( ++nIndex, configValue.getForm( ).getId( ) );
-            daoUtil.setInt( ++nIndex, configValue.getStep( ).getId( ) );
-            daoUtil.setInt( ++nIndex, configValue.getQuestion( ).getId( ) );
+            if ( configValue.getForm( ) != null )
+            {
+                daoUtil.setInt( ++nIndex, configValue.getForm( ).getId( ) );
+            }
+            else
+            {
+                daoUtil.setNull( ++nIndex, Types.INTEGER );
+            }
+            if ( configValue.getStep( ) != null )
+            {
+                daoUtil.setInt( ++nIndex, configValue.getStep( ).getId( ) );
+            }
+            else
+            {
+                daoUtil.setNull( ++nIndex, Types.INTEGER );
+            }
+            if ( configValue.getQuestion( ) != null )
+            {
+                daoUtil.setInt( ++nIndex, configValue.getQuestion( ).getId( ) );
+            }
+            else
+            {
+                daoUtil.setNull( ++nIndex, Types.INTEGER );
+            }
+            daoUtil.setString( ++nIndex, configValue.getCode( ) );
             daoUtil.executeUpdate( );
 
             if ( daoUtil.nextGeneratedKey( ) )
@@ -86,9 +109,31 @@ public class EditFormResponseConfigValueDao implements IEditFormResponseConfigVa
             int nIndex = 0;
             daoUtil.setInt( ++nIndex, configValue.getIdConfigValue( ) );
             daoUtil.setInt( ++nIndex, configValue.getIdConfig( ) );
-            daoUtil.setInt( ++nIndex, configValue.getForm( ).getId( ) );
-            daoUtil.setInt( ++nIndex, configValue.getStep( ).getId( ) );
-            daoUtil.setInt( ++nIndex, configValue.getQuestion( ).getId( ) );
+            if ( configValue.getForm( ) != null )
+            {
+                daoUtil.setInt( ++nIndex, configValue.getForm( ).getId( ) );
+            }
+            else
+            {
+                daoUtil.setNull( ++nIndex, Types.INTEGER );
+            }
+            if ( configValue.getStep( ) != null )
+            {
+                daoUtil.setInt( ++nIndex, configValue.getStep( ).getId( ) );
+            }
+            else
+            {
+                daoUtil.setNull( ++nIndex, Types.INTEGER );
+            }
+            if ( configValue.getQuestion( ) != null )
+            {
+                daoUtil.setInt( ++nIndex, configValue.getQuestion( ).getId( ) );
+            }
+            else
+            {
+                daoUtil.setNull( ++nIndex, Types.INTEGER );
+            }
+            daoUtil.setString( ++nIndex, configValue.getCode( ) );
             daoUtil.setInt( ++nIndex, configValue.getIdConfigValue( ) );
             daoUtil.executeUpdate( );
         }
@@ -160,9 +205,23 @@ public class EditFormResponseConfigValueDao implements IEditFormResponseConfigVa
         int nIndex = 0;
         config.setIdConfigValue( daoUtil.getInt( ++nIndex ) );
         config.setIdConfig( daoUtil.getInt( ++nIndex ) );
-        config.setForm( FormHome.findByPrimaryKey( daoUtil.getInt( ++nIndex ) ) );
-        config.setStep( StepHome.findByPrimaryKey( daoUtil.getInt( ++nIndex ) ) );
-        config.setQuestion( QuestionHome.findByPrimaryKey( daoUtil.getInt( ++nIndex ) ) );
+        
+        int idForm = daoUtil.getInt( ++nIndex );
+        if ( idForm > 0 )
+        {
+            config.setForm( FormHome.findByPrimaryKey( idForm ) );
+        }
+        int idStep = daoUtil.getInt( ++nIndex );
+        if ( idStep > 0 )
+        {
+            config.setStep( StepHome.findByPrimaryKey( idStep ) );
+        }
+        int idQuestion = daoUtil.getInt( ++nIndex );
+        if ( idQuestion > 0 )
+        {
+            config.setQuestion( QuestionHome.findByPrimaryKey( idQuestion ) );
+        }
+        config.setCode( daoUtil.getString( ++nIndex ) );
         return config;
     }
 }
