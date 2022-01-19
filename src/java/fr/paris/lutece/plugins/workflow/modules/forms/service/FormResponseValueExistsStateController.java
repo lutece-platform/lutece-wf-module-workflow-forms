@@ -33,25 +33,19 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
-import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.Question;
-import fr.paris.lutece.plugins.forms.business.QuestionHome;
-import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.FormResponseValueStateControllerConfig;
-import fr.paris.lutece.plugins.workflow.modules.forms.business.FormResponseValueStateControllerConfigHome;
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfig;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
 public class FormResponseValueExistsStateController extends AbstractFormResponseStateController
@@ -60,25 +54,6 @@ public class FormResponseValueExistsStateController extends AbstractFormResponse
 
     private static final String PROPERTY_KEY_LABEL = "module.workflow.forms.state.control.forms.response.exists";
     private static final String PROPERTY_KEY_HELP = "module.workflow.forms.state.control.forms.response.exists.help";
-
-    // Mark
-    private static final String MARK_FORM_LIST = "form_list";
-    private static final String MARK_ID_FORM = "id_form";
-    private static final String MARK_STEP_LIST = "list_step";
-    private static final String MARK_ID_STEP = "id_step";
-    private static final String MARK_QUESTION_LIST = "question_list";
-    private static final String MARK_ID_QUESTION = "id_question";
-
-    // Parameters
-    private static final String PARAMETER_ACTION = "apply";
-    private static final String PARAMETER_FORM = "form_select";
-    private static final String PARAMETER_STEP = "step_select";
-    private static final String PARAMETER_QUESTION = "question_select";
-
-    // Actions
-    private static final String ACTION_SELECT_FORM = "select_form_config";
-    private static final String ACTION_SELECT_STEP = "select_step_config";
-    private static final String ACTION_SELECT_QUESTION = "select_question_config";
 
     private static final String TEMPLATE_TASK_CONFIG = "admin/plugins/workflow/modules/forms/state_control_form_response_value_exists.html";
 
@@ -113,61 +88,9 @@ public class FormResponseValueExistsStateController extends AbstractFormResponse
     }
 
     @Override
-    public void doSaveConfig( HttpServletRequest request, Locale locale, ITask task )
-    {
-        FormResponseValueStateControllerConfig controllerConfig = loadConfig( task.getId( ) );
-        String action = request.getParameter( PARAMETER_ACTION );
-        if ( action != null )
-        {
-            switch( action )
-            {
-                case ACTION_SELECT_FORM:
-                    controllerConfig.setForm( FormHome.findByPrimaryKey( Integer.valueOf( request.getParameter( PARAMETER_FORM ) ) ) );
-                    controllerConfig.setStep( null );
-                    controllerConfig.setQuestion( null );
-                    break;
-                case ACTION_SELECT_STEP:
-                    controllerConfig.setStep( StepHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_STEP ) ) ) );
-                    controllerConfig.setQuestion( null );
-                    break;
-                case ACTION_SELECT_QUESTION:
-                    controllerConfig.setQuestion( QuestionHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_QUESTION ) ) ) );
-                    break;
-                default:
-                    break;
-            }
-        }
-        if ( NumberUtils.isCreatable( request.getParameter( PARAMETER_QUESTION ) ) )
-        {
-            controllerConfig.setQuestion( QuestionHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_QUESTION ) ) ) );
-        }
-        controllerConfig.setValue( null );
-        FormResponseValueStateControllerConfigHome.update( controllerConfig );
-    }
-
-    @Override
     public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITaskConfig config )
     {
-        FormResponseValueStateControllerConfig controllerConfig = loadConfig( config.getIdTask( ) );
-
-        Map<String, Object> model = new HashMap<>( );
-        model.put( MARK_FORM_LIST, FormHome.getFormsReferenceList( ) );
-
-        if ( controllerConfig.getForm( ) != null )
-        {
-            model.put( MARK_ID_FORM, controllerConfig.getForm( ).getId( ) );
-            model.put( MARK_STEP_LIST, StepHome.getStepReferenceListByForm( controllerConfig.getForm( ).getId( ) ) );
-        }
-        if ( controllerConfig.getStep( ) != null )
-        {
-            model.put( MARK_ID_STEP, controllerConfig.getStep( ).getId( ) );
-            model.put( MARK_QUESTION_LIST, getQuestionReferenceList( controllerConfig.getStep( ).getId( ) ) );
-        }
-        if ( controllerConfig.getQuestion( ) != null )
-        {
-            model.put( MARK_ID_QUESTION, controllerConfig.getQuestion( ).getId( ) );
-        }
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_CONFIG, locale, model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_CONFIG, locale, createModelConfig( config ) );
         return template.getHtml( );
     }
 
@@ -175,5 +98,11 @@ public class FormResponseValueExistsStateController extends AbstractFormResponse
     protected boolean canQuestionBeCondition( Question question )
     {
         return true;
+    }
+    
+    @Override
+    protected ReferenceList getResponseReferenceList( int idQuestion )
+    {
+        return null;
     }
 }
