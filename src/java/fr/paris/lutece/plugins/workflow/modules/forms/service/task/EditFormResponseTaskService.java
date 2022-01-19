@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -59,6 +60,7 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseC
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValue;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.util.ReferenceList;
 
 /**
  * This class is a service for the task {@link EditFormResponseTask}
@@ -189,5 +191,20 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
         Question question = formQuestionResponse.getQuestion( );
         IEntryDataService dataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
         dataService.save( formQuestionResponse );
+    }
+    
+    @Override
+    public ReferenceList selectAllTechnicalCode( )
+    {
+        ReferenceList referenceList = new ReferenceList( );
+        List<Question> questionList = QuestionHome.getQuestionsList( );
+        
+        List<String> codeList = questionList.stream( ).map( Question::getCode ).distinct( ).collect( Collectors.toList( ) );
+        codeList.sort( Comparator.naturalOrder( ) );
+        for ( String code : codeList )
+        {
+            referenceList.addItem( code, code );
+        }
+        return referenceList;
     }
 }

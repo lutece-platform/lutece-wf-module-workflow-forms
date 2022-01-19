@@ -83,19 +83,25 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
     private static final String MARK_ID_STEP = "id_step";
     private static final String MARK_QUESTION_LIST = "question_list";
     private static final String MARK_MAPPING_LIST = "mapping_list";
+    private static final String MARK_MULTIFORM = "multiform";
+    private static final String MARK_CODE_LIST = "code_list";
 
     // Parameters
     private static final String PARAMETER_ACTION = "apply";
+    private static final String PARAMETER_MULTIFORM = "multiform";
     private static final String PARAMETER_FORM = "form_select";
     private static final String PARAMETER_STEP = "step_select";
     private static final String PARAMETER_QUESTION = "question_select";
     private static final String PARAMETER_MAPPING_ID = "mapping_id";
+    private static final String PARAMETER_CODE = "code_select";
 
     // Action
     private static final String ACTION_SELECT_FORM = "select_form_config";
+    private static final String ACTION_SELECT_MULTIFORM = "select_multiform";
     private static final String ACTION_SELECT_STEP = "select_step_config";
     private static final String ACTION_SELECT_QUESTION = "select_question_config";
     private static final String ACTION_REMOVE_MAPPING = "delete_mapping";
+    private static final String ACTION_SELECT_CODE = "select_code";
 
     // Messages
     private static final String MESSAGE_ERROR = "module.workflow.forms.error.task.editFormResponse";
@@ -274,6 +280,8 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_FORM_LIST, FormHome.getFormsReferenceList( ) );
         model.put( MARK_MAPPING_LIST, _config.getListConfigValues( ) );
+        model.put( MARK_MULTIFORM, _config.isMultiform( ) ); 
+        model.put( MARK_CODE_LIST, _editFormResponseTaskService.selectAllTechnicalCode( ) );
 
         if ( _configValue.getForm( ) != null )
         {
@@ -341,6 +349,10 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
     {
         switch( action )
         {
+            case ACTION_SELECT_MULTIFORM:
+                _config.setMultiform( request.getParameter( PARAMETER_MULTIFORM ) != null );
+                _config.setListConfigValues( new ArrayList<>( ) );
+                break;
             case ACTION_SELECT_FORM:
                 _configValue = new EditFormResponseConfigValue( );
                 _configValue.setForm( FormHome.findByPrimaryKey( Integer.valueOf( request.getParameter( PARAMETER_FORM ) ) ) );
@@ -353,6 +365,11 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
                 _configValue.setQuestion( QuestionHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_QUESTION ) ) ) );
                 _config.addConfigValue( _configValue );
                 _configValue = new EditFormResponseConfigValue( );
+                break;
+            case ACTION_SELECT_CODE:
+                _configValue = new EditFormResponseConfigValue( );
+                _configValue.setCode( request.getParameter( PARAMETER_CODE ) );
+                _config.addConfigValue( _configValue );
                 break;
             case ACTION_REMOVE_MAPPING:
                 int idToRemove = Integer.parseInt( request.getParameter( PARAMETER_MAPPING_ID ) );

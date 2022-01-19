@@ -39,6 +39,7 @@ import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.util.ReferenceList;
 
 /**
  * This interface represents a service for the task {@link EditFormResponseTask}
@@ -63,4 +64,10 @@ public interface IEditFormResponseTaskService
      *            the responses to save
      */
     void saveResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse );
+    
+    /**
+     * Create a {@link ReferenceList} containing all questions code
+     * @return
+     */
+    ReferenceList selectAllTechnicalCode( );
 }
