@@ -65,6 +65,7 @@ DROP TABLE IF EXISTS workflow_task_editformresponse_config;
 CREATE TABLE workflow_task_editformresponse_config
 (
 	id_config INT NOT NULL AUTO_INCREMENT,
+	is_multiform SMALLINT DEFAULT 0 NOT NULL,
 	id_task INT NOT NULL,
 	PRIMARY KEY (id_config)
 );

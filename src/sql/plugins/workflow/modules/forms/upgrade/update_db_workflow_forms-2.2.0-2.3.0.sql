@@ -1,0 +1,1 @@
+ALTER TABLE workflow_task_editformresponse_config ADD COLUMN is_multiform SMALLINT DEFAULT 0 NOT NULL;

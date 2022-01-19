@@ -41,6 +41,7 @@ import fr.paris.lutece.plugins.workflowcore.business.config.TaskConfig;
 public class EditFormResponseConfig extends TaskConfig
 {
     private int _nIdConfig = -1;
+    private boolean _bMultiform = false;
     private List<EditFormResponseConfigValue> _listConfigValues = new ArrayList<>( );
 
     /**
@@ -80,5 +81,21 @@ public class EditFormResponseConfig extends TaskConfig
     public void addConfigValue( EditFormResponseConfigValue configValue )
     {
         this._listConfigValues.add( configValue );
+    }
+
+    /**
+     * @return the multiform
+     */
+    public boolean isMultiform( )
+    {
+        return _bMultiform;
+    }
+
+    /**
+     * @param multiform the multiform to set
+     */
+    public void setMultiform( boolean multiform )
+    {
+        this._bMultiform = multiform;
     }
 }

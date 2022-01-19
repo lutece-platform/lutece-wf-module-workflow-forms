@@ -42,11 +42,11 @@ public class EditFormResponseConfigDao implements ITaskConfigDAO<EditFormRespons
 {
     public static final String BEAN_NAME = "worklow-forms.editFormResponseConfigDao";
 
-    private static final String SQL_QUERY_SELECT_ALL = "SELECT id_config,id_task FROM workflow_task_editformresponse_config ";
+    private static final String SQL_QUERY_SELECT_ALL = "SELECT id_config,id_task,is_multiform FROM workflow_task_editformresponse_config ";
     private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE id_task = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_task_editformresponse_config ( id_task ) VALUES ( ? )";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_task_editformresponse_config ( id_task,is_multiform ) VALUES ( ?,? )";
     private static final String SQL_QUERY_DELETE = "DELETE FROM workflow_task_editformresponse_config WHERE id_task = ?";
-    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_task_editformresponse_config SET id_config = ?, id_task = ? WHERE id_config = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_task_editformresponse_config SET id_config = ?, id_task = ?, is_multiform = ? WHERE id_config = ?";
 
     @Override
     public void insert( EditFormResponseConfig configValue )
@@ -55,6 +55,7 @@ public class EditFormResponseConfigDao implements ITaskConfigDAO<EditFormRespons
         {
             int nIndex = 0;
             daoUtil.setInt( ++nIndex, configValue.getIdTask( ) );
+            daoUtil.setBoolean( ++nIndex, configValue.isMultiform( ) );
             daoUtil.executeUpdate( );
 
             if ( daoUtil.nextGeneratedKey( ) )
@@ -90,6 +91,8 @@ public class EditFormResponseConfigDao implements ITaskConfigDAO<EditFormRespons
             int nIndex = 0;
             daoUtil.setInt( ++nIndex, configValue.getIdConfig( ) );
             daoUtil.setInt( ++nIndex, configValue.getIdTask( ) );
+            daoUtil.setBoolean( ++nIndex, configValue.isMultiform( ) );
+            
             daoUtil.setInt( ++nIndex, configValue.getIdConfig( ) );
             daoUtil.executeUpdate( );
         }
@@ -114,6 +117,7 @@ public class EditFormResponseConfigDao implements ITaskConfigDAO<EditFormRespons
         int nIndex = 0;
         config.setIdConfig( daoUtil.getInt( ++nIndex ) );
         config.setIdTask( daoUtil.getInt( ++nIndex ) );
+        config.setMultiform( daoUtil.getBoolean( ++nIndex ) );
         return config;
     }
 }
