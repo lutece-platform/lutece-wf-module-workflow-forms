@@ -136,6 +136,20 @@
         p:taskForAutomaticAction="true" p:configRequired="false"
         p:formTaskRequired="false" />
         
+    <!-- Task Update status -->
+    <bean id="workflow-forms.modifyUpdateStatusTypeTask" 
+    	class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+		p:key="modifyUpdateStatusTask" 
+		p:titleI18nKey="module.workflow.forms.task.modifyUpdateStatus.title" 
+		p:beanName="workflow-forms.modifyUpdateStatusTask"
+		p:configRequired="false"
+		p:formTaskRequired="false"
+		p:taskForAutomaticAction="true" />
+		
+	<bean id="workflow-forms.modifyUpdateStatusTask" 
+		class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.ModifyFormResponseUpdateStatusTask" 
+		scope="prototype" />
+        
     <!-- TaskInfoProvider -->
     <bean id="workflow-forms.resubmitFormResponseTaskInfoProvider"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.ResubmitFormResponseTaskInfoProvider"
