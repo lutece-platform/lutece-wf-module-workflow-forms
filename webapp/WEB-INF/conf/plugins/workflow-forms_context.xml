@@ -29,6 +29,9 @@
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.ResubmitFormResponseTaskHistoryService" />
     <bean id="workflow-forms.completeFormResponseTaskHistoryService"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.CompleteFormResponseTaskHistoryService" />
+    <bean id="workflow-forms.modifyFormResponseUpdateStatusTaskService"
+        class="fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService"
+        p:taskConfigDAO-ref="worklow-forms.modifyFormResponseUpdateStatusTaskConfigDAO" />
 
     <!-- DAO -->
     <bean id="worklow-forms.editFormResponseTaskHistoryDAO"
@@ -55,7 +58,33 @@
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponseTaskHistoryDAO" />
     <bean id="worklow-forms.completeFormResponseTaskHistoryDAO"
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskHistoryDAO" />
-        
+    <bean id="worklow-forms.modifyFormResponseUpdateStatusTaskConfigDAO"
+		class="fr.paris.lutece.plugins.workflow.modules.forms.business.ModifyFormResponseUpdateStatusTaskConfigDAO" />
+    
+    <!-- Task Update status -->
+    <bean id="workflow-forms.modifyUpdateStatusTypeTask" 
+    	class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+		p:key="modifyUpdateStatusTask" 
+		p:titleI18nKey="module.workflow.forms.task.modifyUpdateStatus.title" 
+		p:beanName="workflow-forms.modifyUpdateStatusTask"
+		p:configBeanName="workflow-forms.modifyFormResponseUpdateStatusTaskConfig"
+		p:configRequired="true"
+		p:formTaskRequired="true"
+		p:taskForAutomaticAction="true" />
+	
+	<bean id="workflow-forms.modifyUpdateStatusTask" 
+		class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.ModifyFormResponseUpdateStatusTask" 
+		scope="prototype" />
+		
+	<bean id="workflow-forms.modifyFormResponseUpdateStatusTaskConfig"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.business.ModifyFormResponseUpdateStatusTaskConfig"
+        scope="prototype" />
+    
+    <bean id="workflow-forms.modifyFormResponseUpdateStatusTaskComponent"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.web.task.ModifyFormResponseUpdateStatusTaskComponent"
+        p:taskType-ref="workflow-forms.modifyUpdateStatusTypeTask"
+        p:taskConfigService-ref="workflow-forms.modifyFormResponseUpdateStatusTaskService" />
+    
     <!-- Task edit form response -->
     <bean id="workflow-forms.editFormResponseTask"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTask"
@@ -135,20 +164,6 @@
         p:beanName="workflow-forms.modifyUpdateDateTask"
         p:taskForAutomaticAction="true" p:configRequired="false"
         p:formTaskRequired="false" />
-        
-    <!-- Task Update status -->
-    <bean id="workflow-forms.modifyUpdateStatusTypeTask" 
-    	class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
-		p:key="modifyUpdateStatusTask" 
-		p:titleI18nKey="module.workflow.forms.task.modifyUpdateStatus.title" 
-		p:beanName="workflow-forms.modifyUpdateStatusTask"
-		p:configRequired="false"
-		p:formTaskRequired="false"
-		p:taskForAutomaticAction="true" />
-		
-	<bean id="workflow-forms.modifyUpdateStatusTask" 
-		class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.ModifyFormResponseUpdateStatusTask" 
-		scope="prototype" />
         
     <!-- TaskInfoProvider -->
     <bean id="workflow-forms.resubmitFormResponseTaskInfoProvider"

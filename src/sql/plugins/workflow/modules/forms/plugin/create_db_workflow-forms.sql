@@ -120,3 +120,10 @@ CREATE TABLE workflow_task_resubmit_response_history
 	new_value long VARCHAR DEFAULT NULL,
 	PRIMARY KEY (id_history, id_task, id_question, iteration_number)
 );
+
+DROP TABLE IF EXISTS workflow_task_update_status;
+CREATE TABLE workflow_task_update_status(
+  id_task INT DEFAULT 0 NOT NULL,
+  status INT DEFAULT 0 NOT NULL,
+  PRIMARY KEY (id_task)
+);
