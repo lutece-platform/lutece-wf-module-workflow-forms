@@ -8,7 +8,7 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormResponse;
-import fr.paris.lutece.plugins.forms.business.FormResponseHome;
+import fr.paris.lutece.plugins.forms.service.FormResponseService;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ModifyFormResponseUpdateStatusTaskConfig;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
@@ -40,7 +40,7 @@ public class ModifyFormResponseUpdateStatusTask extends SimpleTask
             Timestamp timestampCurrentTime = new Timestamp( System.currentTimeMillis( ) );
             formResponse.setPublished(config.isPublished());
             formResponse.setUpdateStatus(timestampCurrentTime);
-            FormResponseHome.update( formResponse );
+            FormResponseService.saveFormResponse( formResponse );
         }
 	}
 
