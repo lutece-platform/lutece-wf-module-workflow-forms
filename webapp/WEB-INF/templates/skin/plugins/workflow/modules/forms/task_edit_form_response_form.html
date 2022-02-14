@@ -1,0 +1,8 @@
+<#include "/skin/plugins/asynchronousupload/upload_commons.html" />
+<@addRequiredJsFiles />
+<script type="text/javascript" src="jsp/skin/plugins/asynchronousupload/GetMainUploadJs.jsp?handler=formsAsynchronousUploadHandler" ></script>
+<#if list_step?has_content>
+    <#list list_step as step_display>
+        ${step_display!}
+    </#list>
+</#if>

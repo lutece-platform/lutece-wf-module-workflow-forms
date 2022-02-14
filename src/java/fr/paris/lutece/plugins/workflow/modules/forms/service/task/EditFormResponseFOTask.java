@@ -35,68 +35,42 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.inject.Inject;
 
-import fr.paris.lutece.plugins.forms.business.FormResponse;
-import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
-import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
+import fr.paris.lutece.portal.service.i18n.I18nService;
 
 /**
- * This abstract class is represents a task for the plugin-forms
+ * This class is a task to edit a form response
  *
  */
-public abstract class AbstractFormsTask extends SimpleTask
+public class EditFormResponseFOTask extends AbstractEditFormsTask
 {
-    protected final IFormsTaskService _formsTaskService;
+    // Message
+    private static final String MESSAGE_TASK_TITLE = "module.workflow.forms.task.editFormResponseFo.title";
 
     /**
      * Constructor
      * 
      * @param formsTaskService
      *            the form task service
+     * @param editFormResponseTaskService
+     *            the edit form response task service
+     * @param editFormResponseTaskHistoryService
+     *            the edit form response task history service (returns history of forms workflow)
      */
-    public AbstractFormsTask( IFormsTaskService formsTaskService )
+    @Inject
+    public EditFormResponseFOTask( IFormsTaskService formsTaskService, IEditFormResponseTaskService editFormResponseTaskService,
+            IEditFormResponseTaskHistoryService editFormResponseTaskHistoryService )
     {
-        super( );
-
-        _formsTaskService = formsTaskService;
+        super( formsTaskService, editFormResponseTaskService, editFormResponseTaskHistoryService );
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void processTask( int nIdHistory, HttpServletRequest request, Locale locale )
+    public String getTitle( Locale local )
     {
-        ResourceHistory resourceHistory = _formsTaskService.findResourceHistory( nIdHistory );
-
-        if ( resourceHistory != null )
-        {
-            FormResponse formResponse = _formsTaskService.findFormResponseFrom( resourceHistory );
-            processTask( formResponse, request, locale );
-            saveTaskInformation( nIdHistory );
-        }
-
+        return I18nService.getLocalizedString( MESSAGE_TASK_TITLE, local );
     }
-
-    /**
-     * Processes the task for the specified form response
-     * 
-     * @param formResponse
-     *            the form response
-     * @param request
-     *            the request
-     * @param locale
-     *            the locale
-     */
-    protected abstract void processTask( FormResponse formResponse, HttpServletRequest request, Locale locale );
-
-    /**
-     * Process the task to save the information and create history
-     * 
-     * @param nIdHistory
-     *            idHistory
-     */
-    protected abstract void saveTaskInformation( int nIdHistory );
-
 }

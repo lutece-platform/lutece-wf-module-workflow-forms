@@ -110,7 +110,7 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
     private static final String TEMPLATE_TASK_FORM_EDITRESPONSE_HISTORY = "admin/plugins/workflow/modules/forms/task_forms_editresponse_history.html";
     private static final String TEMPLATE_TASK_FORM_EDITRESPONSE_CONFIG = "admin/plugins/workflow/modules/forms/task_edit_form_response_form_config.html";
 
-    private final IFormsTaskService _formsTaskService;
+    protected final IFormsTaskService _formsTaskService;
     private final IEditFormResponseTaskService _editFormResponseTaskService;
     private final IEditFormResponseTaskHistoryService _editFormResponseTaskHistoryService;
 
@@ -237,16 +237,19 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
         {
             listStep.add( StepHome.findByPrimaryKey( nIdStep ) );
         }
-
+        
+        return createTemplateTaskForm( request, locale, formResponse, listStep, listQuestion );
+    }
+    
+    protected String createTemplateTaskForm( HttpServletRequest request, Locale locale, FormResponse formResponse, List<Step> listStep, List<Question> listQuestion )
+    {
         List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestion, formResponse,
-                DisplayType.EDITION_BACKOFFICE );
+                DisplayType.EDITION_BACKOFFICE);
 
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_STEP_LIST, listStepDisplayTree );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_FORM, locale, model );
-
-        return template.getHtml( );
+        return AppTemplateService.getTemplate( TEMPLATE_TASK_FORM, locale, model ).getHtml( );
     }
 
     /**
@@ -281,7 +284,7 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
         model.put( MARK_FORM_LIST, FormHome.getFormsReferenceList( ) );
         model.put( MARK_MAPPING_LIST, _config.getListConfigValues( ) );
         model.put( MARK_MULTIFORM, _config.isMultiform( ) ); 
-        model.put( MARK_CODE_LIST, _editFormResponseTaskService.selectAllTechnicalCode( true ) );
+        model.put( MARK_CODE_LIST, _editFormResponseTaskService.selectAllTechnicalCode( isTaskBo( ) ) );
 
         if ( _configValue.getForm( ) != null )
         {
@@ -297,7 +300,12 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_FORM_EDITRESPONSE_CONFIG, locale, model );
         return template.getHtml( );
     }
-
+    
+    protected boolean isTaskBo( )
+    {
+        return true;
+    }
+    
     private ReferenceList getQuestionReferenceList( int idStep )
     {
         ReferenceList refList = new ReferenceList( );
@@ -307,7 +315,7 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
             List<Question> questionList = QuestionHome.getQuestionsListByStep( idStep );
             for ( Question question : questionList )
             {
-                if ( question.getEntry( ).isOnlyDisplayInBack( ) )
+                if ( question.getEntry( ).isOnlyDisplayInBack( ) == isTaskBo( ) )
                 {
                     refList.addItem( question.getId( ), question.getTitle( ) );
                 }

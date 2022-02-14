@@ -31,22 +31,33 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
+package fr.paris.lutece.plugins.workflow.modules.forms.web.task;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
-import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.plugins.forms.business.FormResponse;
+import fr.paris.lutece.plugins.forms.business.Question;
+import fr.paris.lutece.plugins.forms.business.Step;
+import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskHistoryService;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
+import fr.paris.lutece.portal.service.template.AppTemplateService;
 
 /**
- * This class is a task to edit a form response
+ * This class represents a component for the task {@link fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTask EditFormResponseTask}
  *
  */
-public class EditFormResponseTask extends AbstractEditFormsTask
+public class EditFormResponseFOTaskComponent extends EditFormResponseTaskComponent
 {
-    // Message
-    private static final String MESSAGE_TASK_TITLE = "module.workflow.forms.task.editFormResponse.title";
+    // Templates
+    private static final String TEMPLATE_TASK_FORM_FO = "skin/plugins/workflow/modules/forms/task_edit_form_response_form.html";
 
     /**
      * Constructor
@@ -55,22 +66,29 @@ public class EditFormResponseTask extends AbstractEditFormsTask
      *            the form task service
      * @param editFormResponseTaskService
      *            the edit form response task service
-     * @param editFormResponseTaskHistoryService
-     *            the edit form response task history service (returns history of forms workflow)
      */
     @Inject
-    public EditFormResponseTask( IFormsTaskService formsTaskService, IEditFormResponseTaskService editFormResponseTaskService,
+    public EditFormResponseFOTaskComponent( IFormsTaskService formsTaskService, IEditFormResponseTaskService editFormResponseTaskService,
             IEditFormResponseTaskHistoryService editFormResponseTaskHistoryService )
     {
         super( formsTaskService, editFormResponseTaskService, editFormResponseTaskHistoryService );
     }
-
-    /**
-     * {@inheritDoc}
-     */
+    
     @Override
-    public String getTitle( Locale local )
+    protected String createTemplateTaskForm( HttpServletRequest request, Locale locale, FormResponse formResponse, List<Step> listStep, List<Question> listQuestion )
     {
-        return I18nService.getLocalizedString( MESSAGE_TASK_TITLE, local );
+        List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestion, formResponse,
+                DisplayType.RESUBMIT_FRONTOFFICE);
+
+        Map<String, Object> model = new HashMap<>( );
+        model.put( MARK_STEP_LIST, listStepDisplayTree );
+
+        return AppTemplateService.getTemplate( TEMPLATE_TASK_FORM_FO, locale, model ).getHtml( );
+    }
+
+    @Override
+    protected boolean isTaskBo( )
+    {
+        return false;
     }
 }
