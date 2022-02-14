@@ -194,12 +194,12 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
     }
     
     @Override
-    public ReferenceList selectAllTechnicalCode( )
+    public ReferenceList selectAllTechnicalCode( boolean isBo )
     {
         ReferenceList referenceList = new ReferenceList( );
         List<Question> questionList = QuestionHome.getQuestionsList( );
         
-        List<String> codeList = questionList.stream( ).map( Question::getCode ).distinct( ).collect( Collectors.toList( ) );
+        List<String> codeList = questionList.stream( ).filter( q -> q.getEntry( ).isOnlyDisplayInBack( ) == isBo ).map( Question::getCode ).distinct( ).collect( Collectors.toList( ) );
         codeList.sort( Comparator.naturalOrder( ) );
         for ( String code : codeList )
         {

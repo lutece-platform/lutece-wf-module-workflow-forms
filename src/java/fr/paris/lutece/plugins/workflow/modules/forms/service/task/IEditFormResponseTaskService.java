@@ -69,5 +69,5 @@ public interface IEditFormResponseTaskService
      * Create a {@link ReferenceList} containing all questions code
      * @return
      */
-    ReferenceList selectAllTechnicalCode( );
+    ReferenceList selectAllTechnicalCode( boolean isBo );
 }

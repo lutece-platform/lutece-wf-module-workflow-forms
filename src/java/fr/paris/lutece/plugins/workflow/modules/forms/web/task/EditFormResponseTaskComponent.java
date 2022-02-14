@@ -281,7 +281,7 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
         model.put( MARK_FORM_LIST, FormHome.getFormsReferenceList( ) );
         model.put( MARK_MAPPING_LIST, _config.getListConfigValues( ) );
         model.put( MARK_MULTIFORM, _config.isMultiform( ) ); 
-        model.put( MARK_CODE_LIST, _editFormResponseTaskService.selectAllTechnicalCode( ) );
+        model.put( MARK_CODE_LIST, _editFormResponseTaskService.selectAllTechnicalCode( true ) );
 
         if ( _configValue.getForm( ) != null )
         {
