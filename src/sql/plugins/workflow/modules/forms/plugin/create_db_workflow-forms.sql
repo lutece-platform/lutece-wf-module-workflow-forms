@@ -19,6 +19,7 @@ CREATE TABLE workflow_task_resubmit_response (
   id_task INT DEFAULT 0 NOT NULL,
   message LONG VARCHAR,
   is_complete SMALLINT DEFAULT 0 NOT NULL,
+  date_completed TIMESTAMP NULL,
   PRIMARY KEY (id_history, id_task)
 );
 
@@ -43,6 +44,7 @@ CREATE TABLE workflow_task_complete_response (
   id_task INT DEFAULT 0 NOT NULL,
   message LONG VARCHAR,
   is_complete SMALLINT DEFAULT 0 NOT NULL,
+  date_completed TIMESTAMP NULL,
   PRIMARY KEY (id_history, id_task)
 );
 
