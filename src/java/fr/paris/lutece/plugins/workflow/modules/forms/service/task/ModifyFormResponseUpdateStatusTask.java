@@ -14,6 +14,7 @@ import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 
 public class ModifyFormResponseUpdateStatusTask extends SimpleTask
 {
@@ -40,14 +41,15 @@ public class ModifyFormResponseUpdateStatusTask extends SimpleTask
         if ( resourceHistory != null )
         {
             FormResponse formResponse = _formsTaskService.findFormResponseFrom( resourceHistory );
-            if (formResponse != null)
+            if (formResponse == null)
             {
-                Timestamp timestampCurrentTime = new Timestamp( System.currentTimeMillis( ) );
-            	formResponse.setPublished(config.isPublished());
-                formResponse.setUpdateStatus(timestampCurrentTime);
-                _formService.saveFormResponseWithoutQuestionResponse( formResponse );
+            	AppLogService.error( "No formResponse found with id: " + resourceHistory );
+                return;
             }
-            
+            Timestamp timestampCurrentTime = new Timestamp( System.currentTimeMillis( ) );
+        	formResponse.setPublished(config.isPublished());
+            formResponse.setUpdateStatus(timestampCurrentTime);
+            _formService.saveFormResponseWithoutQuestionResponse( formResponse );
         }
 	}
 
