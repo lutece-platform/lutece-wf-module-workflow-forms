@@ -40,10 +40,14 @@ public class ModifyFormResponseUpdateStatusTask extends SimpleTask
         if ( resourceHistory != null )
         {
             FormResponse formResponse = _formsTaskService.findFormResponseFrom( resourceHistory );
-            Timestamp timestampCurrentTime = new Timestamp( System.currentTimeMillis( ) );
-            formResponse.setPublished(config.isPublished());
-            formResponse.setUpdateStatus(timestampCurrentTime);
-            _formService.saveFormResponseWithoutQuestionResponse( formResponse );
+            if (formResponse != null)
+            {
+                Timestamp timestampCurrentTime = new Timestamp( System.currentTimeMillis( ) );
+            	formResponse.setPublished(config.isPublished());
+                formResponse.setUpdateStatus(timestampCurrentTime);
+                _formService.saveFormResponseWithoutQuestionResponse( formResponse );
+            }
+            
         }
 	}
 
