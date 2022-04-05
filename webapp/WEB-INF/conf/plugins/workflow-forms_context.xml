@@ -89,7 +89,13 @@
     <bean id="workflow-forms.editFormResponseTask"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTask"
         scope="prototype" />
+    <bean id="workflow-forms.editFormResponseAutoUpdateTask"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseAutoUpdateTask"
+        scope="prototype" />
     <bean id="workflow-forms.editFormResponseConfig"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfig"
+        scope="prototype" />
+    <bean id="workflow-forms.editFormResponseAutoUpdateConfig"
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfig"
         scope="prototype" />
 
@@ -101,10 +107,25 @@
         p:formTaskRequired="true"
         p:configBeanName="workflow-forms.editFormResponseConfig"
         p:configRequired="true" />
+        
+    <bean id="workflow-forms.editFormResponseTypeAutoUpdateTask"
+        class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+        p:key="editFormResponseTypeAutoUpdateTask"
+        p:titleI18nKey="module.workflow.forms.task.editFormResponseAutoUpdate.title"
+        p:beanName="workflow-forms.editFormResponseAutoUpdateTask"
+        p:formTaskRequired="false"
+        p:configBeanName="workflow-forms.editFormResponseAutoUpdateConfig"
+        p:configRequired="true" />
 
     <bean id="workflow-forms.editFormResponseTaskComponent"
         class="fr.paris.lutece.plugins.workflow.modules.forms.web.task.EditFormResponseTaskComponent"
         p:taskType-ref="workflow-forms.editFormResponseTypeTask"
+        p:taskConfigService-ref="workflow-forms.editFormResponseConfigService"
+        scope="prototype" />
+        
+    <bean id="workflow-forms.editFormResponseAutoUpdateTaskComponent"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.web.task.EditFormResponseAutoUpdateTaskComponent"
+        p:taskType-ref="workflow-forms.editFormResponseTypeAutoUpdateTask"
         p:taskConfigService-ref="workflow-forms.editFormResponseConfigService"
         scope="prototype" />
     

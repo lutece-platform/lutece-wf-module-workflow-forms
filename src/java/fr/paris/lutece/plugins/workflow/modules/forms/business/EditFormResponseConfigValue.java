@@ -44,6 +44,7 @@ public class EditFormResponseConfigValue
     private Form _form;
     private Step _step;
     private Question _question;
+    private String _strResponse;
     private String _strCode;
 
     /**
@@ -122,6 +123,22 @@ public class EditFormResponseConfigValue
     public void setForm( Form form )
     {
         _form = form;
+    }
+    
+    /**
+     * @return the response
+     */
+    public String getResponse( )
+    {
+        return _strResponse;
+    }
+
+    /**
+     * @param strResponse the strResponse to set
+     */
+    public void setResponse( String strResponse )
+    {
+        _strResponse = strResponse;
     }
 
     /**
