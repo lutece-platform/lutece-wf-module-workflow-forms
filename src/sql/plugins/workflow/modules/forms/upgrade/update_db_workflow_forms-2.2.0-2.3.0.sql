@@ -16,3 +16,5 @@ CREATE TABLE workflow_task_update_status(
   status INT DEFAULT 0 NOT NULL,
   PRIMARY KEY (id_task)
 );
+
+ALTER TABLE workflow_task_editformresponse_config_value ADD COLUMN response VARCHAR(100) NULL;

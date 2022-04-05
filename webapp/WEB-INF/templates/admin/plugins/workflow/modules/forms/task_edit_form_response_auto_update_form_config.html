@@ -1,0 +1,88 @@
+	<@formGroup>
+		<@inputGroup size='sm'>
+			<@checkBox labelFor='multiform' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' name='multiform' id='multiform' value='1' checked=multiform />
+			<@inputGroupItem>
+				<@button type='submit' buttonIcon='check' name='apply' value='select_multiform' size='sm'/>
+			</@inputGroupItem>
+		</@inputGroup>
+	</@formGroup>
+	<@input type='hidden' id='mapping_id' name='mapping_id' />
+	
+	<#if multiform>
+		<@formGroup labelFor='code_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
+			<@inputGroup>
+				<@select name='code_select' items=code_list />
+				<@inputGroupItem>
+					<@button type='submit' buttonIcon='check' name='apply' value='select_code' />
+				</@inputGroupItem>
+			</@inputGroup>
+			<#if id_question??>
+				<@inputGroup params='style="margin-top:1rem;"'>
+					<#if (response_list?size > 1)>
+						<@select name='response_select' items=response_list default_value='${id_response!}' />
+					<#else>
+						<@input name='response_select' type='text' />
+					</#if>
+					<@inputGroupItem>
+						<@button type='submit' buttonIcon='check' name='apply' value='select_response_config' />
+					</@inputGroupItem>
+				</@inputGroup>
+			</#if>
+		</@formGroup>
+		
+	
+		<#list mapping_list as mapping>
+			<@formGroup labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.existing}'>
+				<@staticText>
+					${mapping.code} / ${mapping.response!}
+					<@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' color='danger' size='sm' />
+				</@staticText>
+			</@formGroup>
+		</#list>
+	<#else>
+		<@formGroup labelFor='form_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
+			<@inputGroup>
+				<@select name='form_select' items=form_list default_value='${id_form!}' />
+				<@inputGroupItem>
+					<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
+				</@inputGroupItem>
+			</@inputGroup>
+			<#if id_form??>
+				<@inputGroup params='style="margin-top:1rem;"'>
+					<@select name='step_select' items=list_step default_value='${id_step!}' />
+					<@inputGroupItem>
+						<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
+					</@inputGroupItem>
+				</@inputGroup>
+			</#if>
+			<#if id_step??>
+				<@inputGroup params='style="margin-top:1rem;"'>
+					<@select name='question_select' items=question_list default_value='${id_question!}' />
+					<@inputGroupItem>
+						<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' />
+					</@inputGroupItem>
+				</@inputGroup>
+			</#if>
+			<#if id_question??>
+				<@inputGroup params='style="margin-top:1rem;"'>
+					<#if (response_list?size > 1)>
+						<@select name='response_select' items=response_list default_value='${id_response!}' />
+					<#else>
+						<@input name='response_select' type='text' />
+					</#if>
+					<@inputGroupItem>
+						<@button type='submit' buttonIcon='check' name='apply' value='select_response_config' />
+					</@inputGroupItem>
+				</@inputGroup>
+			</#if>
+		</@formGroup>
+	
+		<#list mapping_list as mapping>
+			<@formGroup labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.existing}'>
+				<@staticText>
+					${mapping.form.title} / ${mapping.step.title} / ${mapping.question.title} / ${mapping.response!}
+					<@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' color='danger' size='sm' />
+				</@staticText>
+			</@formGroup>
+		</#list>
+	</#if>

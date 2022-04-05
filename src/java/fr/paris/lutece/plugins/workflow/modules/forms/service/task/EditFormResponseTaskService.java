@@ -56,6 +56,8 @@ import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.service.FormService;
 import fr.paris.lutece.plugins.forms.util.FormsConstants;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
+import fr.paris.lutece.plugins.genericattributes.business.Field;
+import fr.paris.lutece.plugins.genericattributes.service.entrytype.IEntryTypeService;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfig;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValue;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
@@ -206,5 +208,24 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
             referenceList.addItem( code, code );
         }
         return referenceList;
+    }
+    
+    @Override
+    public ReferenceList getResponseReferenceList( int idQuestion )
+    {
+        ReferenceList refList = new ReferenceList( );
+        refList.addItem( "", "" );
+        if ( idQuestion != -1 )
+        {
+            Question question = QuestionHome.findByPrimaryKey( idQuestion );
+            for ( Field field : question.getEntry( ).getFields( ) )
+            {
+                if ( IEntryTypeService.FIELD_ANSWER_CHOICE.equals( field.getCode( ) ) )
+                {
+                    refList.addItem( field.getValue( ), field.getTitle( ) );
+                }
+            }
+        }
+        return refList;
     }
 }

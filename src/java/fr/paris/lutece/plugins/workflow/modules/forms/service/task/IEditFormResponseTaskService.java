@@ -70,4 +70,6 @@ public interface IEditFormResponseTaskService
      * @return
      */
     ReferenceList selectAllTechnicalCode( boolean isBo );
+
+	ReferenceList getResponseReferenceList(int idQuestion);
 }

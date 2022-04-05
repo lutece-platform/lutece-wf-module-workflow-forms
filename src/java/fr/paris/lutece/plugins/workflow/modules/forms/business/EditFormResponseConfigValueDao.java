@@ -51,13 +51,13 @@ public class EditFormResponseConfigValueDao implements IEditFormResponseConfigVa
 {
     public static final String BEAN_NAME = "worklow-forms.editFormResponseConfigValueDao";
 
-    private static final String SQL_QUERY_SELECT_ALL = "SELECT id_config_value,id_config,id_form,id_step,id_question,code FROM workflow_task_editformresponse_config_value ";
+    private static final String SQL_QUERY_SELECT_ALL = "SELECT id_config_value,id_config,id_form,id_step,id_question,response,code FROM workflow_task_editformresponse_config_value ";
     private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECT_ALL + " WHERE id_config_value = ?";
     private static final String SQL_QUERY_SELECT_BY_CONFIG = SQL_QUERY_SELECT_ALL + " WHERE id_config = ? ";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_task_editformresponse_config_value ( id_config,id_form,id_step,id_question,code ) VALUES ( ?, ?, ?, ?, ? )";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_task_editformresponse_config_value ( id_config,id_form,id_step,id_question,response,code ) VALUES ( ?, ?, ?, ?, ?, ? )";
     private static final String SQL_QUERY_DELETE = "DELETE FROM workflow_task_editformresponse_config_value WHERE id_config_value = ?";
     private static final String SQL_QUERY_DELETE_BY_CONFIG = "DELETE FROM workflow_task_editformresponse_config_value WHERE id_config = ?";
-    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_task_editformresponse_config_value SET id_config_value=?, id_config=?, id_form = ?, id_step=?, id_question=?, code=? WHERE id_config_value = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_task_editformresponse_config_value SET id_config_value=?, id_config=?, id_form = ?, id_step=?, id_question=?, response=?, code=? WHERE id_config_value = ?";
 
     @Override
     public void insert( EditFormResponseConfigValue configValue, Plugin plugin )
@@ -89,6 +89,14 @@ public class EditFormResponseConfigValueDao implements IEditFormResponseConfigVa
             else
             {
                 daoUtil.setNull( ++nIndex, Types.INTEGER );
+            }
+            if ( configValue.getResponse( ) != null )
+            {
+                daoUtil.setString( ++nIndex, configValue.getResponse( ) );
+            }
+            else
+            {
+                daoUtil.setNull( ++nIndex, Types.VARCHAR );
             }
             daoUtil.setString( ++nIndex, configValue.getCode( ) );
             daoUtil.executeUpdate( );
@@ -132,6 +140,14 @@ public class EditFormResponseConfigValueDao implements IEditFormResponseConfigVa
             else
             {
                 daoUtil.setNull( ++nIndex, Types.INTEGER );
+            }
+            if ( configValue.getResponse( ) != null )
+            {
+                daoUtil.setString( ++nIndex, configValue.getResponse() );
+            }
+            else
+            {
+                daoUtil.setNull( ++nIndex, Types.VARCHAR );
             }
             daoUtil.setString( ++nIndex, configValue.getCode( ) );
             daoUtil.setInt( ++nIndex, configValue.getIdConfigValue( ) );
@@ -221,6 +237,7 @@ public class EditFormResponseConfigValueDao implements IEditFormResponseConfigVa
         {
             config.setQuestion( QuestionHome.findByPrimaryKey( idQuestion ) );
         }
+        config.setResponse( daoUtil.getString( ++nIndex ) );
         config.setCode( daoUtil.getString( ++nIndex ) );
         return config;
     }
