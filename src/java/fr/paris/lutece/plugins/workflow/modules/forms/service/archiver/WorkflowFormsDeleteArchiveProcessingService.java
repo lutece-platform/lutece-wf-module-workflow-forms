@@ -33,14 +33,8 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service.archiver;
 
-import javax.inject.Inject;
-
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
-import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponseHome;
-import fr.paris.lutece.plugins.forms.business.FormResponseStepHome;
-import fr.paris.lutece.plugins.forms.service.FormService;
+import fr.paris.lutece.plugins.forms.service.FormResponseService;
 import fr.paris.lutece.plugins.workflow.modules.archive.service.AbstractArchiveProcessingService;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflow;
 
@@ -51,24 +45,9 @@ public class WorkflowFormsDeleteArchiveProcessingService extends AbstractArchive
 {
     public static final String BEAN_NAME = "workflow-forms.workflowFormsDeleteArchiveProcessingService";
 
-    @Inject
-    private FormService _formService;
-
     @Override
     public void archiveResource( ResourceWorkflow resourceWorkflow )
     {
-        int formResponseId = resourceWorkflow.getIdResource( );
-        FormResponse formResponse = FormResponseHome.loadById( formResponseId );
-
-        for ( FormQuestionResponse formQuestionResponse : FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponseId ) )
-        {
-            FormQuestionResponseHome.remove( formQuestionResponse );
-        }
-
-        FormResponseStepHome.removeByFormResponse( formResponseId );
-
-        FormResponseHome.remove( formResponseId );
-
-        _formService.fireFormResponseEventDelete( formResponse );
+        FormResponseService.getInstance().deleteFormResponse(FormResponseHome.loadById( resourceWorkflow.getIdResource( ) ));
     }
 }
