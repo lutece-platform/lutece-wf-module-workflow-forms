@@ -115,6 +115,7 @@
         p:beanName="workflow-forms.editFormResponseAutoUpdateTask"
         p:formTaskRequired="false"
         p:configBeanName="workflow-forms.editFormResponseAutoUpdateConfig"
+        p:taskForAutomaticAction="true"
         p:configRequired="true" />
 
     <bean id="workflow-forms.editFormResponseTaskComponent"
