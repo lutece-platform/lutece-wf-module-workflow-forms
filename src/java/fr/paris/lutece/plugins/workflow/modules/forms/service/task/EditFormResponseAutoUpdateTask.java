@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -42,12 +43,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponseHome;
+import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.service.FormResponseService;
+import fr.paris.lutece.plugins.forms.web.entrytype.EntryTypeDefaultDataService;
 import fr.paris.lutece.plugins.genericattributes.business.Field;
+import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfig;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValue;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
@@ -103,28 +108,39 @@ public class EditFormResponseAutoUpdateTask extends SimpleTask
         if ( resourceHistory != null )
         {
         	FormResponse formResponse = FormResponseHome.findByPrimaryKey( resourceHistory.getIdResource() );
-        	if ( formResponse != null)
+        	if ( formResponse != null )
         	{
         		List<FormQuestionResponse> listFormQuestionResponse = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId() );
-        		List<FormQuestionResponse> listFormQuestionResponseToSave = new ArrayList<FormQuestionResponse>();
-        		for (EditFormResponseConfigValue configValue : configValueList)
+        		List<FormQuestionResponse> listFormQuestionResponseToSave = new ArrayList<FormQuestionResponse>( );
+        		for ( EditFormResponseConfigValue configValue : configValueList )
         		{
-        			FormQuestionResponse questionResponse = config.isMultiform() ? 
-        					listFormQuestionResponse.stream().filter(fqr -> fqr.getQuestion().getCode().equals(configValue.getCode())).collect(Collectors.toList()).get(0) : 
-        						listFormQuestionResponse.stream().filter(fqr -> fqr.getQuestion().getId() == configValue.getQuestion().getId()).collect(Collectors.toList()).get(0);
-        			if ( questionResponse != null )
+        			listFormQuestionResponse = config.isMultiform() ?
+        					listFormQuestionResponse.stream().filter(fqr -> fqr.getQuestion().getCode().equals(configValue.getCode())).collect(Collectors.toList()) :
+        						listFormQuestionResponse.stream().filter(fqr -> fqr.getQuestion().getId() == configValue.getQuestion().getId()).collect(Collectors.toList());
+        			FormQuestionResponse questionResponse = listFormQuestionResponse.isEmpty() ? null : listFormQuestionResponse.get(0);
+        			if ( questionResponse == null )
         			{
-        				questionResponse.getEntryResponse().get(0).setResponseValue(configValue.getResponse());
-            			
-            			for ( Field field : questionResponse.getQuestion().getEntry( ).getFields( ) )
-                        {
-                            if ( field.getValue().equals(configValue.getResponse()) )
-                            {
-                            	questionResponse.getEntryResponse().get(0).setField(field);
-                            }
-                        }
-                		listFormQuestionResponseToSave.add(questionResponse);
+        				questionResponse = new FormQuestionResponse();
+        				Response response = new Response();
+        				Question question = configValue.getQuestion();
+        				response.setEntry( question.getEntry( ) );
+        				questionResponse.setEntryResponse( new ArrayList<Response>( ) );
+        				questionResponse.setQuestion( question );
+        				questionResponse.setIdStep( question.getIdStep( ) );
+        				questionResponse.setEntryResponse( Arrays.asList( response ) );
+        				questionResponse.setIdFormResponse( formResponse.getId( ) );
+        				FormResponseService.getInstance().createFormResponse( formResponse );
         			}
+    				questionResponse.getEntryResponse().get(0).setResponseValue(configValue.getResponse( ) );
+        			
+        			for ( Field field : questionResponse.getQuestion().getEntry( ).getFields( ) )
+                    {
+                        if ( field.getValue().equals(configValue.getResponse( ) ) )
+                        {
+                        	questionResponse.getEntryResponse().get(0).setField(field);
+                        }
+                    }
+            		listFormQuestionResponseToSave.add(questionResponse);
         		}
         		_editFormResponseTaskService.saveResponses(formResponse, listFormQuestionResponseToSave);
         		FormResponseService.getInstance().saveFormResponse(formResponse);
