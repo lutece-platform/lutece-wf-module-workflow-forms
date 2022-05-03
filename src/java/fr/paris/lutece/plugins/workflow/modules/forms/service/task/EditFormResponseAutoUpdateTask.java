@@ -129,7 +129,6 @@ public class EditFormResponseAutoUpdateTask extends SimpleTask
         				questionResponse.setIdStep( question.getIdStep( ) );
         				questionResponse.setEntryResponse( Arrays.asList( response ) );
         				questionResponse.setIdFormResponse( formResponse.getId( ) );
-        				FormResponseService.getInstance().createFormResponse( formResponse );
         			}
     				questionResponse.getEntryResponse().get(0).setResponseValue(configValue.getResponse( ) );
         			
