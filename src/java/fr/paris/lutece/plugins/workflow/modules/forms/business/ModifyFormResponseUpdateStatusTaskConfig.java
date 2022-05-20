@@ -44,8 +44,8 @@ public class ModifyFormResponseUpdateStatusTaskConfig extends TaskConfig
         return _bPublished;
     }
 
-    public void setPublished( boolean _bPublished )
+    public void setPublished( boolean published )
     {
-        this._bPublished = _bPublished;
+        this._bPublished = published;
     }
 }

@@ -34,7 +34,6 @@
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
 import java.sql.Statement;
-import java.sql.Timestamp;
 
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
 import fr.paris.lutece.portal.service.util.AppLogService;
