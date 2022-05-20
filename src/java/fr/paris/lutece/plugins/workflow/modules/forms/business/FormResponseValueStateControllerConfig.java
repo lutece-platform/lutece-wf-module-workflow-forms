@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -159,7 +159,8 @@ public class FormResponseValueStateControllerConfig
     }
 
     /**
-     * @param multiform the multiform to set
+     * @param multiform
+     *            the multiform to set
      */
     public void setMultiform( boolean multiform )
     {
@@ -175,7 +176,8 @@ public class FormResponseValueStateControllerConfig
     }
 
     /**
-     * @param code the code to set
+     * @param code
+     *            the code to set
      */
     public void setCode( String code )
     {

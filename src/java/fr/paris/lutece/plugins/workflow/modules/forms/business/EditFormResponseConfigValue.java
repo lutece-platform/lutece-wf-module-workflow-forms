@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -124,7 +124,7 @@ public class EditFormResponseConfigValue
     {
         _form = form;
     }
-    
+
     /**
      * @return the response
      */
@@ -134,7 +134,8 @@ public class EditFormResponseConfigValue
     }
 
     /**
-     * @param strResponse the strResponse to set
+     * @param strResponse
+     *            the strResponse to set
      */
     public void setResponse( String strResponse )
     {
@@ -150,7 +151,8 @@ public class EditFormResponseConfigValue
     }
 
     /**
-     * @param strCode the strCode to set
+     * @param strCode
+     *            the strCode to set
      */
     public void setCode( String strCode )
     {

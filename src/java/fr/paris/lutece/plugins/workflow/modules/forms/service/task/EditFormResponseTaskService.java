@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -194,14 +194,15 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
         IEntryDataService dataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
         dataService.save( formQuestionResponse );
     }
-    
+
     @Override
     public ReferenceList selectAllTechnicalCode( boolean isBo )
     {
         ReferenceList referenceList = new ReferenceList( );
         List<Question> questionList = QuestionHome.getQuestionsList( );
-        
-        List<String> codeList = questionList.stream( ).filter( q -> q.getEntry( ).isOnlyDisplayInBack( ) == isBo ).map( Question::getCode ).distinct( ).collect( Collectors.toList( ) );
+
+        List<String> codeList = questionList.stream( ).filter( q -> q.getEntry( ).isOnlyDisplayInBack( ) == isBo ).map( Question::getCode ).distinct( )
+                .collect( Collectors.toList( ) );
         codeList.sort( Comparator.naturalOrder( ) );
         for ( String code : codeList )
         {
@@ -209,7 +210,7 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
         }
         return referenceList;
     }
-    
+
     @Override
     public ReferenceList getResponseReferenceList( int idQuestion )
     {

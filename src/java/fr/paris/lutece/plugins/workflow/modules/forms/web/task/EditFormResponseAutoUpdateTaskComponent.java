@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,7 +59,8 @@ import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
 /**
- * This class represents a component for the task {@link fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseAutoUpdateTask EditFormResponseAutoUpdateTask}
+ * This class represents a component for the task {@link fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseAutoUpdateTask
+ * EditFormResponseAutoUpdateTask}
  *
  */
 public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
@@ -101,7 +102,7 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
     private final IEditFormResponseTaskService _editFormResponseTaskService;
     private EditFormResponseConfigValue _configValue;
     private EditFormResponseConfig _config;
-    
+
     /**
      * Constructor
      * 
@@ -145,7 +146,7 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_FORM_LIST, FormHome.getFormsReferenceList( ) );
         model.put( MARK_MAPPING_LIST, _config.getListConfigValues( ) );
-        model.put( MARK_MULTIFORM, _config.isMultiform( ) ); 
+        model.put( MARK_MULTIFORM, _config.isMultiform( ) );
         model.put( MARK_CODE_LIST, _editFormResponseTaskService.selectAllTechnicalCode( isTaskBo( ) ) );
 
         if ( _configValue.getForm( ) != null )
@@ -158,26 +159,27 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
             model.put( MARK_ID_STEP, _configValue.getStep( ).getId( ) );
             model.put( MARK_QUESTION_LIST, getQuestionReferenceList( _configValue.getStep( ).getId( ) ) );
         }
-        if ( _configValue.getQuestion() != null )
+        if ( _configValue.getQuestion( ) != null )
         {
-        	model.put( MARK_ID_QUESTION, _configValue.getQuestion().getId( ) );
-        	model.put( MARK_RESPONSE_LIST, _editFormResponseTaskService.getResponseReferenceList( _configValue.getQuestion().getId() ) );
+            model.put( MARK_ID_QUESTION, _configValue.getQuestion( ).getId( ) );
+            model.put( MARK_RESPONSE_LIST, _editFormResponseTaskService.getResponseReferenceList( _configValue.getQuestion( ).getId( ) ) );
         }
-        if ( _configValue.getCode() != null )
-        {	
-        	model.put( MARK_ID_QUESTION, _configValue.getCode( ) );
-        	model.put( MARK_RESPONSE_LIST, _editFormResponseTaskService.getResponseReferenceList( QuestionHome.findByCode( _configValue.getCode() ).get(0).getId() ) );
+        if ( _configValue.getCode( ) != null )
+        {
+            model.put( MARK_ID_QUESTION, _configValue.getCode( ) );
+            model.put( MARK_RESPONSE_LIST,
+                    _editFormResponseTaskService.getResponseReferenceList( QuestionHome.findByCode( _configValue.getCode( ) ).get( 0 ).getId( ) ) );
         }
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_FORM_EDITRESPONSE_CONFIG, locale, model );
         return template.getHtml( );
     }
-    
+
     protected boolean isTaskBo( )
     {
         return true;
     }
-    
+
     private ReferenceList getQuestionReferenceList( int idStep )
     {
         ReferenceList refList = new ReferenceList( );
@@ -245,8 +247,8 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
                 _configValue.setQuestion( QuestionHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_QUESTION ) ) ) );
                 break;
             case ACTION_SELECT_RESPONSE:
-            	_configValue.setResponse( request.getParameter( PARAMETER_RESPONSE ) );
-            	_config.addConfigValue( _configValue );
+                _configValue.setResponse( request.getParameter( PARAMETER_RESPONSE ) );
+                _config.addConfigValue( _configValue );
                 _configValue = new EditFormResponseConfigValue( );
                 break;
             case ACTION_SELECT_CODE:

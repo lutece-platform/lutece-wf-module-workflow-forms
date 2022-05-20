@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,11 +59,11 @@ public abstract class AbstractEditFormsTask extends SimpleTask
     private final IFormsTaskService _formsTaskService;
     private final IEditFormResponseTaskService _editFormResponseTaskService;
     private final IEditFormResponseTaskHistoryService _editFormResponseTaskHistoryService;
-    
+
     @Inject
     @Named( "workflow-forms.editFormResponseConfigService" )
     private ITaskConfigService _taskEditFormConfigService;
-    
+
     private List<EditableResponse> _listChangedResponse = new ArrayList<>( );
 
     /**
@@ -78,7 +78,7 @@ public abstract class AbstractEditFormsTask extends SimpleTask
      */
     @Inject
     public AbstractEditFormsTask( IFormsTaskService formsTaskService, IEditFormResponseTaskService editFormResponseTaskService,
-            IEditFormResponseTaskHistoryService editFormResponseTaskHistoryService)
+            IEditFormResponseTaskHistoryService editFormResponseTaskHistoryService )
     {
         super( );
         _formsTaskService = formsTaskService;
@@ -141,7 +141,7 @@ public abstract class AbstractEditFormsTask extends SimpleTask
         history.setId( nIdHistory );
         _editFormResponseTaskHistoryService.removeAllByHistoryAndTask( history, this );
     }
-    
+
     @Override
     public void doRemoveConfig( )
     {

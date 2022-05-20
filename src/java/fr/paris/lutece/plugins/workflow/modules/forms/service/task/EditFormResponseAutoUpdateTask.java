@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -66,15 +66,15 @@ import fr.paris.lutece.portal.service.i18n.I18nService;
  */
 public class EditFormResponseAutoUpdateTask extends SimpleTask
 {
-	private final IFormsTaskService _formsTaskService;
-	
-	@Inject
+    private final IFormsTaskService _formsTaskService;
+
+    @Inject
     private IEditFormResponseTaskService _editFormResponseTaskService;
-	
-	@Inject
+
+    @Inject
     @Named( "workflow-forms.editFormResponseConfigService" )
     private ITaskConfigService _taskEditFormConfigService;
-	
+
     // Message
     private static final String MESSAGE_TASK_TITLE = "module.workflow.forms.task.editFormResponseAutoUpdate.title";
 
@@ -87,7 +87,7 @@ public class EditFormResponseAutoUpdateTask extends SimpleTask
     @Inject
     public EditFormResponseAutoUpdateTask( IFormsTaskService formsTaskService )
     {
-    	_formsTaskService = formsTaskService;
+        _formsTaskService = formsTaskService;
     }
 
     /**
@@ -99,51 +99,54 @@ public class EditFormResponseAutoUpdateTask extends SimpleTask
         return I18nService.getLocalizedString( MESSAGE_TASK_TITLE, local );
     }
 
-	@Override
-	public void processTask(int nIdResourceHistory, HttpServletRequest request, Locale locale)
-	{
-		EditFormResponseConfig config = _taskEditFormConfigService.findByPrimaryKey(getId());
-		List<EditFormResponseConfigValue> configValueList = config.getListConfigValues();
-		ResourceHistory resourceHistory = _formsTaskService.findResourceHistory( nIdResourceHistory );
+    @Override
+    public void processTask( int nIdResourceHistory, HttpServletRequest request, Locale locale )
+    {
+        EditFormResponseConfig config = _taskEditFormConfigService.findByPrimaryKey( getId( ) );
+        List<EditFormResponseConfigValue> configValueList = config.getListConfigValues( );
+        ResourceHistory resourceHistory = _formsTaskService.findResourceHistory( nIdResourceHistory );
         if ( resourceHistory != null )
         {
-        	FormResponse formResponse = FormResponseHome.findByPrimaryKey( resourceHistory.getIdResource() );
-        	if ( formResponse != null )
-        	{
-        		List<FormQuestionResponse> listFormQuestionResponse = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId() );
-        		List<FormQuestionResponse> listFormQuestionResponseToSave = new ArrayList<FormQuestionResponse>( );
-        		for ( EditFormResponseConfigValue configValue : configValueList )
-        		{
-        			listFormQuestionResponse = config.isMultiform() ?
-        					listFormQuestionResponse.stream().filter(fqr -> fqr.getQuestion().getCode().equals(configValue.getCode())).collect(Collectors.toList()) :
-        						listFormQuestionResponse.stream().filter(fqr -> fqr.getQuestion().getId() == configValue.getQuestion().getId()).collect(Collectors.toList());
-        			FormQuestionResponse questionResponse = listFormQuestionResponse.isEmpty() ? null : listFormQuestionResponse.get(0);
-        			if ( questionResponse == null )
-        			{
-        				questionResponse = new FormQuestionResponse();
-        				Response response = new Response();
-        				Question question = configValue.getQuestion();
-        				response.setEntry( question.getEntry( ) );
-        				questionResponse.setEntryResponse( new ArrayList<Response>( ) );
-        				questionResponse.setQuestion( question );
-        				questionResponse.setIdStep( question.getIdStep( ) );
-        				questionResponse.setEntryResponse( Arrays.asList( response ) );
-        				questionResponse.setIdFormResponse( formResponse.getId( ) );
-        			}
-    				questionResponse.getEntryResponse().get(0).setResponseValue(configValue.getResponse( ) );
-        			
-        			for ( Field field : questionResponse.getQuestion().getEntry( ).getFields( ) )
+            FormResponse formResponse = FormResponseHome.findByPrimaryKey( resourceHistory.getIdResource( ) );
+            if ( formResponse != null )
+            {
+                List<FormQuestionResponse> listFormQuestionResponse = FormQuestionResponseHome
+                        .getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
+                List<FormQuestionResponse> listFormQuestionResponseToSave = new ArrayList<FormQuestionResponse>( );
+                for ( EditFormResponseConfigValue configValue : configValueList )
+                {
+                    listFormQuestionResponse = config.isMultiform( )
+                            ? listFormQuestionResponse.stream( ).filter( fqr -> fqr.getQuestion( ).getCode( ).equals( configValue.getCode( ) ) )
+                                    .collect( Collectors.toList( ) )
+                            : listFormQuestionResponse.stream( ).filter( fqr -> fqr.getQuestion( ).getId( ) == configValue.getQuestion( ).getId( ) )
+                                    .collect( Collectors.toList( ) );
+                    FormQuestionResponse questionResponse = listFormQuestionResponse.isEmpty( ) ? null : listFormQuestionResponse.get( 0 );
+                    if ( questionResponse == null )
                     {
-                        if ( field.getValue().equals(configValue.getResponse( ) ) )
+                        questionResponse = new FormQuestionResponse( );
+                        Response response = new Response( );
+                        Question question = configValue.getQuestion( );
+                        response.setEntry( question.getEntry( ) );
+                        questionResponse.setEntryResponse( new ArrayList<Response>( ) );
+                        questionResponse.setQuestion( question );
+                        questionResponse.setIdStep( question.getIdStep( ) );
+                        questionResponse.setEntryResponse( Arrays.asList( response ) );
+                        questionResponse.setIdFormResponse( formResponse.getId( ) );
+                    }
+                    questionResponse.getEntryResponse( ).get( 0 ).setResponseValue( configValue.getResponse( ) );
+
+                    for ( Field field : questionResponse.getQuestion( ).getEntry( ).getFields( ) )
+                    {
+                        if ( field.getValue( ).equals( configValue.getResponse( ) ) )
                         {
-                        	questionResponse.getEntryResponse().get(0).setField(field);
+                            questionResponse.getEntryResponse( ).get( 0 ).setField( field );
                         }
                     }
-            		listFormQuestionResponseToSave.add(questionResponse);
-        		}
-        		_editFormResponseTaskService.saveResponses(formResponse, listFormQuestionResponseToSave);
-        		FormResponseService.getInstance().saveFormResponse(formResponse);
-        	}
+                    listFormQuestionResponseToSave.add( questionResponse );
+                }
+                _editFormResponseTaskService.saveResponses( formResponse, listFormQuestionResponseToSave );
+                FormResponseService.getInstance( ).saveFormResponse( formResponse );
+            }
         }
-	}
+    }
 }

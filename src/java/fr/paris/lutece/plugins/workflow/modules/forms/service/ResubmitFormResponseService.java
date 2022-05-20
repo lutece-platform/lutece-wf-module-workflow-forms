@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -152,10 +152,10 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
         Form form = FormHome.findByPrimaryKey( formResponse.getFormId( ) );
         List<Question> listFormQuestion = QuestionHome.getListQuestionByIdForm( form.getId( ) );
 
-        listFormQuestion = listFormQuestion.stream( ).filter( (Question question) -> {
+        listFormQuestion = listFormQuestion.stream( ).filter( ( Question question ) -> {
             Field fieldUsedCorrectResponse = question.getEntry( ).getFieldByCode( FormsConstants.PARAMETER_USED_CORRECT_RESPONSE );
             return fieldUsedCorrectResponse != null && Boolean.valueOf( fieldUsedCorrectResponse.getValue( ) );
-        }).collect( Collectors.toList( ) );
+        } ).collect( Collectors.toList( ) );
 
         List<FormQuestionResponse> listFormQuestionResponses = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
 

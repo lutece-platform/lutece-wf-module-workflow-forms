@@ -1,3 +1,36 @@
+/*
+ * Copyright (c) 2002-2022, City of Paris
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice
+ *     and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice
+ *     and the following disclaimer in the documentation and/or other materials
+ *     provided with the distribution.
+ *
+ *  3. Neither the name of 'Mairie de Paris' nor 'Lutece' nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * License 1.0
+ */
 package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
 import java.sql.Timestamp;
@@ -17,46 +50,46 @@ import fr.paris.lutece.portal.service.i18n.I18nService;
 
 public class ModifyFormResponseUpdateStatusTask extends SimpleTask
 {
-	private final IFormsTaskService _formsTaskService;
-	
-	@Inject
+    private final IFormsTaskService _formsTaskService;
+
+    @Inject
     private FormService _formService;
-	
-	@Inject
+
+    @Inject
     @Named( "workflow-forms.modifyFormResponseUpdateStatusTaskService" )
     private ITaskConfigService _taskConfigService;
-	
-	@Inject
+
+    @Inject
     public ModifyFormResponseUpdateStatusTask( IFormsTaskService formsTaskService )
     {
         _formsTaskService = formsTaskService;
     }
-	
-	@Override
-	public void processTask(int nIdResourceHistory, HttpServletRequest request, Locale locale) 
-	{
-		ResourceHistory resourceHistory = _formsTaskService.findResourceHistory( nIdResourceHistory );
-		ModifyFormResponseUpdateStatusTaskConfig config = _taskConfigService.findByPrimaryKey(getId());
+
+    @Override
+    public void processTask( int nIdResourceHistory, HttpServletRequest request, Locale locale )
+    {
+        ResourceHistory resourceHistory = _formsTaskService.findResourceHistory( nIdResourceHistory );
+        ModifyFormResponseUpdateStatusTaskConfig config = _taskConfigService.findByPrimaryKey( getId( ) );
         if ( resourceHistory != null )
         {
             FormResponse formResponse = _formsTaskService.findFormResponseFrom( resourceHistory );
             Timestamp timestampCurrentTime = new Timestamp( System.currentTimeMillis( ) );
-            formResponse.setPublished(config.isPublished());
-            formResponse.setUpdateStatus(timestampCurrentTime);
+            formResponse.setPublished( config.isPublished( ) );
+            formResponse.setUpdateStatus( timestampCurrentTime );
             _formService.saveFormResponseWithoutQuestionResponse( formResponse );
         }
-	}
+    }
 
-	@Override
-	public String getTitle(Locale locale) 
-	{
-		return I18nService.getLocalizedString( getTaskType( ).getTitleI18nKey( ), locale );
-	}
-	
-	@Override
+    @Override
+    public String getTitle( Locale locale )
+    {
+        return I18nService.getLocalizedString( getTaskType( ).getTitleI18nKey( ), locale );
+    }
+
+    @Override
     public void doRemoveConfig( )
     {
-		_taskConfigService.remove( getId( ) );
+        _taskConfigService.remove( getId( ) );
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -122,7 +122,7 @@ public class FormResponseValueStateControllerConfigDao implements IFormResponseV
             daoUtil.setString( ++index, config.getValue( ) );
             daoUtil.setBoolean( ++index, config.isMultiform( ) );
             daoUtil.setString( ++index, config.getCode( ) );
-            
+
             daoUtil.setInt( ++index, config.getId( ) );
             daoUtil.executeUpdate( );
         }

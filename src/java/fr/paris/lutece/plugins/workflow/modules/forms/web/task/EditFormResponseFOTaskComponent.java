@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,12 +73,13 @@ public class EditFormResponseFOTaskComponent extends EditFormResponseTaskCompone
     {
         super( formsTaskService, editFormResponseTaskService, editFormResponseTaskHistoryService );
     }
-    
+
     @Override
-    protected String createTemplateTaskForm( HttpServletRequest request, Locale locale, FormResponse formResponse, List<Step> listStep, List<Question> listQuestion )
+    protected String createTemplateTaskForm( HttpServletRequest request, Locale locale, FormResponse formResponse, List<Step> listStep,
+            List<Question> listQuestion )
     {
         List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestion, formResponse,
-                DisplayType.RESUBMIT_FRONTOFFICE);
+                DisplayType.RESUBMIT_FRONTOFFICE );
 
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_STEP_LIST, listStepDisplayTree );

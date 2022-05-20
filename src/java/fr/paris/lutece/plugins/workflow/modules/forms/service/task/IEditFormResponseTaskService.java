@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -64,12 +64,13 @@ public interface IEditFormResponseTaskService
      *            the responses to save
      */
     void saveResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse );
-    
+
     /**
      * Create a {@link ReferenceList} containing all questions code
+     * 
      * @return
      */
     ReferenceList selectAllTechnicalCode( boolean isBo );
 
-	ReferenceList getResponseReferenceList(int idQuestion);
+    ReferenceList getResponseReferenceList( int idQuestion );
 }

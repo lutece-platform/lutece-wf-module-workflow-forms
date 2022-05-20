@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -96,7 +96,7 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
     public List<Question> findListQuestionUsedCorrectForm( FormResponse formResponse )
     {
         List<Question> listQuestionForm = QuestionHome.getListQuestionByIdForm( formResponse.getFormId( ) );
-        return listQuestionForm.stream( ).filter( (Question question ) -> {
+        return listQuestionForm.stream( ).filter( ( Question question ) -> {
             Field fieldUsedCompleteResponse = question.getEntry( ).getFieldByCode( FormsConstants.PARAMETER_USED_COMPLETE_RESPONSE );
             return fieldUsedCompleteResponse != null && Boolean.valueOf( fieldUsedCompleteResponse.getValue( ) );
         } ).collect( Collectors.toList( ) );

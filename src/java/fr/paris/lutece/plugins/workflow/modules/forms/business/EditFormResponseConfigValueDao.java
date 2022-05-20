@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -143,7 +143,7 @@ public class EditFormResponseConfigValueDao implements IEditFormResponseConfigVa
             }
             if ( configValue.getResponse( ) != null )
             {
-                daoUtil.setString( ++nIndex, configValue.getResponse() );
+                daoUtil.setString( ++nIndex, configValue.getResponse( ) );
             }
             else
             {
@@ -221,7 +221,7 @@ public class EditFormResponseConfigValueDao implements IEditFormResponseConfigVa
         int nIndex = 0;
         config.setIdConfigValue( daoUtil.getInt( ++nIndex ) );
         config.setIdConfig( daoUtil.getInt( ++nIndex ) );
-        
+
         int idForm = daoUtil.getInt( ++nIndex );
         if ( idForm > 0 )
         {

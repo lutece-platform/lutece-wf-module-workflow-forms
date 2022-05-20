@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,6 +48,6 @@ public class WorkflowFormsDeleteArchiveProcessingService extends AbstractArchive
     @Override
     public void archiveResource( ResourceWorkflow resourceWorkflow )
     {
-        FormResponseService.getInstance().deleteFormResponse(FormResponseHome.loadById( resourceWorkflow.getIdResource( ) ));
+        FormResponseService.getInstance( ).deleteFormResponse( FormResponseHome.loadById( resourceWorkflow.getIdResource( ) ) );
     }
 }

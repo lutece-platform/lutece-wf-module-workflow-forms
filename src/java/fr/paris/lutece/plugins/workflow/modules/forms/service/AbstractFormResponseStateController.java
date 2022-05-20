@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2021, City of Paris
+ * Copyright (c) 2002-2022, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -77,7 +77,7 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
     private static final String MARK_MULTIFORM = "multiform";
     private static final String MARK_CODE_LIST = "code_list";
     private static final String MARK_CODE = "code";
-    
+
     // Parameters
     private static final String PARAMETER_ACTION = "apply";
     private static final String PARAMETER_FORM = "form_select";
@@ -86,13 +86,13 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
     private static final String PARAMETER_VALUE = "response_value";
     private static final String PARAMETER_MULTIFORM = "multiform";
     private static final String PARAMETER_CODE = "code_select";
-    
+
     // Actions
     private static final String ACTION_SELECT_FORM = "select_form_config";
     private static final String ACTION_SELECT_STEP = "select_step_config";
     private static final String ACTION_SELECT_QUESTION = "select_question_config";
     private static final String ACTION_SELECT_MULTIFORM = "select_multiform";
-    
+
     @Override
     public boolean hasConfig( )
     {
@@ -104,17 +104,17 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
     {
         FormResponseValueStateControllerConfigHome.removeByTask( task.getId( ) );
     }
-    
+
     protected Map<String, Object> createModelConfig( ITaskConfig config )
     {
         FormResponseValueStateControllerConfig controllerConfig = loadConfig( config.getIdTask( ) );
 
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_FORM_LIST, FormHome.getFormsReferenceList( ) );
-        model.put( MARK_MULTIFORM, controllerConfig.isMultiform( ) ); 
+        model.put( MARK_MULTIFORM, controllerConfig.isMultiform( ) );
         model.put( MARK_CODE_LIST, getCodeReferenceList( ) );
         model.put( MARK_CODE, controllerConfig.getCode( ) );
-        
+
         if ( controllerConfig.getForm( ) != null )
         {
             model.put( MARK_ID_FORM, controllerConfig.getForm( ).getId( ) );
@@ -134,7 +134,7 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
         {
             model.put( MARK_RESPONSE_VALUE, controllerConfig.getValue( ) );
         }
-        
+
         return model;
     }
 
@@ -186,9 +186,9 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
         controllerConfig.setValue( request.getParameter( PARAMETER_VALUE ) );
         FormResponseValueStateControllerConfigHome.update( controllerConfig );
     }
-    
+
     protected abstract ReferenceList getResponseReferenceList( int idQuestion );
-    
+
     protected FormResponseValueStateControllerConfig loadConfig( int idTask )
     {
         FormResponseValueStateControllerConfig controllerConfig = FormResponseValueStateControllerConfigHome.findByTask( idTask );
@@ -219,7 +219,7 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
 
         return refList;
     }
-    
+
     protected ReferenceList getCodeReferenceList( )
     {
         ReferenceList refList = new ReferenceList( );
@@ -235,7 +235,7 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
 
     protected abstract boolean canQuestionBeCondition( Question question );
 
-    protected Response getResponseFromConfigAndFormResponse(  FormResponseValueStateControllerConfig config, int idResponse )
+    protected Response getResponseFromConfigAndFormResponse( FormResponseValueStateControllerConfig config, int idResponse )
     {
         Question question = null;
         if ( config.isMultiform( ) )
@@ -255,7 +255,7 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
         {
             question = config.getQuestion( );
         }
-        
+
         if ( question == null )
         {
             return null;
@@ -271,6 +271,6 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
         {
             return null;
         }
-       return entryResponseList.get( 0 );
+        return entryResponseList.get( 0 );
     }
 }
