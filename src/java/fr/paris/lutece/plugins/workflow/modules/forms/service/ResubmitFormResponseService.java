@@ -53,8 +53,10 @@ import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.IFormResponseDAO;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
+import fr.paris.lutece.plugins.forms.util.FormsConstants;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
+import fr.paris.lutece.plugins.genericattributes.business.Field;
 import fr.paris.lutece.plugins.genericattributes.business.IEntryDAO;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.IResubmitFormResponseDAO;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.IResubmitFormResponseValueDAO;
@@ -150,7 +152,10 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
         Form form = FormHome.findByPrimaryKey( formResponse.getFormId( ) );
         List<Question> listFormQuestion = QuestionHome.getListQuestionByIdForm( form.getId( ) );
 
-        listFormQuestion = listFormQuestion.stream( ).filter( question -> question.getEntry( ).isUsedInCorrectFormResponse( ) ).collect( Collectors.toList( ) );
+        listFormQuestion = listFormQuestion.stream( ).filter( (Question question) -> {
+            Field fieldUsedCorrectResponse = question.getEntry( ).getFieldByCode( FormsConstants.PARAMETER_USED_CORRECT_RESPONSE );
+            return fieldUsedCorrectResponse != null && Boolean.valueOf( fieldUsedCorrectResponse.getValue( ) );
+        }).collect( Collectors.toList( ) );
 
         List<FormQuestionResponse> listFormQuestionResponses = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
 

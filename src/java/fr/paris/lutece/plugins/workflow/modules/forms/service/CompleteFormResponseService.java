@@ -46,8 +46,10 @@ import javax.servlet.http.HttpServletRequest;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
+import fr.paris.lutece.plugins.forms.util.FormsConstants;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
+import fr.paris.lutece.plugins.genericattributes.business.Field;
 import fr.paris.lutece.plugins.genericattributes.business.IEntryDAO;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskConfig;
@@ -94,7 +96,10 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
     public List<Question> findListQuestionUsedCorrectForm( FormResponse formResponse )
     {
         List<Question> listQuestionForm = QuestionHome.getListQuestionByIdForm( formResponse.getFormId( ) );
-        return listQuestionForm.stream( ).filter( question -> question.getEntry( ).isUsedInCompleteFormResponse( ) ).collect( Collectors.toList( ) );
+        return listQuestionForm.stream( ).filter( (Question question ) -> {
+            Field fieldUsedCompleteResponse = question.getEntry( ).getFieldByCode( FormsConstants.PARAMETER_USED_COMPLETE_RESPONSE );
+            return fieldUsedCompleteResponse != null && Boolean.valueOf( fieldUsedCompleteResponse.getValue( ) );
+        } ).collect( Collectors.toList( ) );
     }
 
     @Override
