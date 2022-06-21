@@ -51,7 +51,7 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 public class ModifyFormResponseUpdateStatusTaskComponent extends NoFormTaskComponent
 {
     // Mark
-    private static final String MARK_PUBLISHED = "published";
+    private static final String MARK_CONFIG = "config";
 
     // Templates
     private static final String TEMPLATE_TASK_FORM_EDITSTATUS_CONFIG = "admin/plugins/workflow/modules/forms/task_edit_form_response_status.html";
@@ -66,13 +66,9 @@ public class ModifyFormResponseUpdateStatusTaskComponent extends NoFormTaskCompo
     public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
     {
         _config = _taskConfigService.findByPrimaryKey( task.getId( ) );
-        if ( _config == null )
-        {
-            _config = new ModifyFormResponseUpdateStatusTaskConfig( );
-        }
 
         Map<String, Object> model = new HashMap<>( );
-        model.put( MARK_PUBLISHED, _config.isPublished( ) );
+        model.put( MARK_CONFIG, _config );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_FORM_EDITSTATUS_CONFIG, locale, model );
 
