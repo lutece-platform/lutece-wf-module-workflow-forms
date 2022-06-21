@@ -1,5 +1,6 @@
 <@fieldSet legend='#i18n{module.workflow.forms.task_edit_form_response_status.title}'>
-	<@formGroup labelFor='statusPublished' labelKey='#i18n{module.workflow.forms.task_edit_form_response_status.label_is_published}'>
-		<@checkBox labelFor='published' name='published' checked=published> </@checkBox>
+	<@formGroup labelFor='statusPublished'>
+		<@radioButton name='published' value='true' params=((config?? && config.published )?string('checked=true','false')!) labelKey='#i18n{module.workflow.forms.task_edit_form_response_status.label_is_published}' />
+		<@radioButton name='published' value='false' params=((config?? && !config.published )?string('checked=true','false')!) labelKey='#i18n{module.workflow.forms.task_edit_form_response_status.label_unpublished}' />		
 	</@formGroup>
 </@fieldSet>
