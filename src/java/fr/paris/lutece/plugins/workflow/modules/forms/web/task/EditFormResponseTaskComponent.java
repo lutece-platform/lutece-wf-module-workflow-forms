@@ -57,7 +57,9 @@ import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.util.FormsConstants;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
+import fr.paris.lutece.plugins.genericattributes.business.Field;
 import fr.paris.lutece.plugins.genericattributes.business.GenericAttributeError;
+import fr.paris.lutece.plugins.genericattributes.service.entrytype.IEntryTypeService;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfig;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValue;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseTaskHistory;
@@ -172,7 +174,10 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
         for ( Question question : listQuestion )
         {
             IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
-            FormQuestionResponse formQuestionResponse = entryDataService.createResponseFromRequest( question, request, true );
+            Field fieldRichText = question.getEntry( ).getFieldByCode( IEntryTypeService.FIELD_RICHTEXT );
+            boolean isRichText = fieldRichText != null && Boolean.valueOf( fieldRichText.getValue( ) );
+            FormQuestionResponse formQuestionResponse = entryDataService.createResponseFromRequest( question, request, !isRichText );
+            
             if ( formQuestionResponse.hasError( ) )
             {
                 error = formQuestionResponse.getError( );
