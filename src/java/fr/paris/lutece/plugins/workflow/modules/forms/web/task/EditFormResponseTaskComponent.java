@@ -67,6 +67,7 @@ import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResp
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.portal.service.admin.AdminUserService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
@@ -174,10 +175,29 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
         for ( Question question : listQuestion )
         {
             IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
+            
             Field fieldRichText = question.getEntry( ).getFieldByCode( IEntryTypeService.FIELD_RICHTEXT );
             boolean isRichText = fieldRichText != null && Boolean.valueOf( fieldRichText.getValue( ) );
-            FormQuestionResponse formQuestionResponse = entryDataService.createResponseFromRequest( question, request, !isRichText );
+
+            String  adminActivateXss = request.getServletContext(  ).getFilterRegistration("safeRequestFilterAdmin" ).getInitParameter( "activateXssFilter" );
+            boolean isAdminActivateXss = adminActivateXss != null && Boolean.valueOf( adminActivateXss);
+         
+            String  siteActivateXss = request.getServletContext(  ).getFilterRegistration("safeRequestFilterSite" ).getInitParameter( "activateXssFilter" );
+            boolean isSiteActivateXss = siteActivateXss != null && Boolean.valueOf( siteActivateXss);
+
+            boolean validateQuestion =true;
             
+            if(isRichText) {
+                
+                if(AdminUserService.getAdminUser( request ) == null) {
+                    validateQuestion = isSiteActivateXss;
+                }else {
+                    validateQuestion = isAdminActivateXss;
+                }
+            }
+            
+            FormQuestionResponse formQuestionResponse = entryDataService.createResponseFromRequest( question, request, validateQuestion );
+    
             if ( formQuestionResponse.hasError( ) )
             {
                 error = formQuestionResponse.getError( );
