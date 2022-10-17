@@ -81,6 +81,7 @@ CREATE TABLE workflow_task_editformresponse_config_value
 	id_step INT NULL,
 	id_question INT NULL,
 	code VARCHAR(100),
+	response VARCHAR(100) NULL
 	PRIMARY KEY (id_config_value)
 );
 CREATE INDEX index_task_editformresponse_config_value ON workflow_task_editformresponse_config_value ( id_config );
