@@ -32,6 +32,11 @@
     <bean id="workflow-forms.modifyFormResponseUpdateStatusTaskService"
         class="fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService"
         p:taskConfigDAO-ref="worklow-forms.modifyFormResponseUpdateStatusTaskConfigDAO" />
+    <bean id="workflow-forms.linkedValuesFormResponseConfigService"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.LinkedValuesFormResponseConfigService"
+        p:taskConfigDAO-ref="worklow-forms.linkedValuesFormResponseConfigDAO" />
+    <bean id="workflow-forms.linkedValuesFormResponseTaskService"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.LinkedValuesFormResponseTaskService" />
 
     <!-- DAO -->
     <bean id="worklow-forms.editFormResponseTaskHistoryDAO"
@@ -60,7 +65,11 @@
         class="fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskHistoryDAO" />
     <bean id="worklow-forms.modifyFormResponseUpdateStatusTaskConfigDAO"
 		class="fr.paris.lutece.plugins.workflow.modules.forms.business.ModifyFormResponseUpdateStatusTaskConfigDAO" />
-    
+    <bean id="worklow-forms.linkedValuesFormResponseConfigDAO"
+		class="fr.paris.lutece.plugins.workflow.modules.forms.business.LinkedValuesFormResponseConfigDAO" />
+    <bean id="worklow-forms.linkedValuesFormResponseConfigValueDAO"
+		class="fr.paris.lutece.plugins.workflow.modules.forms.business.LinkedValuesFormResponseConfigValueDAO" />
+		
     <!-- Task Update status -->
     <bean id="workflow-forms.modifyUpdateStatusTypeTask" 
     	class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
@@ -206,7 +215,32 @@
         p:beanName="workflow-forms.modifyUpdateDateTask"
         p:taskForAutomaticAction="true" p:configRequired="false"
         p:formTaskRequired="false" />
+
+     <!-- Task linked values form response -->     
+    <bean id="workflow-forms.linkedValuesFormResponseConfig"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.business.LinkedValuesFormResponseConfig"
+        scope="prototype" />
         
+    <bean id="workflow-forms.linkedValuesFormResponseTask"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.LinkedValuesFormResponseTask"
+        scope="prototype" />
+
+    <bean id="workflow-forms.linkedValuesFormResponseTypeTask"
+        class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+        p:key="linkedValuesFormResponseTypeTask"
+        p:titleI18nKey="module.workflow.forms.task.linkedValuesFormResponse.title"
+        p:beanName="workflow-forms.linkedValuesFormResponseTask"
+        p:formTaskRequired="false"
+        p:configBeanName="workflow-forms.linkedValuesFormResponseConfig"
+        p:configRequired="true" 
+        p:taskForAutomaticAction="true" />
+
+    <bean id="workflow-forms.linkedValuesFormResponseTaskComponent"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.web.task.LinkedValuesFormResponseTaskComponent"
+        p:taskType-ref="workflow-forms.linkedValuesFormResponseTypeTask"
+        p:taskConfigService-ref="workflow-forms.linkedValuesFormResponseConfigService"
+        scope="prototype" />
+                
     <!-- TaskInfoProvider -->
     <bean id="workflow-forms.resubmitFormResponseTaskInfoProvider"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.provider.ResubmitFormResponseTaskInfoProvider"
