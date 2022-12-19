@@ -81,7 +81,7 @@ CREATE TABLE workflow_task_editformresponse_config_value
 	id_step INT NULL,
 	id_question INT NULL,
 	code VARCHAR(100),
-	response VARCHAR(100) NULL
+	response VARCHAR(100) NULL,
 	PRIMARY KEY (id_config_value)
 );
 CREATE INDEX index_task_editformresponse_config_value ON workflow_task_editformresponse_config_value ( id_config );
@@ -129,4 +129,27 @@ CREATE TABLE workflow_task_update_status(
   id_task INT DEFAULT 0 NOT NULL,
   status INT DEFAULT 0 NOT NULL,
   PRIMARY KEY (id_task)
+);
+
+-- Table structure for table workflow_task_linkedvaluesformresponse_config
+--
+DROP TABLE IF EXISTS workflow_task_linkedvaluesformresponse_config;
+CREATE TABLE workflow_task_linkedvaluesformresponse_config (
+  id_config INT NOT NULL AUTO_INCREMENT,
+  id_task INT DEFAULT 0 NOT NULL,
+  PRIMARY KEY ( id_config )
+);
+
+-- Table structure for table workflow_task_linkedvaluesformresponse_config_value
+--
+DROP TABLE IF EXISTS workflow_task_linkedvaluesformresponse_config_value;
+CREATE TABLE workflow_task_linkedvaluesformresponse_config_value (
+  id_config_value INT NOT NULL AUTO_INCREMENT,
+  id_config INT DEFAULT 0 NOT NULL,
+  id_form INT DEFAULT 0 NOT NULL,
+  id_question_source INT DEFAULT 0 NOT NULL,
+  question_source_value VARCHAR(255) DEFAULT NULL,
+  id_question_target INT DEFAULT 0 NOT NULL,
+  question_target_value VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY ( id_config_value )
 );

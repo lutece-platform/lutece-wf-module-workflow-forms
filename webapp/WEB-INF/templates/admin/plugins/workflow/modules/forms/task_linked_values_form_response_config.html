@@ -1,0 +1,166 @@
+<!-- Liste recap -->
+<@input type='hidden' id='id_config_value' name='id_config_value' />
+<@aButton id="btnModal" class="d-inline" title='#i18n{module.workflow.forms.task_linked_values_form_response_config.add_rule}' buttonIcon='plus' size='sm' params='data-toggle="modal" data-target="#modalRule" ' hideTitle=['xs','sm'] />
+
+<@table>
+	<@tr>
+		<@th> #i18n{module.workflow.forms.task_linked_values_form_response_config.form.label} </@th>
+		<@th> #i18n{module.workflow.forms.task_linked_values_form_response_config.source.question.label}</@th>
+		<@th> #i18n{module.workflow.forms.task_linked_values_form_response_config.source.value.label} </@th>
+		<@th> #i18n{module.workflow.forms.task_linked_values_form_response_config.target.question.label}</@th>
+		<@th> #i18n{module.workflow.forms.task_linked_values_form_response_config.target.value.label} </@th>
+		<@th> #i18n{module.workflow.forms.task_linked_values_form_response_config.action.label}</@th>
+	</@tr>
+	<#if config?? && config.listConfigValues??>
+	<#list config.listConfigValues as value>
+	<@tr>
+		<#assign questionSourceLabel = getLabelQuestion(value.idQuestionSource)/>
+		<#assign questionTargetLabel = getLabelQuestion(value.idQuestionTarget)/>	
+		<@td><@labelForm id=value.idForm?string /></@td>
+		<@td>${(questionSourceLabel)!}</@td>
+		<@td>${(value.questionSourceValue)!}</@td>
+		<@td>${(questionTargetLabel)!}</@td>
+		<@td>${(value.questionTargetValue)!}</@td>
+		<@td><@button id="btnRemove" type='submit' buttonIcon='trash' name='apply' value='remove_rule' params='onclick="$(\'#id_config_value\').val(${value.idConfigValue});"' color='danger' size='sm' /></@td>
+	</@tr>
+	</#list>
+	<#else>
+		<@tr><@td>#i18n{module.workflow.forms.task_linked_values_form_response_config.no_rule}</@td></@tr>
+	</#if>
+</@table>
+
+<!-- Modal -->
+<@modal  id='modalRule' size='lg'>
+    <@modalHeader modalTitle='#i18n{module.workflow.forms.task_linked_values_form_response_config.title.modal}' titleLevel='h4'/>
+    <@modalBody>
+		<!-- Source  -->
+		<@formGroup labelFor='id_form' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.form.label}' mandatory=true>	
+			<@select name='id_form' id="idForm" items=forms default_value='${(config.idForm)!}' />
+		</@formGroup>
+		
+		<@formGroup labelFor='idQuestionSource' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.source.question.label}' mandatory=true>
+			<select id="idQuestionSource" name="id_question_source" class="form-select">
+				<option></option>
+				<#list questions?keys as key >
+					<#list questions[key] as question>
+						<option class="question form-${key}" value="${(question.id!)}">${(question.step.title!)}/${(question.title!)}</option>
+					</#list>
+				</#list>
+			</select>
+		</@formGroup>
+		
+		<@formGroup labelFor='questionSourceValue' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.source.value.label}' mandatory=true>
+			<select id="questionSourceValue" name="question_source_value" class="form-select">
+				<option></option>
+				<#list questions?keys as key >
+					<#list questions[key] as question>
+						<#list question.entry.fields as field>
+							<#if field.code == 'answer_choice'>
+								<option class="answer-choice-source question-source-${(question.id!)}" value="${(field.value!)}">${(field.value!)}</option>
+							</#if>
+						</#list>
+					</#list>
+				</#list>
+			</select>
+		</@formGroup>
+		
+		<@formGroup labelFor='idQuestionTarget' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.target.question.label}' mandatory=true>
+			<select id="idQuestionTarget" name="id_question_target" class="form-select">
+				<option></option>
+				<#list questions?keys as key >
+					<#list questions[key] as question>
+						<option class="question form-${key}" value="${(question.id!)}">${(question.step.title!)}/${(question.title!)}</option>
+					</#list>
+				</#list>
+			</select>
+		</@formGroup>
+		
+		<@formGroup labelFor='questionTargetValue' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.target.value.label}' mandatory=true>
+			<select  id="questionTargetValue" name="question_target_value" class="form-select">
+				<option></option>
+				<#list questions?keys as key >
+					<#list questions[key] as question>
+						<#list question.entry.fields as field>
+							<#if field.code == 'answer_choice'>
+								<option class="answer-choice-target question-target-${(question.id!)}" value="${(field.value!)}">${(field.value!)}</option>
+							</#if>
+						</#list>
+					</#list>
+				</#list>
+			</select>
+		</@formGroup>			
+	</@modalBody>
+    <@modalFooter> 
+    	<@button type='submit' name="apply" value='add_rule' title="#i18n{module.workflow.forms.task_linked_values_form_response_config.save_rule}"/>
+    </@modalFooter>
+</@modal>
+<script>
+$(function(){
+	//Load
+	$('.question').hide();
+	$('.answer-choice-source').hide();
+	$('.answer-choice-target').hide();
+	$('.form-' + $('#idForm').val()).show();
+	
+	//On change
+	$('#idForm').change(function(){
+		var value = $(this).val();
+ 		$('.question').hide();
+		$('.form-' + value).show();		
+	});
+	
+	$('#idQuestionSource').change(function(){
+		var value = $(this).val();
+ 		$('.answer-choice-source').hide();
+		$('.question-source-' + value).show();		
+	});
+	
+	$('#idQuestionTarget').change(function(){
+		var value = $(this).val();
+ 		$('.answer-choice-target').hide();
+		$('.question-target-' + value).show();		
+	});
+	
+	
+	//Add required attribut
+	$('#btnModal').click(function(){
+		setRequiredAttribut( true );
+	});
+	$('#btnRemove').click(function(){
+		setRequiredAttribut( false );
+	});
+	
+	function setRequiredAttribut( value ){
+		$('#idForm').prop('required', value);
+		$('#idQuestionSource').attr('required', value);
+		$('#questionSourceValue').prop('required', value);
+		$('#idQuestionTarget').prop('required', value);
+		$('#questionTargerValue').prop('required', value);	
+	}
+});
+</script>
+
+<#function getLabelQuestion id>
+	<#if id?? && questions??>
+		<#list questions?keys as key >
+			<#if questions[key]??>
+				<#list questions[key] as question>
+					<#if question?? && question.id?? && question.title?? && question.id == id>
+						<#return question.title>
+					</#if>
+				</#list>
+			</#if>
+		</#list>
+	</#if>
+	<#return id>
+</#function>
+
+<#macro labelForm id>
+	<#if forms??>
+		<#list forms as form>
+			<#if form.code == id>
+				${(form.name)!}
+			</#if>
+		</#list>
+	</#if>
+</#macro>
