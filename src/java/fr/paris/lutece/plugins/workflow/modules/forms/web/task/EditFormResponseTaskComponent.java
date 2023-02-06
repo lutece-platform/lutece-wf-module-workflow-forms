@@ -44,6 +44,8 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+
 import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
@@ -168,15 +170,33 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
     private GenericAttributeError validateQuestions( List<Question> listQuestion, HttpServletRequest request )
     {
         GenericAttributeError error = null;
-
+        String [ ] listConditionalQuestionsValues = request.getParameterValues( FormsConstants.PARAMETER_DISPLAYED_QUESTIONS );
+        
         for ( Question question : listQuestion )
         {
-            IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
-            FormQuestionResponse formQuestionResponse = entryDataService.createResponseFromRequest( question, request, true );
-            if ( formQuestionResponse.hasError( ) )
+            for ( int i = 0; i < listConditionalQuestionsValues.length; i++ )
             {
-                error = formQuestionResponse.getError( );
-                break;
+                String [ ] listQuestionId = listConditionalQuestionsValues [i].split( FormsConstants.SEPARATOR_UNDERSCORE );
+                if ( StringUtils.isNotEmpty( listQuestionId [0] ) && Integer.parseInt( listQuestionId [0] ) == question.getId( )
+                        && Integer.parseInt( listQuestionId [1] ) == question.getIterationNumber( ) )
+                {
+                    question.setIsVisible( true );
+                    break;
+                }
+                else
+                {
+                    question.setIsVisible( false );
+                }
+            }
+            if ( question.isVisible( ) )
+            {
+                IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
+                FormQuestionResponse formQuestionResponse = entryDataService.createResponseFromRequest( question, request, true );
+                if ( formQuestionResponse.hasError( ) )
+                {
+                    error = formQuestionResponse.getError( );
+                    break;
+                }
             }
         }
 
