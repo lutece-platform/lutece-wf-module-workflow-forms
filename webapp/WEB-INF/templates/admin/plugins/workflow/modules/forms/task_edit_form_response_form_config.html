@@ -55,7 +55,7 @@
 		<#list mapping_list as mapping>
 			<@formGroup labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.existing}'>
 				<@staticText>
-					${mapping.form.title} / ${mapping.step.title} / ${mapping.question.title}
+					${mapping.form.title} / ${mapping.step.title} /&nbsp;<#if mapping.question?exists>${mapping.question.title}</#if>
 					<@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="$(\'#mapping_id\').val(${mapping.idConfigValue});"' color='danger' size='sm' />
 				</@staticText>
 			</@formGroup>
