@@ -37,6 +37,9 @@
         p:taskConfigDAO-ref="worklow-forms.linkedValuesFormResponseConfigDAO" />
     <bean id="workflow-forms.linkedValuesFormResponseTaskService"
         class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.LinkedValuesFormResponseTaskService" />
+    <bean id="workflow-forms.taskDuplicateFormResponseConfigService"
+        class="fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService"
+        p:taskConfigDAO-ref="workflow-forms.duplicateFormResponseTaskConfigDAO" />
 
     <!-- DAO -->
     <bean id="worklow-forms.editFormResponseTaskHistoryDAO"
@@ -69,6 +72,8 @@
 		class="fr.paris.lutece.plugins.workflow.modules.forms.business.LinkedValuesFormResponseConfigDAO" />
     <bean id="worklow-forms.linkedValuesFormResponseConfigValueDAO"
 		class="fr.paris.lutece.plugins.workflow.modules.forms.business.LinkedValuesFormResponseConfigValueDAO" />
+	<bean id="workflow-forms.duplicateFormResponseTaskConfigDAO" 
+		class="fr.paris.lutece.plugins.workflow.modules.forms.business.DuplicateFormResponseTaskConfigDAO" />
 		
     <!-- Task Update status -->
     <bean id="workflow-forms.modifyUpdateStatusTypeTask" 
@@ -158,6 +163,28 @@
         p:taskType-ref="workflow-forms.editFormResponseFoTypeTask"
         p:taskConfigService-ref="workflow-forms.editFormResponseConfigService"
         scope="prototype" />
+        
+    <!-- Task Duplicate Form Response -->
+    <bean id="workflow-forms.taskDuplicateFormResponse"
+        class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+        p:key="taskDuplicateFormResponse" p:titleI18nKey="module.workflow.forms.task.duplicateFormResponse.title"
+        p:beanName="workflow-forms.duplicateFormResponseTask"
+        p:configBeanName="workflow-forms.duplicateFormResponseTaskConfig"
+        p:configRequired="false" p:formTaskRequired="false"
+        p:taskForAutomaticAction="true" />
+        
+    <bean id="workflow-forms.duplicateFormResponseTask"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.service.task.DuplicateFormResponseTask"
+        scope="prototype" />
+        
+    <bean id="workflow-forms.duplicateFormResponseTaskConfig"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.business.DuplicateFormResponseTaskConfig"
+        scope="prototype" />
+        
+    <bean id="workflow-forms.duplicateFormResponseTaskComponent"
+        class="fr.paris.lutece.plugins.workflow.modules.forms.web.task.DuplicateFormResponseTaskComponent"
+        p:taskType-ref="workflow-forms.taskDuplicateFormResponse"
+        p:taskConfigService-ref="workflow-forms.taskDuplicateFormResponseConfigService" />
     
     <!-- Task Resubmit Form Response -->
     <bean id="workflow-forms.resubmitFormResponseTask"
