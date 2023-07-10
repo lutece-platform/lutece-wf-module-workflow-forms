@@ -153,3 +153,11 @@ CREATE TABLE workflow_task_linkedvaluesformresponse_config_value (
   question_target_value VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY ( id_config_value )
 );
+
+-- Table structure for table workflow_task_duplicate_form_response
+--
+DROP TABLE IF EXISTS workflow_task_duplicate_form_response;
+CREATE TABLE workflow_task_duplicate_form_response (
+  id_task INT NOT NULL,
+  PRIMARY KEY (id_task) 
+);
