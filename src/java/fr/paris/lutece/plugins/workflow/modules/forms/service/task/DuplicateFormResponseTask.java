@@ -147,7 +147,10 @@ public class DuplicateFormResponseTask extends SimpleTask
 		File fileDuplicate = new File( );
 		
 		PhysicalFile physicalFileDuplicate = new PhysicalFile( );
-		physicalFileDuplicate.setValue( file.getPhysicalFile( ).getValue( ) );
+		if ( file.getPhysicalFile( ) != null )
+		{
+			physicalFileDuplicate.setValue( file.getPhysicalFile( ).getValue( ) );
+		}
 		
 		fileDuplicate.setDateCreation( file.getDateCreation( ) );
 		fileDuplicate.setExtension( file.getExtension( ) );
