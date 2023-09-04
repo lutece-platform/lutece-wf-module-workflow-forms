@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponseStep;
@@ -58,7 +59,9 @@ public class DuplicateFormResponseTask extends SimpleTask
 			FormResponse formResponse = _formsTaskService.findFormResponseFrom( resourceHistory );
 			if ( formResponse != null )
 			{
-				_formService.saveFormResponse( duplicateFormResponse( formResponse ) );
+				FormResponse formResponseDuplicated = duplicateFormResponse( formResponse );
+				_formService.saveFormResponse( formResponseDuplicated );
+				_formService.processFormAction( FormHome.findByPrimaryKey( formResponseDuplicated.getFormId( ) ), formResponseDuplicated );
 			}
         }
     }
