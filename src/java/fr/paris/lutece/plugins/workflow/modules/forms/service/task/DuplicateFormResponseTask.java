@@ -20,6 +20,7 @@ import fr.paris.lutece.plugins.workflowcore.service.resource.ResourceHistoryServ
 import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
 import fr.paris.lutece.portal.business.file.File;
 import fr.paris.lutece.portal.business.physicalfile.PhysicalFile;
+import fr.paris.lutece.portal.service.file.FileService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 
 public class DuplicateFormResponseTask extends SimpleTask
@@ -129,7 +130,7 @@ public class DuplicateFormResponseTask extends SimpleTask
 		responseDuplicate.setEntry( response.getEntry( ) );
 		if ( response.getFile( ) != null )
 		{
-			responseDuplicate.setFile( duplicateFile( response.getFile( ) ) );
+			responseDuplicate.setFile( duplicateFile( response.getFile( ).getFileKey( ) ) );
 		}
 		responseDuplicate.setField( response.getField( ) );
 		responseDuplicate.setIsImage( response.getIsImage( ) );
@@ -142,8 +143,9 @@ public class DuplicateFormResponseTask extends SimpleTask
 		return responseDuplicate;
 	}
 
-	private File duplicateFile( File file )
+	private File duplicateFile( String strFileKey )
 	{
+		File file = FileService.getInstance( ).getFileStoreServiceProvider( ).getFile( strFileKey );
 		File fileDuplicate = new File( );
 		
 		PhysicalFile physicalFileDuplicate = new PhysicalFile( );
