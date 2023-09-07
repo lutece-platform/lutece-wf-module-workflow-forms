@@ -201,7 +201,8 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
         ReferenceList referenceList = new ReferenceList( );
         List<Question> questionList = QuestionHome.getQuestionsList( );
 
-        List<String> codeList = questionList.stream( ).filter( q -> q.getEntry( ).isOnlyDisplayInBack( ) == isBo ).map( Question::getCode ).distinct( )
+        List<String> codeList = questionList.stream( ).filter( q -> (q.getEntry( ) != null && q.getEntry( ).isOnlyDisplayInBack( ) == isBo) )
+        		.map( Question::getCode ).distinct( )
                 .collect( Collectors.toList( ) );
         codeList.sort( Comparator.naturalOrder( ) );
         for ( String code : codeList )
