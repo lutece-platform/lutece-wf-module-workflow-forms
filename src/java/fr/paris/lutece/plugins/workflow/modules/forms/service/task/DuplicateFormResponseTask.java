@@ -117,8 +117,13 @@ public class DuplicateFormResponseTask extends SimpleTask
 		List<Response> listResponseDuplicate = new ArrayList<>( );
 		
 		for ( Response response : formQuestionResponse.getEntryResponse( ) )
-		{	
-			listResponseDuplicate.add( duplicateResponse( response ) );
+		{
+			Response duplicateResponse = duplicateResponse( response );
+			
+			if ( duplicateResponse != null )
+			{
+				listResponseDuplicate.add( duplicateResponse );
+			}
 		}
 		
 		questionDuplicate.setEntryResponse( listResponseDuplicate );
@@ -133,7 +138,14 @@ public class DuplicateFormResponseTask extends SimpleTask
 		responseDuplicate.setEntry( response.getEntry( ) );
 		if ( response.getFile( ) != null )
 		{
-			responseDuplicate.setFile( duplicateFile( response.getFile( ).getFileKey( ) ) );
+			File duplicateFile = duplicateFile( response.getFile( ).getFileKey( ) );
+			
+			if ( duplicateFile == null )
+			{
+				return null;
+			}
+			
+			responseDuplicate.setFile( duplicateFile );
 		}
 		responseDuplicate.setField( response.getField( ) );
 		responseDuplicate.setIsImage( response.getIsImage( ) );
@@ -149,6 +161,12 @@ public class DuplicateFormResponseTask extends SimpleTask
 	private File duplicateFile( String strFileKey )
 	{
 		File file = FileService.getInstance( ).getFileStoreServiceProvider( ).getFile( strFileKey );
+		
+		if ( file == null )
+		{
+			return null;
+		}
+		
 		File fileDuplicate = new File( );
 		
 		PhysicalFile physicalFileDuplicate = new PhysicalFile( );
