@@ -66,7 +66,7 @@ CREATE TABLE workflow_task_complete_response_cf(
 DROP TABLE IF EXISTS workflow_task_editformresponse_config;
 CREATE TABLE workflow_task_editformresponse_config
 (
-	id_config INT NOT NULL AUTO_INCREMENT,
+	id_config INT AUTO_INCREMENT,
 	is_multiform SMALLINT DEFAULT 0 NOT NULL,
 	id_task INT NOT NULL,
 	PRIMARY KEY (id_config)
@@ -135,7 +135,7 @@ CREATE TABLE workflow_task_update_status(
 --
 DROP TABLE IF EXISTS workflow_task_linkedvaluesformresponse_config;
 CREATE TABLE workflow_task_linkedvaluesformresponse_config (
-  id_config INT NOT NULL AUTO_INCREMENT,
+  id_config INT AUTO_INCREMENT,
   id_task INT DEFAULT 0 NOT NULL,
   PRIMARY KEY ( id_config )
 );
@@ -144,7 +144,7 @@ CREATE TABLE workflow_task_linkedvaluesformresponse_config (
 --
 DROP TABLE IF EXISTS workflow_task_linkedvaluesformresponse_config_value;
 CREATE TABLE workflow_task_linkedvaluesformresponse_config_value (
-  id_config_value INT NOT NULL AUTO_INCREMENT,
+  id_config_value INT AUTO_INCREMENT,
   id_config INT DEFAULT 0 NOT NULL,
   id_form INT DEFAULT 0 NOT NULL,
   id_question_source INT DEFAULT 0 NOT NULL,

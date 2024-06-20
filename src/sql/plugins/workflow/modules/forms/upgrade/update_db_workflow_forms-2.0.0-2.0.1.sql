@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS workflow_task_editformresponse_config;
 CREATE TABLE workflow_task_editformresponse_config
 (
-	id_config INT NOT NULL AUTO_INCREMENT,
+	id_config INT AUTO_INCREMENT,
 	id_task INT NOT NULL,
 	PRIMARY KEY (id_config)
 );
