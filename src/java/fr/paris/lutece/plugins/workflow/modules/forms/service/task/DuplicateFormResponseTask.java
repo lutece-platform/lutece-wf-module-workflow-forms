@@ -22,7 +22,9 @@ import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
 import fr.paris.lutece.portal.business.file.File;
 import fr.paris.lutece.portal.business.physicalfile.PhysicalFile;
 import fr.paris.lutece.portal.service.file.FileService;
+import fr.paris.lutece.portal.service.file.FileServiceException;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 
 public class DuplicateFormResponseTask extends SimpleTask
 {
@@ -160,7 +162,13 @@ public class DuplicateFormResponseTask extends SimpleTask
 
 	private File duplicateFile( String strFileKey )
 	{
-		File file = FileService.getInstance( ).getFileStoreServiceProvider( ).getFile( strFileKey );
+		File file;
+		try {
+			file = FileService.getInstance( ).getFileStoreServiceProvider( ).getFile( strFileKey );
+		} catch (FileServiceException e) {
+			AppLogService.error(e);
+			return null;
+		}
 		
 		if ( file == null )
 		{
