@@ -56,12 +56,9 @@ import fr.paris.lutece.portal.service.template.AppTemplateService;
  */
 public class EditFormResponseFOTaskComponent extends EditFormResponseTaskComponent
 {
-    // Templates
-    private static final String TEMPLATE_TASK_FORM_FO = "skin/plugins/workflow/modules/forms/task_edit_form_response_form.html";
-
     /**
      * Constructor
-     * 
+     *
      * @param formsTaskService
      *            the form task service
      * @param editFormResponseTaskService
@@ -79,12 +76,12 @@ public class EditFormResponseFOTaskComponent extends EditFormResponseTaskCompone
             List<Question> listQuestion )
     {
         List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestion, formResponse,
-                DisplayType.RESUBMIT_FRONTOFFICE );
+                DisplayType.EDITION_BACKOFFICE );
 
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_STEP_LIST, listStepDisplayTree );
 
-        return AppTemplateService.getTemplate( TEMPLATE_TASK_FORM_FO, locale, model ).getHtml( );
+        return AppTemplateService.getTemplate( TEMPLATE_TASK_FORM, locale, model ).getHtml( );
     }
 
     @Override
