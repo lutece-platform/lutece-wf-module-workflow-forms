@@ -165,7 +165,7 @@ public class LinkedValuesFormResponseTaskComponent extends NoFormTaskComponent
 
             for ( Question question : QuestionHome.getListQuestionByIdForm( Integer.parseInt( form.getCode( ) ) ) )
             {
-                if ( listIdTypeEntry.contains( String.valueOf( question.getEntry( ).getEntryType( ).getIdType( ) ) ) )
+                if ( listIdTypeEntry.contains( question.getEntry( ).getEntryType( ).getBeanName( ) ) )
                 {
                     listQuestions.add( question );
                 }
