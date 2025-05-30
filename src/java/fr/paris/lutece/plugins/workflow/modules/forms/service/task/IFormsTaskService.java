@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -98,6 +99,26 @@ public interface IFormsTaskService
 
     List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay, FormResponse formResponse,
             DisplayType displayType );
+
+    /**
+     * Get a List of Strings containing the models and values displayed to the user, for each existing Step
+     * 
+     * @param request
+     *            the HTTP request
+     * @param listStep
+     *            the List of Steps being processed
+     * @param listQuestionToDisplay
+     *            the List of Question that should be resubmitted by the user
+     * @param listFormQuestionResponse
+     *            the List of new FormQuestionResponse being submitted by the user
+     * @param formResponse
+     *            the FormResponse being processed
+     * @param displayType
+     *            the DisplayType used in the template
+     * @return a List of Strings containing the complete template 
+     */
+    List<String> buildFormStepDisplayTree( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay,
+            List<FormQuestionResponse> listFormQuestionResponse, FormResponse formResponse, DisplayType displayType );
 
     /**
      * Finds the responses that have changed
@@ -174,4 +195,26 @@ public interface IFormsTaskService
      * @return a value ready to be inserted in history
      */
     String createPreviousNewValue( FormQuestionResponse responseForm );
+
+    /**
+     * Get the List of responses being submitted
+     * 
+     * @param request
+     *            the HTTP request
+     * @param formResponse
+     *            the FormReponse being submitted
+     * @param listQuestions
+     *            the List of Question associated with the responses being submitted
+     * @return a List of FormQuestionResponse containing the new Responses' values
+     */
+    List<FormQuestionResponse> getSubmittedFormQuestionResponses( HttpServletRequest request, FormResponse formResponse, List<Question> listQuestions );
+
+    /**
+     * Check whether the values from the given FormQuestionResponse satisfy the Validators (regEx, file type, etc.) associated with them
+     * 
+     * @param formQuestionResponses
+     *            the List of FormQuestionResponse to check
+     * @return true if all the Responses are valid, returns false otherwise
+     */
+    boolean areFormQuestionResponsesValid( List<FormQuestionResponse> formQuestionResponses );
 }

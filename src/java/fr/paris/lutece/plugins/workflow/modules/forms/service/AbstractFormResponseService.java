@@ -137,4 +137,16 @@ public abstract class AbstractFormResponseService
         }
         return bIsValid;
     }
+
+    /**
+     * Check whether the values from the given List of FormQuestionResponse are valid
+     * 
+     * @param listFormQuestionResponse
+     *            the List of FormQuestionResponse to check
+     * @return true if all the Responses have valid values, returns false otherwise
+     */
+    protected boolean areFormResponsesValid( List<FormQuestionResponse> listFormQuestionResponse )
+    {
+        return _formsTaskService.areFormQuestionResponsesValid( listFormQuestionResponse );
+    }
 }
