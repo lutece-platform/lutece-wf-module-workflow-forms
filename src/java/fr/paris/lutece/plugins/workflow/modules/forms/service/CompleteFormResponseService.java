@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -43,6 +44,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
@@ -91,6 +93,9 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
 
     @Inject
     private ICompleteFormResponseTaskHistoryService _completeFormResponseTaskHistoryService;
+
+    // List of FormQuestionResponse to store the user's new Responses 
+    private List<FormQuestionResponse> _submittedFormResponses;
 
     @Override
     public List<Question> findListQuestionUsedCorrectForm( FormResponse formResponse )
@@ -226,7 +231,15 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
             return false;
         }
         List<Question> listQuestions = getListQuestionToEdit( response, completeFormResponse.getListCompleteReponseValues( ) );
-
+        // Get the values of the newly submitted Responses
+        _submittedFormResponses = _formsTaskService.getSubmittedFormQuestionResponses( request, response, listQuestions );
+        // Check if the new Responses are valid
+        if ( !areFormResponsesValid( _submittedFormResponses ) )
+        {
+            return false;
+        }
+        // Reset the content of the List
+        _submittedFormResponses = Collections.emptyList( );
         doEditResponseData( request, response, listQuestions, idTask, idHistory );
         return true;
     }
@@ -261,5 +274,11 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
         history.setNewValue( _formsTaskService.createPreviousNewValue( editableResponse.getResponseFromForm( ) ) );
 
         _completeFormResponseTaskHistoryService.create( history );
+    }
+
+    @Override
+    public List<FormQuestionResponse> getSubmittedFormResponseList( )
+    {
+        return _submittedFormResponses;
     }
 }

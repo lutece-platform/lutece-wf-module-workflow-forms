@@ -43,6 +43,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import fr.paris.lutece.plugins.forms.business.Control;
+import fr.paris.lutece.plugins.forms.business.ControlHome;
+import fr.paris.lutece.plugins.forms.business.ControlType;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
@@ -52,9 +55,11 @@ import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.service.entrytype.EntryTypeDate;
+import fr.paris.lutece.plugins.forms.validation.IValidator;
 import fr.paris.lutece.plugins.forms.web.StepDisplayTree;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
+import fr.paris.lutece.plugins.genericattributes.business.GenericAttributeError;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.genericattributes.service.entrytype.AbstractEntryTypeUpload;
 import fr.paris.lutece.plugins.genericattributes.service.entrytype.EntryTypeServiceManager;
@@ -179,6 +184,28 @@ public class FormsTaskService implements IFormsTaskService
     }
 
     @Override
+    public List<String> buildFormStepDisplayTree( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay,
+            List<FormQuestionResponse> listFormQuestionResponse, FormResponse formResponse, DisplayType displayType )
+    {
+        List<String> listFormDisplayTrees = new ArrayList<>( );
+
+        List<Integer> listQuestionToDisplayId = listFormQuestionResponse.stream( ).map( FormQuestionResponse::getQuestion ).map( Question::getId )
+                .collect( Collectors.toList( ) );
+
+        if ( !CollectionUtils.isEmpty( listStep ) )
+        {
+            for ( Step step : listStep )
+            {
+                int nIdStep = step.getId( );
+
+                StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, formResponse, listQuestionToDisplayId );
+                listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, listFormQuestionResponse, request.getLocale( ), displayType ) );
+            }
+        }
+        return listFormDisplayTrees;
+    }
+
+    @Override
     public List<EditableResponse> findChangedResponses( List<EditableResponse> listEditableResponse )
     {
         List<EditableResponse> listChangedResponse = new ArrayList<>( );
@@ -207,6 +234,7 @@ public class FormsTaskService implements IFormsTaskService
             IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
             FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, false );
             responseFromForm.setIdFormResponse( formResponse.getId( ) );
+
             FormQuestionResponse responseSaved = findSavedResponse( formResponse, question );
 
             if ( responseSaved == null )
@@ -363,5 +391,68 @@ public class FormsTaskService implements IFormsTaskService
             }
         }
         return value;
+    }
+
+    @Override
+    public List<FormQuestionResponse> getSubmittedFormQuestionResponses( HttpServletRequest request, FormResponse formResponse, List<Question> listQuestions )
+    {
+        List<FormQuestionResponse> submittedFormResponses = new ArrayList<>( );
+        for ( Question question : listQuestions )
+        {
+            IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
+            FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, false );
+            responseFromForm.setIdFormResponse( formResponse.getId( ) );
+            submittedFormResponses.add( responseFromForm );
+        }
+        return submittedFormResponses;
+    }
+
+    @Override
+    public boolean areFormQuestionResponsesValid( List<FormQuestionResponse> listFormQuestionResponse )
+    {
+        boolean areAllResponsesValid = Boolean.TRUE;
+
+        for ( FormQuestionResponse formQuestionResponse : listFormQuestionResponse )
+        {
+            if ( !isResponseValid( formQuestionResponse ) )
+            {
+                areAllResponsesValid = Boolean.FALSE;
+            }
+        }
+        return areAllResponsesValid;
+    }
+
+    /**
+     * Check whether the given FormQuestionResponse satisfies the Validator associated with it
+     * 
+     * @param formQuestionResponse
+     *            the FormQuestionResponse to check
+     * @return true if the Response is valid, returns false otherwise
+     */
+    private boolean isResponseValid( FormQuestionResponse formQuestionResponse )
+    {
+        // Get the list of controls created for this question's validation process
+        List<Control> listControl = ControlHome.getControlByQuestionAndType( formQuestionResponse.getQuestion( ).getId( ),
+                ControlType.VALIDATION.getLabel( ) );
+
+        // Check that the current response is valid with each associated control 
+        for ( Control control : listControl )
+        {
+            IValidator validator = EntryServiceManager.getInstance( ).getValidator( control.getValidatorName( ) );
+
+            // If the given response is not valid with a control
+            if ( !validator.validate( formQuestionResponse, control ) )
+            {
+                // Create an error to be displayed
+                GenericAttributeError error = new GenericAttributeError( );
+                error.setIsDisplayableError( true );
+                error.setErrorMessage( control.getErrorMessage( ) );
+                // Set the error on the response's Entry field
+                formQuestionResponse.setError( error );
+
+                return false;
+            }
+        }
+        return true;
     }
 }
