@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -104,6 +105,9 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
 
     @Inject
     private IResubmitFormResponseTaskHistoryService _resubmitFormResponseTaskHistoryService;
+
+    // List of FormQuestionResponse to store the user's new Responses 
+    private List<FormQuestionResponse> _submittedFormQuestionResponses;
 
     @Override
     public ResubmitFormResponse find( int nIdHistory, int nIdTask )
@@ -270,7 +274,15 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
             return false;
         }
         List<Question> listQuestions = getListQuestionToEdit( response, resubmitFormResponse.getListResubmitReponseValues( ) );
-
+        // Get the values of the newly submitted Responses
+        _submittedFormQuestionResponses = _formsTaskService.getSubmittedFormQuestionResponses( request, response, listQuestions );
+        // Check if the new Responses are valid
+        if ( !areFormResponsesValid( _submittedFormQuestionResponses ) )
+        {
+            return false;
+        }
+        // Reset the content of the List
+        _submittedFormQuestionResponses = Collections.emptyList( );
         doEditResponseData( request, response, listQuestions, idTask, idHistory );
         return true;
     }
@@ -306,5 +318,11 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
         resubmitFormResponse.setIsComplete( true );
         resubmitFormResponse.setDateCompleted( new Date( System.currentTimeMillis( ) ) );
         update( resubmitFormResponse );
+    }
+
+    @Override
+    public List<FormQuestionResponse> getSubmittedFormResponseList( )
+    {
+        return _submittedFormQuestionResponses;
     }
 }

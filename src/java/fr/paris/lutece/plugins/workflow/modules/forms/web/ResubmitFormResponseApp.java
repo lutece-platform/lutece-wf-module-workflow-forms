@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.Step;
@@ -62,6 +63,7 @@ import fr.paris.lutece.portal.web.constants.Messages;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.signrequest.AbstractPrivateKeyAuthenticator;
+import io.jsonwebtoken.lang.Collections;
 
 public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFormResponse>
 {
@@ -145,6 +147,7 @@ public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFor
     protected XPage getFormResponseXPage( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse )
     {
         XPage page = new XPage( );
+        List<String> listStepDisplayTree;
 
         FormResponse formResponse = _formsTaskService.getFormResponseFromIdHistory( resubmitFormResponse.getIdHistory( ) );
         List<Question> listQuestions = _resubmitFormResponseService.getListQuestionToEdit( formResponse, resubmitFormResponse.getListResubmitReponseValues( ) );
@@ -152,8 +155,21 @@ public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFor
         List<Step> listStep = listQuestions.stream( ).map( Question::getStep ).map( Step::getId ).distinct( ).map( StepHome::findByPrimaryKey )
                 .collect( Collectors.toList( ) );
 
-        List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse,
-                DisplayType.RESUBMIT_FRONTOFFICE );
+        // Get the List of Responses the user previously tried to submit
+        List<FormQuestionResponse> formQuestionResponseList = _resubmitFormResponseService.getSubmittedFormResponseList( );
+        // If the List is empty, then it is likely the first submission attempt
+        if ( Collections.isEmpty( formQuestionResponseList ) )
+        {
+            listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse,
+                    DisplayType.RESUBMIT_FRONTOFFICE );
+        }
+        else
+        {
+            // If the List has elements, then the user already tried to submit some Responses.
+            // We make sure to retrieve their values, as well as the potential errors associated with them
+            listStepDisplayTree = _formsTaskService.buildFormStepDisplayTree( request, listStep, listQuestions, formQuestionResponseList, formResponse,
+                    DisplayType.RESUBMIT_FRONTOFFICE );
+        }
 
         Map<String, Object> model = initModelFormPage( request, formResponse, listStepDisplayTree );
         model.put( MARK_RESUBMIT_FORM, resubmitFormResponse );

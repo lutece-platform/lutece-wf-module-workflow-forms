@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.Step;
@@ -57,6 +58,7 @@ import fr.paris.lutece.portal.web.constants.Messages;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.signrequest.AbstractPrivateKeyAuthenticator;
+import io.jsonwebtoken.lang.Collections;
 
 public class CompleteFormResponseApp extends AbstractFormResponseApp<CompleteFormResponse>
 {
@@ -88,6 +90,7 @@ public class CompleteFormResponseApp extends AbstractFormResponseApp<CompleteFor
     protected XPage getFormResponseXPage( HttpServletRequest request, CompleteFormResponse completeFormResponse )
     {
         XPage page = new XPage( );
+        List<String> listStepDisplayTree;
 
         FormResponse formResponse = _formsTaskService.getFormResponseFromIdHistory( completeFormResponse.getIdHistory( ) );
         List<Question> listQuestions = _completeFormResponseService.getListQuestionToEdit( formResponse, completeFormResponse.getListCompleteReponseValues( ) );
@@ -95,8 +98,21 @@ public class CompleteFormResponseApp extends AbstractFormResponseApp<CompleteFor
         List<Step> listStep = listQuestions.stream( ).map( Question::getStep ).map( Step::getId ).distinct( ).map( StepHome::findByPrimaryKey )
                 .collect( Collectors.toList( ) );
 
-        List<String> listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse,
-                DisplayType.COMPLETE_FRONTOFFICE );
+        // Get the List of Responses the user previously tried to submit
+        List<FormQuestionResponse> formQuestionResponseList = _completeFormResponseService.getSubmittedFormResponseList( );
+        // If the List is empty, then it is likely the first submission attempt
+        if ( Collections.isEmpty( formQuestionResponseList ) )
+        {
+            // If the List has elements, then the user already tried to submit some Responses.
+            // We make sure to retrieve their values, as well as the potential errors associated with them
+            listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse,
+                    DisplayType.COMPLETE_FRONTOFFICE );
+        }
+        else
+        {
+            listStepDisplayTree = _formsTaskService.buildFormStepDisplayTree( request, listStep, listQuestions, formQuestionResponseList, formResponse,
+                    DisplayType.COMPLETE_FRONTOFFICE );
+        }
 
         Map<String, Object> model = initModelFormPage( request, formResponse, listStepDisplayTree );
         model.put( MARK_COMPLETE_FORM, completeFormResponse );
