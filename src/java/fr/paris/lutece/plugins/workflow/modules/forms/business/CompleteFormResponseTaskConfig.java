@@ -33,11 +33,16 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Named;
+
 /**
  *
  * TaskCompleteFormResponseConfig
  *
  */
+@Dependent
+@Named( "workflow-forms.completeFormResponseTaskConfig" )
 public class CompleteFormResponseTaskConfig extends AbstractCompleteFormResponseTaskConfig
 {
 }

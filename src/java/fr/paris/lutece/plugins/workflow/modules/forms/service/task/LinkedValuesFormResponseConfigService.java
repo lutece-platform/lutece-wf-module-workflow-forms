@@ -37,17 +37,29 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.LinkedValuesFormR
 import fr.paris.lutece.plugins.workflow.modules.forms.business.LinkedValuesFormResponseConfigValue;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.LinkedValuesFormResponseConfigValueHome;
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfig;
+import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
 import fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * 
  * LinkedValuesFormResponseConfigService
  *
  */
+@ApplicationScoped
+@Named( LinkedValuesFormResponseConfigService.BEAN_NAME )
 public class LinkedValuesFormResponseConfigService extends TaskConfigService
 {
     
     public static final String BEAN_NAME = "workflow-forms.linkedValuesFormResponseConfigService";
+    
+    @Inject
+    public LinkedValuesFormResponseConfigService( @Named( "worklow-forms.linkedValuesFormResponseConfigDAO" ) ITaskConfigDAO<LinkedValuesFormResponseConfig> linkedValuesFormResponseConfigDAO ) 
+	{
+       setTaskConfigDAO( (ITaskConfigDAO) linkedValuesFormResponseConfigDAO ); 
+    }
     
     @Override
     public LinkedValuesFormResponseConfig findByPrimaryKey( int nIdTask )

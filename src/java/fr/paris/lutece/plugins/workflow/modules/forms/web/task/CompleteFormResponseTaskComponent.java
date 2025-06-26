@@ -39,9 +39,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
@@ -54,11 +55,14 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormRespo
 import fr.paris.lutece.plugins.workflow.modules.forms.service.ICompleteFormResponseService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.ICompleteFormResponseTaskHistoryService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
+import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
+@ApplicationScoped
+@Named( "workflow-forms.completetFormResponseTaskComponent" )
 public class CompleteFormResponseTaskComponent extends AbstractFormResponseTaskComponent
 {
 
@@ -85,6 +89,14 @@ public class CompleteFormResponseTaskComponent extends AbstractFormResponseTaskC
 
     @Inject
     private ICompleteFormResponseTaskHistoryService _completeFormResponseTaskHistoryService;
+
+    @Inject
+    public CompleteFormResponseTaskComponent( @Named( "workflow-forms.completeFormResponseTypeTask" ) ITaskType taskType,
+            @Named( "workflow-forms.taskCompleteResponseConfigService" ) ITaskConfigService taskConfigService )
+    {
+        setTaskType( taskType );
+        setTaskConfigService( taskConfigService );
+    }
 
     @Override
     public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )

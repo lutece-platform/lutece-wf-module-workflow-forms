@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?><plug-in>
     <name>workflow-forms</name>
     <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
-    <version>2.3.4-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <documentation/>
     <installation/>
     <changes/>
     <user-guide/>
     <description>module.workflow.forms.module.description</description>
     <provider>module.workflow.forms.module.provider</provider>
-    <provider-url>http://lutece.paris.fr</provider-url>
+    <provider-url>https://lutece.paris.fr</provider-url>
     <icon-url>images/admin/skin/feature_default_icon.png</icon-url>
     <copyright>Copyright (c) 2018 Mairie de Paris</copyright>
     <db-pool-required>1</db-pool-required>
 
     <core-version-dependency>
-        <min-core-version>6.1.0</min-core-version>
+        <min-core-version>8.0.0</min-core-version>
         <max-core-version/>
     </core-version-dependency>
 
@@ -26,13 +26,9 @@
     <applications>
         <application>
             <application-id>workflow-resubmit-form</application-id>
-            <application-class>fr.paris.lutece.plugins.workflow.modules.forms.web.ResubmitFormResponseApp
-            </application-class>
         </application>
         <application>
             <application-id>workflow-complete-form</application-id>
-            <application-class>fr.paris.lutece.plugins.workflow.modules.forms.web.CompleteFormResponseApp
-            </application-class>
         </application>
     </applications>
 

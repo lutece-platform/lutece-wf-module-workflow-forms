@@ -35,7 +35,9 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service;
 
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -48,9 +50,11 @@ import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
+@ApplicationScoped
+@Named( FormResponseValueExistsStateController.BEAN_NAME )
 public class FormResponseValueExistsStateController extends AbstractFormResponseStateController
 {
-    private static final String BEAN_NAME = "workflow-forms.formResponseValueExistsStateController";
+    public static final String BEAN_NAME = "workflow-forms.formResponseValueExistsStateController";
 
     private static final String PROPERTY_KEY_LABEL = "module.workflow.forms.state.control.forms.response.exists";
     private static final String PROPERTY_KEY_HELP = "module.workflow.forms.state.control.forms.response.exists.help";

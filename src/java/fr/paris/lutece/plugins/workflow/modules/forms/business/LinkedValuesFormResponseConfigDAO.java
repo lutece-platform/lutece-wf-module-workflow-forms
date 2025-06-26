@@ -36,13 +36,17 @@ package fr.paris.lutece.plugins.workflow.modules.forms.business;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
 import java.sql.Statement;
 
 /**
  * This class provides Data Access methods for LinkedValuesFormResponseConfig objects
  */
-public final class LinkedValuesFormResponseConfigDAO implements ITaskConfigDAO<LinkedValuesFormResponseConfig>
+@ApplicationScoped
+@Named( "worklow-forms.linkedValuesFormResponseConfigDAO" )
+public class LinkedValuesFormResponseConfigDAO implements ITaskConfigDAO<LinkedValuesFormResponseConfig>
 {
     // Constants
     private static final String SQL_QUERY_SELECT    = "SELECT id_config, id_task FROM workflow_task_linkedvaluesformresponse_config WHERE id_task = ?";

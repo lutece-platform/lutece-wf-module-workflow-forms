@@ -38,7 +38,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
@@ -52,7 +55,6 @@ import fr.paris.lutece.plugins.workflow.modules.forms.service.signrequest.Comple
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.SiteMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.web.constants.Messages;
 import fr.paris.lutece.portal.web.xpages.XPage;
@@ -60,6 +62,8 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.signrequest.AbstractPrivateKeyAuthenticator;
 import io.jsonwebtoken.lang.Collections;
 
+@RequestScoped
+@Named( "workflow-forms.xpage.workflow-complete-form" )
 public class CompleteFormResponseApp extends AbstractFormResponseApp<CompleteFormResponse>
 {
     private static final long serialVersionUID = -6753642997148910492L;
@@ -75,7 +79,8 @@ public class CompleteFormResponseApp extends AbstractFormResponseApp<CompleteFor
     private static final String MARK_COMPLETE_FORM = "complete_form";
 
     // SERVICES
-    private ICompleteFormResponseService _completeFormResponseService = SpringContextService.getBean( "workflow-forms.taskCompleteResponseService" );
+    @Inject
+    private ICompleteFormResponseService _completeFormResponseService;
 
     /**
      * Get the CompleteFormResponse page

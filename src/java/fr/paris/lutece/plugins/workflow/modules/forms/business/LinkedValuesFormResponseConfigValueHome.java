@@ -33,7 +33,8 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import jakarta.enterprise.inject.spi.CDI;
+
 import java.util.List;
 
 /**
@@ -44,7 +45,7 @@ public final class LinkedValuesFormResponseConfigValueHome
 {
 
     // Static variable pointed at the DAO instance
-    private static ILinkedValuesFormResponseConfigValueDAO _dao = ( ILinkedValuesFormResponseConfigValueDAO ) SpringContextService.getBean( LinkedValuesFormResponseConfigValueDAO.BEAN_NAME );
+    private static ILinkedValuesFormResponseConfigValueDAO _dao = CDI.current( ).select( ILinkedValuesFormResponseConfigValueDAO.class ).get( );
 
     /**
      * Private constructor - this class need not be instantiated

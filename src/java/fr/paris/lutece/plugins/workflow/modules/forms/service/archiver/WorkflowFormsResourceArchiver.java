@@ -33,8 +33,9 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service.archiver;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.workflow.modules.archive.ArchivalType;
@@ -45,6 +46,8 @@ import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflow;
 /**
  * {@link IResourceArchiver} for all data of module workflow-forms
  */
+@ApplicationScoped
+@Named( WorkflowFormsResourceArchiver.BEAN_NAME )
 public class WorkflowFormsResourceArchiver implements IResourceArchiver
 {
     public static final String BEAN_NAME = "workflow-forms.workflowFormsResourceArchiver";

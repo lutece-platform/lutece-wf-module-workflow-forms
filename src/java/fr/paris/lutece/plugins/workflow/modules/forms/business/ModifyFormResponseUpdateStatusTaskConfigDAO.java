@@ -38,7 +38,11 @@ import java.sql.Statement;
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
+@ApplicationScoped
+@Named( "worklow-forms.modifyFormResponseUpdateStatusTaskConfigDAO" )
 public class ModifyFormResponseUpdateStatusTaskConfigDAO implements ITaskConfigDAO<ModifyFormResponseUpdateStatusTaskConfig>
 {
     private static final String SQL_QUERY_SELECT_ALL = "SELECT id_task, status FROM workflow_task_update_status ";

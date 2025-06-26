@@ -37,10 +37,14 @@ import fr.paris.lutece.plugins.forms.business.FormResponseHome;
 import fr.paris.lutece.plugins.forms.service.FormResponseService;
 import fr.paris.lutece.plugins.workflow.modules.archive.service.AbstractArchiveProcessingService;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflow;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
 /**
  * Service for archival of type delete of plugin-workflow.
  */
+@ApplicationScoped
+@Named( WorkflowFormsDeleteArchiveProcessingService.BEAN_NAME )
 public class WorkflowFormsDeleteArchiveProcessingService extends AbstractArchiveProcessingService
 {
     public static final String BEAN_NAME = "workflow-forms.workflowFormsDeleteArchiveProcessingService";

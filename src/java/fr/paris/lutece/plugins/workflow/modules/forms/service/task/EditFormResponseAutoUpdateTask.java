@@ -39,9 +39,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
@@ -62,6 +63,8 @@ import fr.paris.lutece.portal.service.i18n.I18nService;
  * This class is a task to edit a form response
  *
  */
+@Dependent
+@Named( "workflow-forms.editFormResponseAutoUpdateTask" )
 public class EditFormResponseAutoUpdateTask extends SimpleTask
 {
     private final IFormsTaskService _formsTaskService;

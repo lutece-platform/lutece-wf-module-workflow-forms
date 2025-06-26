@@ -37,17 +37,21 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ModifyFormResponseUpdateStatusTaskConfig;
 import fr.paris.lutece.plugins.workflow.web.task.NoFormTaskComponent;
+import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
+@ApplicationScoped
+@Named( "workflow-forms.modifyFormResponseUpdateStatusTaskComponent" )
 public class ModifyFormResponseUpdateStatusTaskComponent extends NoFormTaskComponent
 {
     // Mark
@@ -57,15 +61,19 @@ public class ModifyFormResponseUpdateStatusTaskComponent extends NoFormTaskCompo
     private static final String TEMPLATE_TASK_FORM_EDITSTATUS_CONFIG = "admin/plugins/workflow/modules/forms/task_edit_form_response_status.html";
 
     private ModifyFormResponseUpdateStatusTaskConfig _config;
-
+    
     @Inject
-    @Named( "workflow-forms.modifyFormResponseUpdateStatusTaskService" )
-    private ITaskConfigService _taskConfigService;
+    public ModifyFormResponseUpdateStatusTaskComponent( @Named( "workflow-forms.modifyUpdateStatusTypeTask" ) ITaskType taskType,
+    		@Named( "workflow-forms.modifyFormResponseUpdateStatusTaskService" ) ITaskConfigService taskConfigService )
+    {
+        setTaskType( taskType );
+        setTaskConfigService( taskConfigService );
+    }
 
     @Override
     public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
     {
-        _config = _taskConfigService.findByPrimaryKey( task.getId( ) );
+        _config = getTaskConfigService( ).findByPrimaryKey( task.getId( ) );
 
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_CONFIG, _config );

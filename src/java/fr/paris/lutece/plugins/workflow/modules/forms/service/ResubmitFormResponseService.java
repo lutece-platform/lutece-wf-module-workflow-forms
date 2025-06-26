@@ -40,9 +40,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -78,6 +79,8 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 /**
  * Implements IResubmitResponseService
  */
+@ApplicationScoped
+@Named( "workflow-forms.taskResubmitResponseService" )
 public class ResubmitFormResponseService extends AbstractFormResponseService implements IResubmitFormResponseService
 {
 

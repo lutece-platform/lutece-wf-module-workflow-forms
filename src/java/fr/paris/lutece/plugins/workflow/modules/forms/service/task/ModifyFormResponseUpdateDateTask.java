@@ -35,8 +35,10 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
 import java.util.Locale;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponseHome;
@@ -47,6 +49,8 @@ import fr.paris.lutece.portal.service.i18n.I18nService;
 /**
  * Task that updates the update date of the FormResponse.
  */
+@Dependent
+@Named( "workflow-forms.modifyUpdateDateTask" )
 public class ModifyFormResponseUpdateDateTask extends SimpleTask
 {
     private final IFormsTaskService _formsTaskService;

@@ -35,8 +35,9 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.IResubmitFormResponseTaskHistoryDAO;
@@ -44,6 +45,8 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormRespo
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 
+@ApplicationScoped
+@Named( "workflow-forms.resubmitFormResponseTaskHistoryService" )
 public class ResubmitFormResponseTaskHistoryService implements IResubmitFormResponseTaskHistoryService
 {
     @Inject

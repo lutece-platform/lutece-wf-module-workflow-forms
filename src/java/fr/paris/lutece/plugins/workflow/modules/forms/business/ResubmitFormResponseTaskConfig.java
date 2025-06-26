@@ -33,11 +33,16 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Named;
+
 /**
  *
  * TaskResubmitFormResponseConfig
  *
  */
+@Dependent
+@Named( "workflow-forms.resubmitFormResponseTaskConfig" )
 public class ResubmitFormResponseTaskConfig extends AbstractCompleteFormResponseTaskConfig
 {
 

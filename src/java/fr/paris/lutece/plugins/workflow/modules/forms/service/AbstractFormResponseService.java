@@ -37,8 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
@@ -72,6 +72,9 @@ public abstract class AbstractFormResponseService
 
     @Inject
     protected IFormsTaskService _formsTaskService;
+    
+    @Inject
+    private WorkflowService _workflowService;
 
     protected void doChangeResponseState( ITask task, int idStateAfterEdition, int idHistory, Locale locale )
     {
@@ -88,10 +91,10 @@ public abstract class AbstractFormResponseService
             resourceWorkflow.setState( state );
             _resourceWorkflowService.update( resourceWorkflow );
 
-            WorkflowService.getInstance( ).doProcessAutomaticReflexiveActions( response.getId( ), FormResponse.RESOURCE_TYPE, action.getStateAfter( ).getId( ),
+            _workflowService.doProcessAutomaticReflexiveActions( response.getId( ), FormResponse.RESOURCE_TYPE, action.getStateAfter( ).getId( ),
                     resourceWorkflow.getExternalParentId( ), locale, null );
             // if new state have action automatic
-            WorkflowService.getInstance( ).executeActionAutomatic( response.getId( ), FormResponse.RESOURCE_TYPE, action.getWorkflow( ).getId( ),
+            _workflowService.executeActionAutomatic( response.getId( ), FormResponse.RESOURCE_TYPE, action.getWorkflow( ).getId( ),
                     resourceWorkflow.getExternalParentId( ), null );
         }
     }

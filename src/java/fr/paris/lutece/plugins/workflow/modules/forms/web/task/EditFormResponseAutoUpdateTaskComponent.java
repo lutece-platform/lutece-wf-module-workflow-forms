@@ -40,8 +40,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.Question;
@@ -53,6 +55,8 @@ import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResp
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
 import fr.paris.lutece.plugins.workflow.web.task.NoFormTaskComponent;
+import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.util.ReferenceList;
@@ -63,6 +67,8 @@ import fr.paris.lutece.util.html.HtmlTemplate;
  * EditFormResponseAutoUpdateTask}
  *
  */
+@ApplicationScoped
+@Named( "workflow-forms.editFormResponseAutoUpdateTaskComponent" )
 public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
 {
     // Mark
@@ -100,6 +106,8 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
 
     protected final IFormsTaskService _formsTaskService;
     private final IEditFormResponseTaskService _editFormResponseTaskService;
+    
+    @Inject
     private EditFormResponseConfigValue _configValue;
     private EditFormResponseConfig _config;
 
@@ -113,12 +121,15 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
      */
     @Inject
     public EditFormResponseAutoUpdateTaskComponent( IFormsTaskService formsTaskService, IEditFormResponseTaskService editFormResponseTaskService,
-            IEditFormResponseTaskHistoryService editFormResponseTaskHistoryService )
+            IEditFormResponseTaskHistoryService editFormResponseTaskHistoryService, @Named( "workflow-forms.editFormResponseTypeAutoUpdateTask" ) ITaskType taskType,
+            @Named( "workflow-forms.editFormResponseConfigService" ) ITaskConfigService taskConfigService )
     {
         super( );
 
         _formsTaskService = formsTaskService;
         _editFormResponseTaskService = editFormResponseTaskService;
+        setTaskType( taskType );
+        setTaskConfigService( taskConfigService );
     }
 
     /**

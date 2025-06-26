@@ -40,7 +40,11 @@ import java.util.List;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
+@ApplicationScoped
+@Named( "worklow-forms.resubmitFormResponseTaskHistoryDAO" )
 public class ResubmitFormResponseTaskHistoryDAO implements IResubmitFormResponseTaskHistoryDAO
 {
     private static final String SQL_QUERY_SELECT = "SELECT id_history, id_task, id_question, iteration_number, previous_value, new_value FROM workflow_task_resubmit_response_history ";

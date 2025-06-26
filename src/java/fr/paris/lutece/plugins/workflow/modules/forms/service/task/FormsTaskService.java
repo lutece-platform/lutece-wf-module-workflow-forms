@@ -37,8 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -82,6 +84,8 @@ import fr.paris.lutece.util.ReferenceList;
  * This class is a service for the tasks of the plugin-forms
  *
  */
+@ApplicationScoped
+@Named( "workflow-forms.formsTaskService" )
 public class FormsTaskService implements IFormsTaskService
 {
     private static final String NULL = "null";

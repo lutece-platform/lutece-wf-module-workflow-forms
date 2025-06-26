@@ -35,13 +35,28 @@ package fr.paris.lutece.plugins.workflow.modules.forms.web.task;
 
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.workflow.web.task.NoFormTaskComponent;
+import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 
+@ApplicationScoped
+@Named( "workflow-forms.duplicateFormResponseTaskComponent" )
 public class DuplicateFormResponseTaskComponent extends NoFormTaskComponent
 {
+	@Inject
+    public DuplicateFormResponseTaskComponent( @Named( "workflow-forms.taskDuplicateFormResponse" ) ITaskType taskType,
+            @Named( "workflow-forms.taskDuplicateFormResponseConfigService" ) ITaskConfigService taskConfigService )
+    {
+        setTaskType( taskType );
+        setTaskConfigService( taskConfigService );
+    }
+	
 	@Override
 	public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
 	{

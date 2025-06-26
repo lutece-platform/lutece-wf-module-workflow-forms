@@ -38,8 +38,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
@@ -48,12 +50,16 @@ import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskHistoryService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
+import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 
 /**
  * This class represents a component for the task {@link fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTask EditFormResponseTask}
  *
  */
+@ApplicationScoped
+@Named( "workflow-forms.editFormResponseFoTaskComponent" )
 public class EditFormResponseFOTaskComponent extends EditFormResponseTaskComponent
 {
     /**
@@ -66,9 +72,10 @@ public class EditFormResponseFOTaskComponent extends EditFormResponseTaskCompone
      */
     @Inject
     public EditFormResponseFOTaskComponent( IFormsTaskService formsTaskService, IEditFormResponseTaskService editFormResponseTaskService,
-            IEditFormResponseTaskHistoryService editFormResponseTaskHistoryService )
+            IEditFormResponseTaskHistoryService editFormResponseTaskHistoryService, @Named( "workflow-forms.editFormResponseFoTypeTask" ) ITaskType taskType,
+            @Named( "workflow-forms.editFormResponseConfigService" ) ITaskConfigService taskConfigService )
     {
-        super( formsTaskService, editFormResponseTaskService, editFormResponseTaskHistoryService );
+        super( formsTaskService, editFormResponseTaskService, editFormResponseTaskHistoryService, taskType, taskConfigService );
     }
 
     @Override

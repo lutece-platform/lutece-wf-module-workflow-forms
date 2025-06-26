@@ -33,13 +33,13 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service.signrequest;
 
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.util.CdiHelper;
 import fr.paris.lutece.util.signrequest.AbstractPrivateKeyAuthenticator;
 
 public final class CompleteFormResponseRequestAuthenticatorService
 {
 
-    private static final String BEAN_RESUBMIT_FORM_REQUEST_AUTHENTICATOR = "workflow-forms.completeFormResponseRequestAuthenticator";
+    private static final String BEAN_COMPLETE_FORM_REQUEST_AUTHENTICATOR = "workflow-forms.completeFormResponseRequestAuthenticator";
 
     /**
      * Private constructor
@@ -55,6 +55,6 @@ public final class CompleteFormResponseRequestAuthenticatorService
      */
     public static AbstractPrivateKeyAuthenticator getRequestAuthenticator( )
     {
-        return SpringContextService.getBean( BEAN_RESUBMIT_FORM_REQUEST_AUTHENTICATOR );
+        return CdiHelper.getReference( AbstractPrivateKeyAuthenticator.class, BEAN_COMPLETE_FORM_REQUEST_AUTHENTICATOR );
     }
 }
