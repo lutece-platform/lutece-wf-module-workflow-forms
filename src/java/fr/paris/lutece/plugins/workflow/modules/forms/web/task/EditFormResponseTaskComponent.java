@@ -41,8 +41,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -66,6 +68,8 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseT
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskHistoryService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
+import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
@@ -77,6 +81,8 @@ import fr.paris.lutece.util.html.HtmlTemplate;
  * This class represents a component for the task {@link fr.paris.lutece.plugins.workflow.modules.forms.service.task.EditFormResponseTask EditFormResponseTask}
  *
  */
+@ApplicationScoped
+@Named( "workflow-forms.editFormResponseTaskComponent" )
 public class EditFormResponseTaskComponent extends AbstractFormResponseTaskComponent
 {
     // Mark
@@ -116,6 +122,7 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
     private final IEditFormResponseTaskService _editFormResponseTaskService;
     private final IEditFormResponseTaskHistoryService _editFormResponseTaskHistoryService;
 
+    @Inject
     private EditFormResponseConfigValue _configValue;
     private EditFormResponseConfig _config;
 
@@ -129,13 +136,16 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
      */
     @Inject
     public EditFormResponseTaskComponent( IFormsTaskService formsTaskService, IEditFormResponseTaskService editFormResponseTaskService,
-            IEditFormResponseTaskHistoryService editFormResponseTaskHistoryService )
+            IEditFormResponseTaskHistoryService editFormResponseTaskHistoryService, @Named( "workflow-forms.editFormResponseTypeTask" ) ITaskType taskType,
+            @Named( "workflow-forms.editFormResponseConfigService" ) ITaskConfigService taskConfigService )
     {
         super( );
 
         _formsTaskService = formsTaskService;
         _editFormResponseTaskService = editFormResponseTaskService;
         _editFormResponseTaskHistoryService = editFormResponseTaskHistoryService;
+        setTaskType(taskType);
+        setTaskConfigService(taskConfigService);
     }
 
     /**

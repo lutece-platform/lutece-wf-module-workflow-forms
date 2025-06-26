@@ -37,10 +37,22 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseC
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValue;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValueHome;
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfig;
+import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
 import fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
+@ApplicationScoped
+@Named( "workflow-forms.editFormResponseConfigService" )
 public class EditFormResponseConfigService extends TaskConfigService
 {
+	@Inject
+    public EditFormResponseConfigService( @Named( "worklow-forms.editFormResponseConfigDao" ) ITaskConfigDAO<EditFormResponseConfig> editFormResponseConfigDAO ) 
+	{
+       setTaskConfigDAO( (ITaskConfigDAO) editFormResponseConfigDAO ); 
+    }
+
     @Override
     public EditFormResponseConfig findByPrimaryKey( int nIdTask )
     {

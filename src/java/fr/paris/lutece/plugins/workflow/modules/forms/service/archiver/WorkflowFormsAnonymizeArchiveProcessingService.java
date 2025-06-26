@@ -33,8 +33,9 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service.archiver;
 
-import javax.inject.Inject;
-
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
@@ -52,6 +53,8 @@ import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflow;
 /**
  * Service for archival of type delete of plugin-workflow.
  */
+@ApplicationScoped
+@Named( WorkflowFormsAnonymizeArchiveProcessingService.BEAN_NAME )
 public class WorkflowFormsAnonymizeArchiveProcessingService extends AbstractArchiveProcessingService
 {
     public static final String BEAN_NAME = "workflow-forms.workflowFormsAnonymizeArchiveProcessingService";

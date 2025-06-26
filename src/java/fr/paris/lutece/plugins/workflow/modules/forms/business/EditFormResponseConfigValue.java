@@ -33,13 +33,18 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
+import java.io.Serializable;
+
 import fr.paris.lutece.plugins.forms.business.Form;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.Step;
+import jakarta.enterprise.context.SessionScoped;
 
-public class EditFormResponseConfigValue
+@SessionScoped
+public class EditFormResponseConfigValue implements Serializable
 {
-    private int _nIdConfigValue;
+    private static final long serialVersionUID = 1836658196356435247L;
+	private int _nIdConfigValue;
     private int _nIdConfig;
     private Form _form;
     private Step _step;

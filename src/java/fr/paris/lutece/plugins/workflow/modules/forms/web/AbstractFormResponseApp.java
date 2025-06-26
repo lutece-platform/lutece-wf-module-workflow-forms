@@ -38,7 +38,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -49,7 +50,6 @@ import fr.paris.lutece.portal.service.message.SiteMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.security.UserNotSignedException;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.web.constants.Messages;
 import fr.paris.lutece.portal.web.xpages.XPage;
@@ -65,7 +65,7 @@ public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResp
     private static final long serialVersionUID = 2628844288485204790L;
 
     // ACTIONS
-    private static final String ACTION_DO_MODIFY_RESPONSE = "do_modify_response";
+    private static final String ACTION_DO_EDIT_RESPONSE = "doEditResponse";
 
     // MARKS
     private static final String MARK_STEP_LIST = "list_step";
@@ -88,7 +88,8 @@ public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResp
     private static final String MESSAGE_EDITION_COMPLETE = "module.workflow.forms.message.edition_complete";
     private static final String MESSAGE_RECORD_ALREADY_COMPLETED = "module.workflow.forms.message.response_already_completed";
 
-    protected IFormsTaskService _formsTaskService = SpringContextService.getBean( "workflow-forms.formsTaskService" );
+    @Inject
+    protected IFormsTaskService _formsTaskService;
 
     @Override
     public XPage getPage( HttpServletRequest request, int nMode, Plugin plugin ) throws UserNotSignedException, SiteMessageException
@@ -145,7 +146,7 @@ public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResp
             return;
         }
 
-        if ( ACTION_DO_MODIFY_RESPONSE.equals( strAction ) && doEditResponse( request, completeFormResponse, idTask, idHistory ) )
+        if ( ACTION_DO_EDIT_RESPONSE.equals( strAction ) && doEditResponse( request, completeFormResponse, idTask, idHistory ) )
         {
             // Back to home page
             String strUrlReturn = request.getParameter( PARAMETER_URL_RETURN );

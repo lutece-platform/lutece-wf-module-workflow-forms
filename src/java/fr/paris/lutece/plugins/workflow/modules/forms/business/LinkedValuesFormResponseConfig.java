@@ -37,10 +37,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.paris.lutece.plugins.workflowcore.business.config.TaskConfig;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Named;
 
 /**
  * This is the business class for the object LinkedValuesFormResponseConfig
  */
+@Dependent
+@Named( "workflow-forms.linkedValuesFormResponseConfig" )
 public class LinkedValuesFormResponseConfig extends TaskConfig
 {
     // Variables declarations

@@ -33,14 +33,20 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
+import org.junit.jupiter.api.Test;
+
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
 import fr.paris.lutece.test.LuteceTestCase;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 public class EditFormResponseConfigBusinessTest extends LuteceTestCase
 {
+    @Inject
+    @Named( EditFormResponseConfigDao.BEAN_NAME )
+    private ITaskConfigDAO<EditFormResponseConfig> _dao;
 
-    private ITaskConfigDAO<EditFormResponseConfig> _dao = new EditFormResponseConfigDao( );
-
+    @Test
     public void testCRUD( )
     {
         EditFormResponseConfig config = new EditFormResponseConfig( );

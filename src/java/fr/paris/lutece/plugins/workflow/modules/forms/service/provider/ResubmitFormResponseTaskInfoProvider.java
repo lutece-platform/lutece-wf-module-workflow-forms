@@ -36,7 +36,9 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service.provider;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +48,10 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.IResubmitFormResp
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.IResubmitFormResponseService;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
+import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
 
+@ApplicationScoped
+@Named( "workflow-forms.resubmitFormResponseTaskInfoProvider" )
 public class ResubmitFormResponseTaskInfoProvider extends AbstractCompleteFormResponseTaskInfoProvider
 {
     private static final String PAGE_NAME = "workflow-resubmit-form";
@@ -59,6 +64,12 @@ public class ResubmitFormResponseTaskInfoProvider extends AbstractCompleteFormRe
 
     @Inject
     private IResubmitFormResponseService _resubmitFormResponseService;
+
+    @Inject
+    public ResubmitFormResponseTaskInfoProvider( @Named( "workflow-forms.resubmitFormResponseTypeTask" ) ITaskType taskType )
+    {
+        setTaskType( taskType );
+    }
 
     @Override
     protected String getInfoEntries( int nIdHistory )

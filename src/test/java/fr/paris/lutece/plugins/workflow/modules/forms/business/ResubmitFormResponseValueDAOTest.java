@@ -37,10 +37,14 @@ import java.util.List;
 
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.test.LuteceTestCase;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 public class ResubmitFormResponseValueDAOTest extends LuteceTestCase
 {
-    private ResubmitFormResponseValueDAO _dao = new ResubmitFormResponseValueDAO( );
+	@Inject
+	@Named( "worklow-forms.resubmitFormResponseValueDAO" )
+    private ResubmitFormResponseValueDAO _dao;
 
     public void testCRUD( )
     {

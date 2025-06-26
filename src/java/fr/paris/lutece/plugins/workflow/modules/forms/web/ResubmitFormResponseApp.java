@@ -38,8 +38,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -57,7 +59,6 @@ import fr.paris.lutece.portal.service.message.SiteMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.security.UserNotSignedException;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.web.constants.Messages;
 import fr.paris.lutece.portal.web.xpages.XPage;
@@ -65,6 +66,8 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.signrequest.AbstractPrivateKeyAuthenticator;
 import io.jsonwebtoken.lang.Collections;
 
+@RequestScoped
+@Named( "workflow-forms.xpage.workflow-resubmit-form" )
 public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFormResponse>
 {
     private static final long serialVersionUID = -6753642997148910492L;
@@ -86,7 +89,7 @@ public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFor
 
     // SERVICES
     @Inject
-    private IResubmitFormResponseService _resubmitFormResponseService = SpringContextService.getBean( "workflow-forms.taskResubmitResponseService" );
+    private IResubmitFormResponseService _resubmitFormResponseService;
 
     @Override
     public XPage getPage( HttpServletRequest request, int nMode, Plugin plugin ) throws UserNotSignedException, SiteMessageException

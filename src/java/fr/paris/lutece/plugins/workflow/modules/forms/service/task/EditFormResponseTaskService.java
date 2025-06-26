@@ -39,8 +39,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -68,6 +69,8 @@ import fr.paris.lutece.util.ReferenceList;
  * This class is a service for the task {@link EditFormResponseTask}
  *
  */
+@ApplicationScoped
+@Named( "workflow-forms.editFormResponseTaskService" )
 public class EditFormResponseTaskService implements IEditFormResponseTaskService
 {
 

@@ -35,11 +35,11 @@ package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import jakarta.enterprise.inject.spi.CDI;
 
 public class FormResponseValueStateControllerConfigHome
 {
-    private static IFormResponseValueStateControllerConfigDao _dao = SpringContextService.getBean( "worklow-forms.formResponseValueStateControllerConfigDao" );
+    private static IFormResponseValueStateControllerConfigDao _dao = CDI.current( ).select( IFormResponseValueStateControllerConfigDao.class ).get( );
     private static Plugin _plugin = WorkflowUtils.getPlugin( );
 
     /**

@@ -36,8 +36,9 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
@@ -55,6 +56,8 @@ import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
  * LinkedValuesFormResponseTaskService
  *
  */
+@ApplicationScoped
+@Named( LinkedValuesFormResponseTaskService.BEAN_NAME )
 public class LinkedValuesFormResponseTaskService implements ILinkedValuesFormResponseTaskService
 {
 

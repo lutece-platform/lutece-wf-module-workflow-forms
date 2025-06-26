@@ -36,12 +36,16 @@ package fr.paris.lutece.plugins.workflow.modules.forms.business;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
 /**
  *
  * CompleteFormResponseTaskConfigDAO
  *
  */
+@ApplicationScoped
+@Named( "worklow-forms.taskCompleteFormResponseConfigDAO" )
 public class CompleteFormResponseTaskConfigDAO implements ITaskConfigDAO<CompleteFormResponseTaskConfig>
 {
     private static final String SQL_QUERY_FIND_BY_PRIMARY_KEY = " SELECT id_task, id_state_after_edition, default_message FROM workflow_task_complete_response_cf "

@@ -31,59 +31,30 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.workflow.modules.forms.business;
+package fr.paris.lutece.plugins.workflow.modules.forms.service.signrequest;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import fr.paris.lutece.util.signrequest.AbstractPrivateKeyAuthenticator;
+import fr.paris.lutece.util.signrequest.cdi.AbstractSignRequestAuthenticatorProducer;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Named;
 
-import fr.paris.lutece.plugins.workflowcore.business.config.TaskConfig;
-
-public abstract class AbstractCompleteFormResponseTaskConfig extends TaskConfig
+@ApplicationScoped
+public class AuthenticatorProducer extends AbstractSignRequestAuthenticatorProducer
 {
-    @NotNull
-    @Min( 1 )
-    private int _nIdStateAfterEdition;
-    private String _strDefaultMessage;
-
-    /**
-     * Set the id state after edition
-     * 
-     * @param nIdStateAfterEdition
-     *            the id state after edition
-     */
-    public void setIdStateAfterEdition( int nIdStateAfterEdition )
+	@Produces
+    @ApplicationScoped
+    @Named( "workflow-forms.resubmitFormResponseRequestAuthenticator" )
+    public AbstractPrivateKeyAuthenticator produceResubmitFormResponseRequestAuthenticator( )
     {
-        _nIdStateAfterEdition = nIdStateAfterEdition;
+		return (AbstractPrivateKeyAuthenticator) produceRequestAuthenticator( "workflow-forms.resubmitFormResponseRequestAuthenticator" );
     }
 
-    /**
-     * Get the id state after edition
-     * 
-     * @return the id state after edition
-     */
-    public int getIdStateAfterEdition( )
+	@Produces
+    @ApplicationScoped
+    @Named( "workflow-forms.completeFormResponseRequestAuthenticator" )
+    public AbstractPrivateKeyAuthenticator produceCompleteFormResponseRequestAuthenticator( )
     {
-        return _nIdStateAfterEdition;
-    }
-
-    /**
-     * Set the default message
-     * 
-     * @param strDefaultMessage
-     *            the default message
-     */
-    public void setDefaultMessage( String strDefaultMessage )
-    {
-        _strDefaultMessage = strDefaultMessage;
-    }
-
-    /**
-     * Get the default message
-     * 
-     * @return the default message
-     */
-    public String getDefaultMessage( )
-    {
-        return _strDefaultMessage;
+        return (AbstractPrivateKeyAuthenticator) produceRequestAuthenticator( "workflow-forms.completeFormResponseRequestAuthenticator" );
     }
 }

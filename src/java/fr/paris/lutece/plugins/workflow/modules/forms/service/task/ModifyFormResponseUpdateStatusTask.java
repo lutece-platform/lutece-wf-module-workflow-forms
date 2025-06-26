@@ -36,9 +36,10 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 import java.sql.Timestamp;
 import java.util.Locale;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.service.FormService;
@@ -48,6 +49,8 @@ import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 
+@Dependent
+@Named( "workflow-forms.modifyUpdateStatusTask" )
 public class ModifyFormResponseUpdateStatusTask extends SimpleTask
 {
     private final IFormsTaskService _formsTaskService;

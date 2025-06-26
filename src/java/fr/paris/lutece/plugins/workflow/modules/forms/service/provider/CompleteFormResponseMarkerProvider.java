@@ -38,9 +38,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.workflow.service.taskinfo.ITaskInfoProvider;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
@@ -54,9 +55,11 @@ import net.sf.json.JSONObject;
  * This class represents a NotifyGru marker provider for the Resubmit Form task
  *
  */
+@ApplicationScoped
+@Named( CompleteFormResponseMarkerProvider.ID )
 public class CompleteFormResponseMarkerProvider implements IMarkerProvider
 {
-    private static final String ID = "workflow-forms.completeFormResponseMarkerProvider";
+    public static final String ID = "workflow-forms.completeFormResponseMarkerProvider";
 
     // Services
     @Inject

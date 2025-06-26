@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
+import org.junit.jupiter.api.Test;
+
 import fr.paris.lutece.plugins.forms.business.Form;
 import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.Question;
@@ -43,7 +45,7 @@ import fr.paris.lutece.test.LuteceTestCase;
 
 public class EditFormResponseConfigValueBusinessTest extends LuteceTestCase
 {
-
+	@Test
     public void testCRUD( )
     {
         Form form = new Form( );

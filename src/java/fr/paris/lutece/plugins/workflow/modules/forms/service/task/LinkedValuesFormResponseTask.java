@@ -36,9 +36,10 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
 import java.util.Locale;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.LinkedValuesFormResponseConfig;
@@ -53,12 +54,14 @@ import fr.paris.lutece.portal.service.i18n.I18nService;
  * LinkedValuesFormResponseTask
  *
  */
+@Dependent
+@Named( "workflow-forms.linkedValuesFormResponseTask" )
 public class LinkedValuesFormResponseTask extends SimpleTask
 {
 
     @Inject
     @Named( LinkedValuesFormResponseConfigService.BEAN_NAME )
-    private ITaskConfigService                   _linkedValuesFormResponseConfigService;
+    private ITaskConfigService _linkedValuesFormResponseConfigService;
 
     @Inject
     @Named( LinkedValuesFormResponseTaskService.BEAN_NAME )
@@ -66,10 +69,10 @@ public class LinkedValuesFormResponseTask extends SimpleTask
 
     @Inject
     @Named( "workflow-forms.formsTaskService" )
-    private IFormsTaskService                    _formsTaskService;
+    private IFormsTaskService _formsTaskService;
 
 
-    private static final String                  MESSAGE_TASK_TITLE = "module.workflow.forms.task.linkedValuesFormResponse.config.title";
+    private static final String MESSAGE_TASK_TITLE = "module.workflow.forms.task.linkedValuesFormResponse.config.title";
 
     @Override
     public void processTask( int nIdHistory, HttpServletRequest request, Locale locale )

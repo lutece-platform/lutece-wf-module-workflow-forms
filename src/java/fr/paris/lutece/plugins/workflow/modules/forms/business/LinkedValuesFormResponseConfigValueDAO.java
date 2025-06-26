@@ -35,6 +35,8 @@ package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +45,9 @@ import java.sql.Statement;
 /**
  * This class provides Data Access methods for LinkedValuesFormResponseConfigValue objects
  */
-public final class LinkedValuesFormResponseConfigValueDAO implements ILinkedValuesFormResponseConfigValueDAO
+@ApplicationScoped
+@Named( LinkedValuesFormResponseConfigValueDAO.BEAN_NAME )
+public class LinkedValuesFormResponseConfigValueDAO implements ILinkedValuesFormResponseConfigValueDAO
 {
     public static final String BEAN_NAME = "worklow-forms.linkedValuesFormResponseConfigValueDAO";
     

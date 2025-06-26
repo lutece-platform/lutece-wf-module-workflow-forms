@@ -36,7 +36,9 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service.provider;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +48,10 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormRespo
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ICompleteFormResponseDAO;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.ICompleteFormResponseService;
 import fr.paris.lutece.plugins.workflow.utils.WorkflowUtils;
+import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
 
+@ApplicationScoped
+@Named( "workflow-forms.completeFormResponseTaskInfoProvider" )
 public class CompleteFormResponseTaskInfoProvider extends AbstractCompleteFormResponseTaskInfoProvider
 {
     private static final String PAGE_NAME = "workflow-complete-form";
@@ -60,6 +65,12 @@ public class CompleteFormResponseTaskInfoProvider extends AbstractCompleteFormRe
     @Inject
     private ICompleteFormResponseService _completeFormResponseService;
 
+    @Inject
+    public CompleteFormResponseTaskInfoProvider( @Named( "workflow-forms.completeFormResponseTypeTask" ) ITaskType taskType )
+    {
+        setTaskType( taskType );
+    }
+    
     @Override
     protected String getInfoEntries( int nIdHistory )
     {

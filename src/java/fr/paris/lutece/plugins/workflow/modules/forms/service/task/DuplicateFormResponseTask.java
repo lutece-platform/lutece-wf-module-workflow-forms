@@ -37,10 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
@@ -54,11 +54,13 @@ import fr.paris.lutece.plugins.workflowcore.service.resource.ResourceHistoryServ
 import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
 import fr.paris.lutece.portal.business.file.File;
 import fr.paris.lutece.portal.business.physicalfile.PhysicalFile;
-import fr.paris.lutece.portal.service.file.FileService;
 import fr.paris.lutece.portal.service.file.FileServiceException;
+import fr.paris.lutece.portal.service.file.IFileStoreServiceProvider;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 
+@Dependent
+@Named( "workflow-forms.duplicateFormResponseTask" )
 public class DuplicateFormResponseTask extends SimpleTask
 {
 	@Inject 
@@ -71,6 +73,10 @@ public class DuplicateFormResponseTask extends SimpleTask
 	
 	@Inject
     private FormService _formService;
+	
+	@Inject
+	@Named( "defaultDatabaseFileStoreProvider" )
+	private IFileStoreServiceProvider _fileStoreService;
 	
 	private final IFormsTaskService _formsTaskService;
 	
@@ -197,7 +203,7 @@ public class DuplicateFormResponseTask extends SimpleTask
 	{
 		File file;
 		try {
-			file = FileService.getInstance( ).getFileStoreServiceProvider( ).getFile( strFileKey );
+			file = _fileStoreService.getFile( strFileKey );
 		} catch (FileServiceException e) {
 			AppLogService.error(e);
 			return null;

@@ -41,9 +41,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.Question;
@@ -52,6 +53,8 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.LinkedValuesFormR
 import fr.paris.lutece.plugins.workflow.modules.forms.business.LinkedValuesFormResponseConfigValue;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.LinkedValuesFormResponseConfigService;
 import fr.paris.lutece.plugins.workflow.web.task.NoFormTaskComponent;
+import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
+import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -65,31 +68,37 @@ import fr.paris.lutece.util.html.HtmlTemplate;
  * LinkedValuesFormResponseTaskComponent
  *
  */
+@Dependent
+@Named( "workflow-forms.linkedValuesFormResponseTaskComponent" )
 public class LinkedValuesFormResponseTaskComponent extends NoFormTaskComponent
 {
     
     // TEMPLATES
-    private static final String           TEMPLATE_CONFIG               = "admin/plugins/workflow/modules/forms/task_linked_values_form_response_config.html";
+    private static final String TEMPLATE_CONFIG = "admin/plugins/workflow/modules/forms/task_linked_values_form_response_config.html";
 
     // MARKERS
-    private static final String           MARK_CONFIG                   = "config";
-    private static final String           MARK_LIST_FORM                = "forms";
-    private static final String           MARK_LIST_QUESTIONS           = "questions";
+    private static final String MARK_CONFIG = "config";
+    private static final String MARK_LIST_FORM = "forms";
+    private static final String MARK_LIST_QUESTIONS = "questions";
 
     // PROPERTIES
-    private static final String           PROPERTY_LIST_ENTRY_AVAILABLE = "task_linked_values_form_response_list_entry_id_type_available";
+    private static final String PROPERTY_LIST_ENTRY_AVAILABLE = "task_linked_values_form_response_list_entry_id_type_available";
 
     // ACTIONS
-    private static final String           ACTION_ADD_RULE               = "add_rule";
-    private static final String           ACTION_REMOVE_RULE            = "remove_rule";
+    private static final String ACTION_ADD_RULE = "add_rule";
+    private static final String ACTION_REMOVE_RULE = "remove_rule";
 
     // PARAMETERS
-    private static final String           PARAMETER_ID_CONFIG_VALUE     = "id_config_value";
-    private static final String           PARAMETER_ACTION              = "apply";
-    
+    private static final String PARAMETER_ID_CONFIG_VALUE = "id_config_value";
+    private static final String PARAMETER_ACTION = "apply";
+
     @Inject
-    @Named( LinkedValuesFormResponseConfigService.BEAN_NAME )
-    LinkedValuesFormResponseConfigService _configService;
+    public LinkedValuesFormResponseTaskComponent( @Named( "workflow-forms.linkedValuesFormResponseTypeTask" ) ITaskType taskType,
+    		@Named( LinkedValuesFormResponseConfigService.BEAN_NAME ) ITaskConfigService taskConfigService )
+    {
+    	setTaskType( taskType );
+    	setTaskConfigService( taskConfigService );
+    }
 
     @Override
     public String getDisplayConfigForm( HttpServletRequest reques, Locale locale, ITask task )
@@ -99,7 +108,7 @@ public class LinkedValuesFormResponseTaskComponent extends NoFormTaskComponent
 
         model.put( MARK_LIST_FORM, formList );
         model.put( MARK_LIST_QUESTIONS, getListQuestions( formList ) );
-        model.put( MARK_CONFIG, _configService.findByPrimaryKey( task.getId( ) ) );
+        model.put( MARK_CONFIG, getTaskConfigService( ).findByPrimaryKey( task.getId( ) ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_CONFIG, locale, model );
         return template.getHtml( );
@@ -109,7 +118,7 @@ public class LinkedValuesFormResponseTaskComponent extends NoFormTaskComponent
     public String doSaveConfig( HttpServletRequest request, Locale locale, ITask task )
     {        
         String action = request.getParameter( PARAMETER_ACTION );
-        LinkedValuesFormResponseConfig config = _configService.findByPrimaryKey( task.getId( ) );
+        LinkedValuesFormResponseConfig config = getTaskConfigService( ).findByPrimaryKey( task.getId( ) );
         LinkedValuesFormResponseConfigValue configValue = new LinkedValuesFormResponseConfigValue( );
         BeanUtil.populate( configValue, request, null );
         
@@ -127,11 +136,11 @@ public class LinkedValuesFormResponseTaskComponent extends NoFormTaskComponent
             config.addConfigValue( configValue );
             if( isNewConfig )
             {
-                _configService.create( config );
+            	getTaskConfigService( ).create( config );
             }
             else
             {
-                _configService.update( config );  
+            	getTaskConfigService( ).update( config );  
             }
         }
         else if ( ACTION_REMOVE_RULE.equals( action ) )
@@ -144,7 +153,7 @@ public class LinkedValuesFormResponseTaskComponent extends NoFormTaskComponent
             
             config.setListConfigValues( newList );
             
-            _configService.update( config );
+            getTaskConfigService( ).update( config );
         }
         return null;
     }

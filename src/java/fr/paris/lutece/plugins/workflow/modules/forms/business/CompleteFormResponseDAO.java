@@ -35,6 +35,8 @@ package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -47,6 +49,8 @@ import java.util.List;
  * CompleteFormResponseDAO
  *
  */
+@ApplicationScoped
+@Named( "worklow-forms.completeFormResponseDAO" )
 public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
 {
     private static final String SQL_QUERY_SELECT_ALL = " SELECT id_history, id_task, message, is_complete, date_completed "

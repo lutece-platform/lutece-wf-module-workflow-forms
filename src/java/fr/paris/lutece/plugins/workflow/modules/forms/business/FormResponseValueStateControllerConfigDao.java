@@ -40,7 +40,11 @@ import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
+@ApplicationScoped
+@Named( "worklow-forms.formResponseValueStateControllerConfigDao" )
 public class FormResponseValueStateControllerConfigDao implements IFormResponseValueStateControllerConfigDao
 {
     private static final String SQL_QUERY_SELECT_ALL = "SELECT id, id_task, id_form, id_step, id_question, response_value,is_multiform,code FROM workflow_state_controller_form_response_value ";

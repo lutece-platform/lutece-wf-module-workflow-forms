@@ -34,7 +34,11 @@
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
 import fr.paris.lutece.plugins.workflowcore.business.config.TaskConfig;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Named;
 
+@Dependent
+@Named( "workflow-forms.modifyFormResponseUpdateStatusTaskConfig" )
 public class ModifyFormResponseUpdateStatusTaskConfig extends TaskConfig
 {
     private boolean _bPublished = false;
