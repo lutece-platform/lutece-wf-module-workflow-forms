@@ -1,3 +1,6 @@
+--liquibase formatted sql
+--changeset workflow-forms:update_db_workflow_forms-2.3.0-2.3.1.sql
+--preconditions onFail:MARK_RAN onError:WARN
 -- Table structure for table workflow_task_linkedvaluesformresponse_config
 --
 DROP TABLE IF EXISTS workflow_task_linkedvaluesformresponse_config;
