@@ -1,3 +1,6 @@
+--liquibase formatted sql
+--changeset workflow-forms:update_db_workflow_forms-2.0.0-2.0.1.sql
+--preconditions onFail:MARK_RAN onError:WARN
 DROP TABLE IF EXISTS workflow_task_editformresponse_config;
 CREATE TABLE workflow_task_editformresponse_config
 (
