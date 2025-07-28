@@ -3,7 +3,7 @@
     <parent>
         <artifactId>lutece-global-pom</artifactId>
         <groupId>fr.paris.lutece.tools</groupId>
-        <version>6.0.0</version>
+        <version>7.0.2</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -18,13 +18,13 @@
         <repository>
             <id>lutece</id>
             <name>luteceRepository</name>
-            <url>http://dev.lutece.paris.fr/maven_repository</url>
+            <url>https://dev.lutece.paris.fr/maven_repository</url>
             <layout>default</layout>
         </repository>
         <repository>
             <id>luteceSnapshot</id>
             <name>luteceSnapshot</name>
-            <url>http://dev.lutece.paris.fr/snapshot_repository</url>
+            <url>https://dev.lutece.paris.fr/snapshot_repository</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
