@@ -33,10 +33,19 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 public abstract class AbstractCompleteFormResponseValue
 {
+
+    /**
+     * Default iteration number of a Response
+     */
+    public static final int DEFAULT_ITERATION_NUMBER = NumberUtils.INTEGER_MINUS_ONE;
+
     private int _nIdHistory;
     private int _nIdEntry;
+    private int _nIterationNumber = DEFAULT_ITERATION_NUMBER;
 
     /**
      * Get the id history
@@ -78,5 +87,26 @@ public abstract class AbstractCompleteFormResponseValue
     public void setIdEntry( int nIdEntry )
     {
         _nIdEntry = nIdEntry;
+    }
+
+    /**
+     * Return the iteration number of the response
+     *
+     * @return the nIterationNumber
+     */
+    public int getIterationNumber( )
+    {
+        return _nIterationNumber;
+    }
+
+    /**
+     * Set the iteration number of the response
+     *
+     * @param nIterationNumber
+     *            the nIterationNumber to set
+     */
+    public void setIterationNumber( int nIterationNumber )
+    {
+        _nIterationNumber = nIterationNumber;
     }
 }
