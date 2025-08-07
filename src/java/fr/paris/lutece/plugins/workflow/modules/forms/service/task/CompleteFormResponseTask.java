@@ -95,13 +95,18 @@ public class CompleteFormResponseTask extends Task
             {
                 for ( String strIdEntry : listIdsEntry )
                 {
-                    if ( StringUtils.isNotBlank( strIdEntry ) && StringUtils.isNumeric( strIdEntry ) )
+                    if ( StringUtils.isNotBlank( strIdEntry ) )
                     {
-                        int nIdEntry = Integer.parseInt( strIdEntry );
-                        CompleteFormResponseValue editRecordValue = new CompleteFormResponseValue( );
-                        editRecordValue.setIdEntry( nIdEntry );
+                        String[] idEntryNIter = strIdEntry.split( "_" );
 
-                        listCompleteFormResponseValues.add( editRecordValue );
+                        if( idEntryNIter.length == 2 && StringUtils.isNumeric( idEntryNIter[0] ) && StringUtils.isNumeric( idEntryNIter[1] ))
+                        {
+                            CompleteFormResponseValue editRecordValue = new CompleteFormResponseValue( );
+                            editRecordValue.setIdEntry( Integer.parseInt( idEntryNIter[0] ) );
+                            editRecordValue.setIterationNumber( Integer.parseInt( idEntryNIter[1] ) );
+
+                            listCompleteFormResponseValues.add( editRecordValue );
+                        }
                     }
                 }
             }

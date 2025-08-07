@@ -36,8 +36,10 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -45,7 +47,10 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 
+import fr.paris.lutece.plugins.forms.business.FormDisplay;
+import fr.paris.lutece.plugins.forms.business.FormDisplayHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.forms.business.QuestionHome;
@@ -54,6 +59,7 @@ import fr.paris.lutece.plugins.genericattributes.business.Entry;
 import fr.paris.lutece.plugins.genericattributes.business.EntryHome;
 import fr.paris.lutece.plugins.genericattributes.business.Field;
 import fr.paris.lutece.plugins.genericattributes.business.IEntryDAO;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.AbstractCompleteFormResponseValue;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponse;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskConfig;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponseTaskHistory;
@@ -103,11 +109,53 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
     @Override
     public List<Question> findListQuestionUsedCorrectForm( FormResponse formResponse )
     {
-        List<Question> listQuestionForm = QuestionHome.getListQuestionByIdForm( formResponse.getFormId( ) );
-        return listQuestionForm.stream( ).filter( ( Question question ) -> {
+        List<FormDisplay> listFormDisplay = FormDisplayHome.getFormDisplayByForm(formResponse.getFormId() );
+
+        List<Question> listBaseQuestionForm = QuestionHome.getListQuestionByIdForm( formResponse.getFormId( ) );
+        listBaseQuestionForm = listBaseQuestionForm.stream( ).filter( ( Question question ) -> {
             Field fieldUsedCompleteResponse = question.getEntry( ).getFieldByCode( FormsConstants.PARAMETER_USED_COMPLETE_RESPONSE );
             return fieldUsedCompleteResponse != null && Boolean.valueOf( fieldUsedCompleteResponse.getValue( ) );
         } ).collect( Collectors.toList( ) );
+
+        Map<Integer,Integer> idDisplayGroupNIterationMax = new HashMap<>();
+
+        List<FormQuestionResponse> listFormQuestionResponses = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
+
+        for ( FormQuestionResponse questionResponse : listFormQuestionResponses)
+        {
+            FormDisplay formdisplay = listFormDisplay.stream().filter( display -> display.getCompositeId() == questionResponse.getQuestion().getId()).findFirst().orElse( null );
+            if ( formdisplay!=null && formdisplay.getParentId() > 0)
+            {
+                Integer maxValueIter = idDisplayGroupNIterationMax.get( formdisplay.getParentId() );
+                if( maxValueIter==null || maxValueIter<questionResponse.getQuestion().getIterationNumber() )
+                {
+                    idDisplayGroupNIterationMax.put( formdisplay.getParentId() , questionResponse.getQuestion().getIterationNumber() );
+                }
+            }
+        }
+
+        List<Question> listQuestionForm = new ArrayList<>();
+        for( Question question : listBaseQuestionForm)
+        {
+
+            FormDisplay formdisplay = listFormDisplay.stream().filter( display -> display.getCompositeId() == question.getId()).findFirst().orElse( null );
+            if( formdisplay != null && formdisplay.getParentId() > 0 )
+            {
+                int nbIteration = idDisplayGroupNIterationMax.get( formdisplay.getParentId() );
+
+                for( int i =0 ; i<=nbIteration; i++)
+                {
+                    Question copyQuestion = new Question( question );
+                    copyQuestion.setIterationNumber( i );
+                    listQuestionForm.add( copyQuestion );
+                }
+            }
+            else
+            {
+                listQuestionForm.add( question );
+            }
+        }
+        return listQuestionForm;
     }
 
     @Override
@@ -215,11 +263,15 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
     @Override
     public List<Question> getListQuestionToEdit( FormResponse formResponse, List<CompleteFormResponseValue> listEditRecordValues )
     {
-        List<Integer> idEntries = listEditRecordValues.stream( ).map( CompleteFormResponseValue::getIdEntry ).map( EntryHome::findByPrimaryKey )
-                .map( Entry::getIdEntry ).collect( Collectors.toList( ) );
-
         List<Question> listQuestions = findListQuestionUsedCorrectForm( formResponse );
-        return listQuestions.stream( ).filter( question -> idEntries.contains( question.getEntry( ).getIdEntry( ) ) ).collect( Collectors.toList( ) );
+
+
+        return listQuestions.stream().filter(question ->
+                        listEditRecordValues.stream().anyMatch(completeFormResponseValue ->
+                                completeFormResponseValue.getIdEntry() == question.getEntry().getIdEntry()
+                                        && (completeFormResponseValue.getIterationNumber() == AbstractCompleteFormResponseValue.DEFAULT_ITERATION_NUMBER
+                                        || completeFormResponseValue.getIterationNumber() == question.getIterationNumber())))
+                .collect(Collectors.toList());
     }
 
     @Override

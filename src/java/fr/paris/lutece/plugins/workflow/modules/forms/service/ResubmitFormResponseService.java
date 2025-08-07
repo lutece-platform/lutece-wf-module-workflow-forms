@@ -45,6 +45,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 
+import fr.paris.lutece.plugins.workflow.modules.forms.business.AbstractCompleteFormResponseValue;
 import org.apache.commons.collections.CollectionUtils;
 
 import fr.paris.lutece.plugins.forms.business.Form;
@@ -175,7 +176,9 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
 
             if ( formQuestionResponse != null && CollectionUtils.isNotEmpty( formQuestionResponse.getEntryResponse( ) ) )
             {
-                listQuestionWithResponse.add( question );
+                Question copyQuestion = new Question( question );
+                copyQuestion.setIterationNumber( AbstractCompleteFormResponseValue.DEFAULT_ITERATION_NUMBER );
+                listQuestionWithResponse.add( copyQuestion );
             }
         }
         return listQuestionWithResponse;
@@ -259,10 +262,20 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
             Entry entry = EntryHome.findByPrimaryKey( value.getIdEntry( ) );
             listEntries.add( entry );
         }
-        List<Integer> idEntries = listEntries.stream( ).map( Entry::getIdEntry ).collect( Collectors.toList( ) );
-
         List<Question> listQuestions = findListQuestionUsedCorrectForm( formResponse );
-        return listQuestions.stream( ).filter( question -> idEntries.contains( question.getEntry( ).getIdEntry( ) ) ).collect( Collectors.toList( ) );
+
+        List<Question> questionToEdit = new ArrayList<>();
+
+        for (ResubmitFormResponseValue resubmitEditRecordValue : listEditRecordValues) {
+            Question question = listQuestions.stream().filter(questionL -> questionL.getEntry().getIdEntry() == resubmitEditRecordValue.getIdEntry()).findFirst().orElse(null);
+            if (question != null) {
+                Question questionCopy = new Question(question);
+                questionCopy.setIterationNumber(resubmitEditRecordValue.getIterationNumber());
+                questionToEdit.add(questionCopy);
+            }
+        }
+
+        return questionToEdit;
     }
 
     @Override
