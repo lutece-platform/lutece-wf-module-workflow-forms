@@ -92,13 +92,17 @@ public class ResubmitFormResponseTask extends Task
             {
                 for ( String strIdEntry : listIdsEntry )
                 {
-                    if ( StringUtils.isNotBlank( strIdEntry ) && StringUtils.isNumeric( strIdEntry ) )
+                    if ( StringUtils.isNotBlank( strIdEntry ) )
                     {
-                        int nIdEntry = Integer.parseInt( strIdEntry );
-                        ResubmitFormResponseValue editRecordValue = new ResubmitFormResponseValue( );
-                        editRecordValue.setIdEntry( nIdEntry );
+                        String[] idEntryNIter = strIdEntry.split("_");
 
-                        listResubmitFormResponseValues.add( editRecordValue );
+                        if (idEntryNIter.length == 2 && StringUtils.isNumeric(idEntryNIter[0]) && StringUtils.isNumeric(idEntryNIter[1])) {
+                            ResubmitFormResponseValue editRecordValue = new ResubmitFormResponseValue();
+                            editRecordValue.setIdEntry(Integer.parseInt(idEntryNIter[0]));
+                            editRecordValue.setIterationNumber(Integer.parseInt(idEntryNIter[1]));
+
+                            listResubmitFormResponseValues.add(editRecordValue);
+                        }
                     }
                 }
             }
