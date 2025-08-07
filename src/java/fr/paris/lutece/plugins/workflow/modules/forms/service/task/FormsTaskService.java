@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import fr.paris.lutece.plugins.workflow.modules.forms.business.AbstractCompleteFormResponseValue;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -150,11 +151,12 @@ public class FormsTaskService implements IFormsTaskService
         List<String> listFormDisplayTrees = new ArrayList<>( );
 
         List<FormQuestionResponse> listFormQuestionResponse = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
-        List<Integer> listQuestionToDisplayId = listQuestionToDisplay.stream( ).map( Question::getId ).collect( Collectors.toList( ) );
 
-        listFormQuestionResponse = listFormQuestionResponse.stream( )
-                .filter( formQuestionResponse -> listQuestionToDisplayId.contains( formQuestionResponse.getQuestion( ).getId( ) ) )
-                .collect( Collectors.toList( ) );
+        listFormQuestionResponse = listFormQuestionResponse.stream()
+                .filter(formQuestionResponse -> listQuestionToDisplay.stream().anyMatch(questionToDisplay -> formQuestionResponse.getQuestion().getId() == questionToDisplay.getId()
+                        && (formQuestionResponse.getQuestion().getIterationNumber() == questionToDisplay.getIterationNumber()
+                        || questionToDisplay.getIterationNumber() == AbstractCompleteFormResponseValue.DEFAULT_ITERATION_NUMBER)))
+                .collect(Collectors.toList());
 
         for ( FormQuestionResponse formQuestionResponse : listFormQuestionResponse )
         {
@@ -175,7 +177,7 @@ public class FormsTaskService implements IFormsTaskService
             {
                 int nIdStep = step.getId( );
 
-                StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, formResponse, listQuestionToDisplayId );
+                StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, listQuestionToDisplay, formResponse );
                 listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, listFormQuestionResponse, request.getLocale( ), displayType ) );
             }
         }
@@ -189,16 +191,13 @@ public class FormsTaskService implements IFormsTaskService
     {
         List<String> listFormDisplayTrees = new ArrayList<>( );
 
-        List<Integer> listQuestionToDisplayId = listFormQuestionResponse.stream( ).map( FormQuestionResponse::getQuestion ).map( Question::getId )
-                .collect( Collectors.toList( ) );
-
         if ( !CollectionUtils.isEmpty( listStep ) )
         {
             for ( Step step : listStep )
             {
                 int nIdStep = step.getId( );
 
-                StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, formResponse, listQuestionToDisplayId );
+                StepDisplayTree stepDisplayTree = new StepDisplayTree(nIdStep, listQuestionToDisplay, formResponse);
                 listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, listFormQuestionResponse, request.getLocale( ), displayType ) );
             }
         }

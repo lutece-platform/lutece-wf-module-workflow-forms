@@ -46,8 +46,8 @@ import java.util.List;
  */
 public class CompleteFormResponseValueDAO implements ICompleteFormResponseValueDAO
 {
-    private static final String SQL_QUERY_SELECT = " SELECT id_history, id_entry FROM workflow_task_complete_response_value WHERE id_history = ? ";
-    private static final String SQL_QUERY_INSERT = " INSERT INTO workflow_task_complete_response_value (id_history, id_entry ) VALUES ( ?,? ) ";
+    private static final String SQL_QUERY_SELECT = " SELECT id_history, id_entry, iteration_number FROM workflow_task_complete_response_value WHERE id_history = ? ";
+    private static final String SQL_QUERY_INSERT = " INSERT INTO workflow_task_complete_response_value (id_history, id_entry, iteration_number ) VALUES ( ?,?,? ) ";
     private static final String SQL_QUERY_DELETE = " DELETE FROM workflow_task_complete_response_value WHERE id_history = ? ";
 
     /**
@@ -62,6 +62,7 @@ public class CompleteFormResponseValueDAO implements ICompleteFormResponseValueD
         {
             daoUtil.setInt( nIndex++, completeFormResponseValue.getIdHistory( ) );
             daoUtil.setInt( nIndex++, completeFormResponseValue.getIdEntry( ) );
+            daoUtil.setInt( nIndex++, completeFormResponseValue.getIterationNumber( ) );
 
             daoUtil.executeUpdate( );
         }
@@ -88,6 +89,7 @@ public class CompleteFormResponseValueDAO implements ICompleteFormResponseValueD
                 CompleteFormResponseValue completeFormResponseValue = new CompleteFormResponseValue( );
                 completeFormResponseValue.setIdHistory( daoUtil.getInt( nIndex++ ) );
                 completeFormResponseValue.setIdEntry( daoUtil.getInt( nIndex++ ) );
+                completeFormResponseValue.setIterationNumber( daoUtil.getInt( nIndex++ ) );
 
                 listCompleteFormResponseValues.add( completeFormResponseValue );
             }

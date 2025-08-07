@@ -46,8 +46,8 @@ import java.util.List;
  */
 public class ResubmitFormResponseValueDAO implements IResubmitFormResponseValueDAO
 {
-    private static final String SQL_QUERY_SELECT = " SELECT id_history, id_entry FROM workflow_task_resubmit_response_value WHERE id_history = ? ";
-    private static final String SQL_QUERY_INSERT = " INSERT INTO workflow_task_resubmit_response_value (id_history, id_entry ) VALUES ( ?,? ) ";
+    private static final String SQL_QUERY_SELECT = " SELECT id_history, id_entry, iteration_number FROM workflow_task_resubmit_response_value WHERE id_history = ? ";
+    private static final String SQL_QUERY_INSERT = " INSERT INTO workflow_task_resubmit_response_value (id_history, id_entry, iteration_number ) VALUES ( ?,?,? ) ";
     private static final String SQL_QUERY_DELETE = " DELETE FROM workflow_task_resubmit_response_value WHERE id_history = ? ";
 
     /**
@@ -62,6 +62,7 @@ public class ResubmitFormResponseValueDAO implements IResubmitFormResponseValueD
         {
             daoUtil.setInt( nIndex++, resubmitFormResponseValue.getIdHistory( ) );
             daoUtil.setInt( nIndex++, resubmitFormResponseValue.getIdEntry( ) );
+            daoUtil.setInt( nIndex++, resubmitFormResponseValue.getIterationNumber( ) );
 
             daoUtil.executeUpdate( );
         }
@@ -88,6 +89,7 @@ public class ResubmitFormResponseValueDAO implements IResubmitFormResponseValueD
                 ResubmitFormResponseValue resubmitFormResponseValue = new ResubmitFormResponseValue( );
                 resubmitFormResponseValue.setIdHistory( daoUtil.getInt( nIndex++ ) );
                 resubmitFormResponseValue.setIdEntry( daoUtil.getInt( nIndex++ ) );
+                resubmitFormResponseValue.setIterationNumber( daoUtil.getInt( nIndex++ ) );
 
                 listResubmitFormResponseValues.add( resubmitFormResponseValue );
             }

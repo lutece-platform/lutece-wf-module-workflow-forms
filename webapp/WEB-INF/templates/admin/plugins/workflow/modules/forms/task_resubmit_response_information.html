@@ -8,20 +8,27 @@
 	    	<@alert color='warning'>#i18n{module.workflow.forms.task_resubmit_response_information.label_not_completed}</@alert>
 		</#if>
 	</#if>
-    <#if list_entries?exists && list_entries?has_content>
-    	<p>#i18n{module.workflow.forms.task_resubmit_response_information.label_list_entries}</p>
-	    <#list list_entries as entry>
-	   		<b>${entry.title}</b>
-	   		<#if list_history?exists && list_history?has_content>
-		   		<#list list_history as history>
-		   			<#if history.question.idEntry==entry.idEntry>
-		   				${history.previousValue}<@icon style='arrow-right' />${history.newValue}
-		   			</#if>
-		   		</#list>
-	   		</#if>
-	   		<#if entry_has_next>
-	   			<br />
-	   		</#if>
+    <#if edit_response.listResubmitReponseValues?exists && edit_response.listResubmitReponseValues?has_content>
+		<p>#i18n{module.workflow.forms.task_resubmit_response_information.label_list_entries}</p>
+		<#list edit_response.listResubmitReponseValues as reponseValues>
+			<#if list_entries?exists && list_entries?has_content>
+				<#list list_entries as entry>
+					<#if reponseValues.idEntry==entry.idEntry>
+						<b>${entry.title} <#if reponseValues.iterationNumber &gt; 0>(${reponseValues.iterationNumber+1})</#if></b>
+						<#if list_history?exists && list_history?has_content>
+							<#list list_history as history>
+								<#if history.question.idEntry==reponseValues.idEntry && history.question.iterationNumber==reponseValues.iterationNumber >
+									${history.previousValue}<@icon style='arrow-right' />${history.newValue}
+								</#if>
+							</#list>
+						</#if>
+						<#if reponseValues_has_next>
+							<br />
+						</#if>
+						<#break>
+					</#if>
+				</#list>
+			</#if>
 		</#list>
     </#if>
 </#if>
