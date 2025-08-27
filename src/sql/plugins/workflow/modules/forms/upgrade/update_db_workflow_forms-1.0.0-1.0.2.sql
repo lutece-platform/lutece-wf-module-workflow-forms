@@ -1,6 +1,6 @@
---liquibase formatted sql
---changeset workflow-forms:update_db_workflow_forms-1.0.0-1.0.2.sql
---preconditions onFail:MARK_RAN onError:WARN
+-- liquibase formatted sql
+-- changeset workflow-forms:update_db_workflow_forms-1.0.0-1.0.2.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 DROP TABLE IF EXISTS workflow_task_resubmit_response;
 CREATE TABLE workflow_task_resubmit_response (
   id_history INT DEFAULT 0 NOT NULL,
