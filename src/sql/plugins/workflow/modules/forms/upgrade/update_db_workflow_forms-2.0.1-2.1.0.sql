@@ -1,6 +1,6 @@
---liquibase formatted sql
---changeset workflow-forms:update_db_workflow_forms-2.0.1-2.1.0.sql
---preconditions onFail:MARK_RAN onError:WARN
+-- liquibase formatted sql
+-- changeset workflow-forms:update_db_workflow_forms-2.0.1-2.1.0.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 DROP TABLE IF EXISTS workflow_state_controller_form_response_value;
 CREATE TABLE workflow_state_controller_form_response_value
 (

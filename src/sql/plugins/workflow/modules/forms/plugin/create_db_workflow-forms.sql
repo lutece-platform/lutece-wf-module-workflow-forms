@@ -1,6 +1,6 @@
---liquibase formatted sql
---changeset workflow-forms:create_db_workflow-forms.sql
---preconditions onFail:MARK_RAN onError:WARN
+-- liquibase formatted sql
+-- changeset workflow-forms:create_db_workflow-forms.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 --
 -- ADD  TABLE workflow_task_forms_editresponse_history to record changements about the forms workflow
 --

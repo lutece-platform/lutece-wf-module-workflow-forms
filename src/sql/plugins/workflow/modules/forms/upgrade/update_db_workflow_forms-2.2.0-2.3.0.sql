@@ -1,6 +1,6 @@
---liquibase formatted sql
---changeset workflow-forms:update_db_workflow_forms-2.2.0-2.3.0.sql
---preconditions onFail:MARK_RAN onError:WARN
+-- liquibase formatted sql
+-- changeset workflow-forms:update_db_workflow_forms-2.2.0-2.3.0.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 ALTER TABLE workflow_task_editformresponse_config ADD COLUMN is_multiform SMALLINT DEFAULT 0 NOT NULL;
 
 ALTER TABLE workflow_task_editformresponse_config_value ADD COLUMN code VARCHAR(100);
