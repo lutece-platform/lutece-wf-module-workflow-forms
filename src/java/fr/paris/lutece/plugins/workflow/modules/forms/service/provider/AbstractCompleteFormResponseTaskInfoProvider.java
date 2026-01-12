@@ -40,6 +40,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.workflow.modules.forms.service.signrequest.ResubmitFormResponseRequestAuthenticatorService;
@@ -51,7 +53,6 @@ import fr.paris.lutece.portal.service.content.XPageAppService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.url.UrlItem;
-import net.sf.json.JSONObject;
 
 public abstract class AbstractCompleteFormResponseTaskInfoProvider extends AbstractTaskInfoProvider
 {
@@ -82,7 +83,9 @@ public abstract class AbstractCompleteFormResponseTaskInfoProvider extends Abstr
     @Override
     public String getTaskResourceInfo( int nIdHistory, int nIdTask, HttpServletRequest request )
     {
-        JSONObject jsonInfos = new JSONObject( );
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode jsonInfos = mapper.createObjectNode();
+
         String strInfoUrl = StringUtils.EMPTY;
 
         ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdHistory );
@@ -115,9 +118,9 @@ public abstract class AbstractCompleteFormResponseTaskInfoProvider extends Abstr
         String strInfoEntries = getInfoEntries( nIdHistory );
 
         String strInfoMsg = getInfoMessage( nIdHistory, nIdTask );
-        jsonInfos.accumulate( getMarkUrl( ), strInfoUrl );
-        jsonInfos.accumulate( getMarkMsg( ), strInfoMsg );
-        jsonInfos.accumulate( getMarkEntries( ), strInfoEntries );
+        jsonInfos.put(getMarkUrl(), strInfoUrl);
+        jsonInfos.put(getMarkMsg(), strInfoMsg);
+        jsonInfos.put(getMarkEntries(), strInfoEntries);
 
         return jsonInfos.toString( );
     }
