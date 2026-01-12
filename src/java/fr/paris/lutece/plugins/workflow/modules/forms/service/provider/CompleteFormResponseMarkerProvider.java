@@ -42,13 +42,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.paris.lutece.plugins.workflow.service.taskinfo.ITaskInfoProvider;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.service.provider.IMarkerProvider;
 import fr.paris.lutece.plugins.workflowcore.service.provider.InfoMarker;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
-import net.sf.json.JSONObject;
+import fr.paris.lutece.portal.service.util.AppLogService;
 
 /**
  * This class represents a NotifyGru marker provider for the Resubmit Form task
@@ -121,22 +124,30 @@ public class CompleteFormResponseMarkerProvider implements IMarkerProvider
             {
                 String strJsonInfos = _completeFormResponseTaskInfoProvider.getTaskResourceInfo( resourceHistory.getId( ), taskOther.getId( ), request );
 
-                JSONObject jsonInfos = JSONObject.fromObject( strJsonInfos );
-                String strUrl = jsonInfos.getString( CompleteFormResponseTaskInfoProvider.MARK_COMPLETE_FORM_URL );
-                String strMsg = jsonInfos.getString( CompleteFormResponseTaskInfoProvider.MARK_COMPLETE_FORM_MESSAGE );
-                String strEntries = jsonInfos.getString( CompleteFormResponseTaskInfoProvider.MARK_COMPLETE_FORM_ENTRIES );
+                ObjectMapper mapper = new ObjectMapper();
+                try {
+                    JsonNode jsonInfos = mapper.readTree(strJsonInfos);
 
-                InfoMarker notifyGruMarkerUrl = new InfoMarker( CompleteFormResponseTaskInfoProvider.MARK_COMPLETE_FORM_URL );
-                notifyGruMarkerUrl.setValue( strUrl );
-                listMarkers.add( notifyGruMarkerUrl );
+                    String strUrl = jsonInfos.get( CompleteFormResponseTaskInfoProvider.MARK_COMPLETE_FORM_URL ).asText();
+                    String strMsg = jsonInfos.get( CompleteFormResponseTaskInfoProvider.MARK_COMPLETE_FORM_MESSAGE ).asText();
+                    String strEntries = jsonInfos.get( CompleteFormResponseTaskInfoProvider.MARK_COMPLETE_FORM_ENTRIES ).asText();
 
-                InfoMarker notifyGruMarkerMsg = new InfoMarker( CompleteFormResponseTaskInfoProvider.MARK_COMPLETE_FORM_MESSAGE );
-                notifyGruMarkerMsg.setValue( strMsg );
-                listMarkers.add( notifyGruMarkerMsg );
+                    InfoMarker notifyGruMarkerUrl = new InfoMarker( CompleteFormResponseTaskInfoProvider.MARK_COMPLETE_FORM_URL );
+                    notifyGruMarkerUrl.setValue( strUrl );
+                    listMarkers.add( notifyGruMarkerUrl );
 
-                InfoMarker notifyGruMarkerEntries = new InfoMarker( CompleteFormResponseTaskInfoProvider.MARK_COMPLETE_FORM_ENTRIES );
-                notifyGruMarkerEntries.setValue( strEntries );
-                listMarkers.add( notifyGruMarkerEntries );
+                    InfoMarker notifyGruMarkerMsg = new InfoMarker( CompleteFormResponseTaskInfoProvider.MARK_COMPLETE_FORM_MESSAGE );
+                    notifyGruMarkerMsg.setValue( strMsg );
+                    listMarkers.add( notifyGruMarkerMsg );
+
+                    InfoMarker notifyGruMarkerEntries = new InfoMarker( CompleteFormResponseTaskInfoProvider.MARK_COMPLETE_FORM_ENTRIES );
+                    notifyGruMarkerEntries.setValue( strEntries );
+                    listMarkers.add( notifyGruMarkerEntries );
+                }
+                catch (JsonProcessingException e)
+                {
+                    AppLogService.error( e.getMessage( ) );
+                }
 
                 break;
             }

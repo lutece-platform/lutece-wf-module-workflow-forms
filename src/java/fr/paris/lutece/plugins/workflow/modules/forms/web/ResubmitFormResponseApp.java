@@ -63,7 +63,6 @@ import fr.paris.lutece.portal.web.constants.Messages;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.signrequest.AbstractPrivateKeyAuthenticator;
-import io.jsonwebtoken.lang.Collections;
 
 public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFormResponse>
 {
@@ -158,7 +157,7 @@ public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFor
         // Get the List of Responses the user previously tried to submit
         List<FormQuestionResponse> formQuestionResponseList = _resubmitFormResponseService.getSubmittedFormResponseList( );
         // If the List is empty, then it is likely the first submission attempt
-        if ( Collections.isEmpty( formQuestionResponseList ) )
+        if ( formQuestionResponseList==null || formQuestionResponseList.isEmpty() )
         {
             listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse,
                     DisplayType.RESUBMIT_FRONTOFFICE );
