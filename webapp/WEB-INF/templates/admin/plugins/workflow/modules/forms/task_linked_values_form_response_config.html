@@ -21,7 +21,7 @@
 		<@td>${(value.questionSourceValue)!}</@td>
 		<@td>${(questionTargetLabel)!}</@td>
 		<@td>${(value.questionTargetValue)!}</@td>
-		<@td><@button id="btnRemove" type='submit' buttonIcon='trash' name='apply' value='remove_rule' params='onclick="$(\'#id_config_value\').val(${value.idConfigValue});"' color='danger' size='sm' /></@td>
+		<@td><@button id="btnRemove" type='submit' buttonIcon='trash' name='apply' value='remove_rule' params='onclick="document.getElementById(\'id_config_value\').value = ${value.idConfigValue};"' color='danger' size='sm' /></@td>
 	</@tr>
 	</#list>
 	<#else>
@@ -95,49 +95,45 @@
     </@modalFooter>
 </@modal>
 <script>
-$(function(){
-	//Load
-	$('.question').hide();
-	$('.answer-choice-source').hide();
-	$('.answer-choice-target').hide();
-	$('.form-' + $('#idForm').val()).show();
-	
-	//On change
-	$('#idForm').change(function(){
-		var value = $(this).val();
- 		$('.question').hide();
-		$('.form-' + value).show();		
+	document.addEventListener('DOMContentLoaded', function() {
+	    document.querySelectorAll('.question').forEach(el => el.style.display = 'none');
+	    document.querySelectorAll('.answer-choice-source').forEach(el => el.style.display = 'none');
+	    document.querySelectorAll('.answer-choice-target').forEach(el => el.style.display = 'none');
+	    document.querySelectorAll('.form-' + document.getElementById('idForm').value).forEach(el => el.style.display = 'block');
+
+	    document.getElementById('idForm').addEventListener('change', function() {
+	        var value = this.value;
+	        document.querySelectorAll('.question').forEach(el => el.style.display = 'none');
+	        document.querySelectorAll('.form-' + value).forEach(el => el.style.display = 'block');
+	    });
+
+	    document.getElementById('idQuestionSource').addEventListener('change', function() {
+	        var value = this.value;
+	        document.querySelectorAll('.answer-choice-source').forEach(el => el.style.display = 'none');
+	        document.querySelectorAll('.question-source-' + value).forEach(el => el.style.display = 'block');
+	    });
+
+	    document.getElementById('idQuestionTarget').addEventListener('change', function() {
+	        var value = this.value;
+	        document.querySelectorAll('.answer-choice-target').forEach(el => el.style.display = 'none');
+	        document.querySelectorAll('.question-target-' + value).forEach(el => el.style.display = 'block');
+	    });
+
+	    document.getElementById('btnModal').addEventListener('click', function() {
+	        setRequiredAttribut(true);
+	    });
+	    document.getElementById('btnRemove').addEventListener('click', function() {
+	        setRequiredAttribut(false);
+	    });
 	});
 	
-	$('#idQuestionSource').change(function(){
-		var value = $(this).val();
- 		$('.answer-choice-source').hide();
-		$('.question-source-' + value).show();		
-	});
-	
-	$('#idQuestionTarget').change(function(){
-		var value = $(this).val();
- 		$('.answer-choice-target').hide();
-		$('.question-target-' + value).show();		
-	});
-	
-	
-	//Add required attribut
-	$('#btnModal').click(function(){
-		setRequiredAttribut( true );
-	});
-	$('#btnRemove').click(function(){
-		setRequiredAttribut( false );
-	});
-	
-	function setRequiredAttribut( value ){
-		$('#idForm').prop('required', value);
-		$('#idQuestionSource').attr('required', value);
-		$('#questionSourceValue').prop('required', value);
-		$('#idQuestionTarget').prop('required', value);
-		$('#questionTargerValue').prop('required', value);	
+	function setRequiredAttribut(value) {
+	    document.getElementById('idForm').required = value;
+	    document.getElementById('idQuestionSource').required = value;
+	    document.getElementById('questionSourceValue').required = value;
+	    document.getElementById('idQuestionTarget').required = value;
+	    document.getElementById('questionTargetValue').required = value;
 	}
-});
 </script>
 
 <#function getLabelQuestion id>
