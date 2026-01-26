@@ -392,8 +392,11 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
                 break;
             case ACTION_SELECT_QUESTION:
                 _configValue.setQuestion( QuestionHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_QUESTION ) ) ) );
-                _config.addConfigValue( _configValue );
-                _configValue = new EditFormResponseConfigValue( );
+                if ( _configValue.getQuestion( ) != null )
+                {
+                	_config.addConfigValue( _configValue );
+                	_configValue = new EditFormResponseConfigValue( );
+                }
                 break;
             case ACTION_SELECT_CODE:
                 _configValue = new EditFormResponseConfigValue( );
