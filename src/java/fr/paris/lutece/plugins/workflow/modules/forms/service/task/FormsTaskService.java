@@ -399,7 +399,7 @@ public class FormsTaskService implements IFormsTaskService
         for ( Question question : listQuestions )
         {
             IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
-            FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, false );
+            FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, true );
             responseFromForm.setIdFormResponse( formResponse.getId( ) );
             submittedFormResponses.add( responseFromForm );
         }
@@ -430,6 +430,16 @@ public class FormsTaskService implements IFormsTaskService
      */
     private boolean isResponseValid( FormQuestionResponse formQuestionResponse )
     {
+
+        for ( Response response : formQuestionResponse.getEntryResponse() )
+        {
+            if ( response.getEntry()!=null && response.getEntry().getError()!=null )
+            {
+                formQuestionResponse.setError( response.getEntry().getError() );
+                return false;
+            }
+        }
+
         // Get the list of controls created for this question's validation process
         List<Control> listControl = ControlHome.getControlByQuestionAndType( formQuestionResponse.getQuestion( ).getId( ),
                 ControlType.VALIDATION.getLabel( ) );
