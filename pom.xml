@@ -10,7 +10,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>module-workflow-forms</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>2.3.5-SNAPSHOT</version>
+    <version>2.3.5-beta-02</version>
 
     <name>Lutece workflow forms module</name>
 
@@ -70,6 +70,6 @@
         <connection>scm:git:https://github.com/lutece-platform/lutece-wf-module-workflow-forms.git</connection>
         <developerConnection>scm:git:https://github.com/lutece-platform/lutece-wf-module-workflow-forms.git</developerConnection>
         <url>https://github.com/lutece-platform/lutece-wf-module-workflow-forms.git</url>
-        <tag>HEAD</tag>
+        <tag>module-workflow-forms-2.3.5-beta-02</tag>
     </scm>
 </project>
