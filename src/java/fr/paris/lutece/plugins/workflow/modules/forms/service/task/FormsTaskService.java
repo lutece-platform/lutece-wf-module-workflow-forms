@@ -338,7 +338,8 @@ public class FormsTaskService implements IFormsTaskService
     {
         if ( StringUtils.isNotBlank( strUrlReturn ) )
         {
-            SiteMessageService.setMessage( request, strMessage, nTypeMessage, strUrlReturn );
+            SiteMessageService.setMessage( request, strMessage, null, null, null,
+                null, nTypeMessage, null, strUrlReturn );
         }
         else
         {
