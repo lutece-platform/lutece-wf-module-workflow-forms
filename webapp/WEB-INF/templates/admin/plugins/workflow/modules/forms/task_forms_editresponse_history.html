@@ -1,28 +1,29 @@
-<label>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.information.title} :</label>
-<br/>
+<@h level=2>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.information.title} :</@h>
 <#if list_responses?? && list_responses?has_content>
+<@ul>
 	<#list list_responses as response>
 		<#if response?? && response?has_content>
+			<@li>
 			<#if response.question?? && response.question?has_content>
-				<b>${response.question.title}</b> :  
+				<strong>${response.question.title}</strong> :  
 				<#if response.previousValue?? && response.previousValue?has_content && response.previousValue!="">
 					${response.previousValue}
 				<#else>
-					<i>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.empty}</i>
+					<em>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.empty}</em>
 				</#if>
 				<@icon style='arrow-right' />
 				<#if response.newValue?? && response.newValue?has_content && response.newValue!="">
-					${response.newValue}
+					<em>${response.newValue}</em>
 				<#else>
-					<i>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.empty}</i>
+					<em>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.empty}</em>
 				</#if>
-				<br/>
 			<#else>
-				<i>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.questionDeleted}</i>
-				<br/>
+				<em>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.questionDeleted}</em>
 			</#if>
+			</@li>
 		</#if>
 	</#list>
+</@ul>
 <#else>
-	<i>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.noModification}</i>
+	<@empty title='#i18n{module.workflow.forms.task.editFormResponseTaskHistory.noModification}' />
 </#if>

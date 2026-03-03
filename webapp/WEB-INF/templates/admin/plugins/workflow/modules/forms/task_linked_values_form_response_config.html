@@ -1,162 +1,131 @@
 <!-- Liste recap -->
 <@input type='hidden' id='id_config_value' name='id_config_value' />
-<@aButton id="btnModal" class="d-inline" title='#i18n{module.workflow.forms.task_linked_values_form_response_config.add_rule}' buttonIcon='plus' size='sm' params='data-toggle="modal" data-target="#modalRule" ' hideTitle=['xs','sm'] />
-
-<@table>
-	<@tr>
-		<@th> #i18n{module.workflow.forms.task_linked_values_form_response_config.form.label} </@th>
-		<@th> #i18n{module.workflow.forms.task_linked_values_form_response_config.source.question.label}</@th>
-		<@th> #i18n{module.workflow.forms.task_linked_values_form_response_config.source.value.label} </@th>
-		<@th> #i18n{module.workflow.forms.task_linked_values_form_response_config.target.question.label}</@th>
-		<@th> #i18n{module.workflow.forms.task_linked_values_form_response_config.target.value.label} </@th>
-		<@th> #i18n{module.workflow.forms.task_linked_values_form_response_config.action.label}</@th>
-	</@tr>
-	<#if config?? && config.listConfigValues??>
+<@row>
+	<@columns class='d-flex justify-content-between align-items-center'>
+		<@h level=2>#i18n{module.workflow.forms.task_linked_values_form_response_config.title}</@h>
+		<@offcanvas id='offcanvasRule' position='end' size='half' title='#i18n{module.workflow.forms.task_linked_values_form_response_config.title.modal}' btnTitle='#i18n{module.workflow.forms.task_linked_values_form_response_config.add_rule}' btnIcon='plus' hideTitle=['xs','sm']>
+			<@formGroup labelFor='id_form' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.form.label}' mandatory=true>
+				<@select name='id_form' id="idForm" items=forms default_value='${(config.idForm)!}' />
+			</@formGroup>
+			<@formGroup labelFor='idQuestionSource' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.source.question.label}' mandatory=true>
+				<@select id='idQuestionSource' name='id_question_source'>
+					<@option label='' value='' />
+					<#list questions?keys as key >
+						<#list questions[key] as question>
+							<@option class='question form-${key}' value='${(question.id!)}' label='${(question.step.title!)}/${(question.title!)}' />
+						</#list>
+					</#list>
+				</@select>
+			</@formGroup>
+			<@formGroup labelFor='questionSourceValue' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.source.value.label}' mandatory=true>
+				<@select id='questionSourceValue' name='question_source_value'>
+					<@option label='' value='' />
+					<#list questions?keys as key >
+						<#list questions[key] as question>
+							<#list question.entry.fields as field>
+								<#if field.code == 'answer_choice'>
+									<@option class='answer-choice-source question-source-${(question.id!)}' value='${(field.value!)}' label='${(field.value!)}' />
+								</#if>
+							</#list>
+						</#list>
+					</#list>
+				</@select>
+			</@formGroup>
+			<@formGroup labelFor='idQuestionTarget' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.target.question.label}' mandatory=true>
+				<@select id='idQuestionTarget' name='id_question_target'>
+					<@option label='' value='' />
+					<#list questions?keys as key >
+						<#list questions[key] as question>
+							<@option class='question form-${key}' value='${(question.id!)}' label='${(question.step.title!)}/${(question.title!)}' />
+						</#list>
+					</#list>
+				</@select>
+			</@formGroup>
+			<@formGroup labelFor='questionTargetValue' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.target.value.label}' mandatory=true>
+				<@select id='questionTargetValue' name='question_target_value'>
+					<@option label='' value='' />
+					<#list questions?keys as key >
+						<#list questions[key] as question>
+							<#list question.entry.fields as field>
+								<#if field.code == 'answer_choice'>
+									<@option class='answer-choice-target question-target-${(question.id!)}' value='${(field.value!)}' label='${(field.value!)}' />
+								</#if>
+							</#list>
+						</#list>
+					</#list>
+				</@select>
+			</@formGroup>
+			<@formGroup>
+				<@button type='submit' name="apply" value='add_rule' title="#i18n{module.workflow.forms.task_linked_values_form_response_config.save_rule}"/>
+			</@formGroup>
+		</@offcanvas>
+	</@columns>
+</@row>	
+<#if config?? && config.listConfigValues?? && config.listConfigValues?size gt 0>
+	<@manageFeature>
 	<#list config.listConfigValues as value>
-	<@tr>
-		<#assign questionSourceLabel = getLabelQuestion(value.idQuestionSource)/>
-		<#assign questionTargetLabel = getLabelQuestion(value.idQuestionTarget)/>	
-		<@td><@labelForm id=value.idForm?string /></@td>
-		<@td>${(questionSourceLabel)!}</@td>
-		<@td>${(value.questionSourceValue)!}</@td>
-		<@td>${(questionTargetLabel)!}</@td>
-		<@td>${(value.questionTargetValue)!}</@td>
-		<@td><@button id="btnRemove" type='submit' buttonIcon='trash' name='apply' value='remove_rule' params='onclick="document.getElementById(\'id_config_value\').value = ${value.idConfigValue};"' color='danger' size='sm' /></@td>
-	</@tr>
+		<@manageFeatureItem>
+			<#assign questionSourceLabel = getLabelQuestion(value.idQuestionSource)/>
+			<#assign questionTargetLabel = getLabelQuestion(value.idQuestionTarget)/>	
+			<@manageFeatureItemColumn> #i18n{module.workflow.forms.task_linked_values_form_response_config.form.label} : <@labelForm id=value.idForm?string /></@manageFeatureItemColumn>
+			<@manageFeatureItemColumn>#i18n{module.workflow.forms.task_linked_values_form_response_config.source.question.label} : ${(questionSourceLabel)!}</@manageFeatureItemColumn>
+			<@manageFeatureItemColumn>#i18n{module.workflow.forms.task_linked_values_form_response_config.source.value.label} : ${(value.questionSourceValue)!}</@manageFeatureItemColumn>
+			<@manageFeatureItemColumn>#i18n{module.workflow.forms.task_linked_values_form_response_config.target.question.label} : ${(questionTargetLabel)!}</@manageFeatureItemColumn>
+			<@manageFeatureItemColumn>#i18n{module.workflow.forms.task_linked_values_form_response_config.target.value.label} : ${(value.questionTargetValue)!}</@manageFeatureItemColumn>
+			<@manageFeatureItemColumn align='end'>
+				<@button id='btnRemove' type='submit' buttonIcon='trash' name='apply' value='remove_rule' params='onclick="document.getElementById(\'id_config_value\').value = ${value.idConfigValue};"' color='danger'  />
+			</@manageFeatureItemColumn>
+		</@manageFeatureItem>
 	</#list>
-	<#else>
-		<@tr><@td>#i18n{module.workflow.forms.task_linked_values_form_response_config.no_rule}</@td></@tr>
-	</#if>
-</@table>
-
-<!-- Modal -->
-<@modal  id='modalRule' size='lg'>
-    <@modalHeader modalTitle='#i18n{module.workflow.forms.task_linked_values_form_response_config.title.modal}' titleLevel='h4'/>
-    <@modalBody>
-		<!-- Source  -->
-		<@formGroup labelFor='id_form' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.form.label}' mandatory=true>	
-			<@select name='id_form' id="idForm" items=forms default_value='${(config.idForm)!}' />
-		</@formGroup>
-		
-		<@formGroup labelFor='idQuestionSource' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.source.question.label}' mandatory=true>
-			<select id="idQuestionSource" name="id_question_source" class="form-select">
-				<option></option>
-				<#list questions?keys as key >
-					<#list questions[key] as question>
-						<option class="question form-${key}" value="${(question.id!)}">${(question.step.title!)}/${(question.title!)}</option>
-					</#list>
-				</#list>
-			</select>
-		</@formGroup>
-		
-		<@formGroup labelFor='questionSourceValue' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.source.value.label}' mandatory=true>
-			<select id="questionSourceValue" name="question_source_value" class="form-select">
-				<option></option>
-				<#list questions?keys as key >
-					<#list questions[key] as question>
-						<#list question.entry.fields as field>
-							<#if field.code == 'answer_choice'>
-								<option class="answer-choice-source question-source-${(question.id!)}" value="${(field.value!)}">${(field.value!)}</option>
-							</#if>
-						</#list>
-					</#list>
-				</#list>
-			</select>
-		</@formGroup>
-		
-		<@formGroup labelFor='idQuestionTarget' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.target.question.label}' mandatory=true>
-			<select id="idQuestionTarget" name="id_question_target" class="form-select">
-				<option></option>
-				<#list questions?keys as key >
-					<#list questions[key] as question>
-						<option class="question form-${key}" value="${(question.id!)}">${(question.step.title!)}/${(question.title!)}</option>
-					</#list>
-				</#list>
-			</select>
-		</@formGroup>
-		
-		<@formGroup labelFor='questionTargetValue' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.target.value.label}' mandatory=true>
-			<select  id="questionTargetValue" name="question_target_value" class="form-select">
-				<option></option>
-				<#list questions?keys as key >
-					<#list questions[key] as question>
-						<#list question.entry.fields as field>
-							<#if field.code == 'answer_choice'>
-								<option class="answer-choice-target question-target-${(question.id!)}" value="${(field.value!)}">${(field.value!)}</option>
-							</#if>
-						</#list>
-					</#list>
-				</#list>
-			</select>
-		</@formGroup>			
-	</@modalBody>
-    <@modalFooter> 
-    	<@button type='submit' name="apply" value='add_rule' title="#i18n{module.workflow.forms.task_linked_values_form_response_config.save_rule}"/>
-    </@modalFooter>
-</@modal>
+	</@manageFeature>
+<#else>
+	<@empty title='#i18n{module.workflow.forms.task_linked_values_form_response_config.no_rule}' subTitle='#i18n{module.workflow.forms.task_linked_values_form_response_config.add_rule}' />
+</#if>
 <script>
-	document.addEventListener('DOMContentLoaded', function() {
-	    document.querySelectorAll('.question').forEach(el => el.style.display = 'none');
-	    document.querySelectorAll('.answer-choice-source').forEach(el => el.style.display = 'none');
-	    document.querySelectorAll('.answer-choice-target').forEach(el => el.style.display = 'none');
-	    document.querySelectorAll('.form-' + document.getElementById('idForm').value).forEach(el => el.style.display = 'block');
+document.addEventListener('DOMContentLoaded', function() {
+	document.querySelectorAll('.question').forEach(el => el.style.display = 'none');
+	document.querySelectorAll('.answer-choice-source').forEach(el => el.style.display = 'none');
+	document.querySelectorAll('.answer-choice-target').forEach(el => el.style.display = 'none');
+	document.querySelectorAll('.form-' + document.getElementById('idForm').value).forEach(el => el.style.display = 'block');
 
-	    document.getElementById('idForm').addEventListener('change', function() {
-	        var value = this.value;
-	        document.querySelectorAll('.question').forEach(el => el.style.display = 'none');
-	        document.querySelectorAll('.form-' + value).forEach(el => el.style.display = 'block');
-	    });
-
-	    document.getElementById('idQuestionSource').addEventListener('change', function() {
-	        var value = this.value;
-	        document.querySelectorAll('.answer-choice-source').forEach(el => el.style.display = 'none');
-	        document.querySelectorAll('.question-source-' + value).forEach(el => el.style.display = 'block');
-	    });
-
-	    document.getElementById('idQuestionTarget').addEventListener('change', function() {
-	        var value = this.value;
-	        document.querySelectorAll('.answer-choice-target').forEach(el => el.style.display = 'none');
-	        document.querySelectorAll('.question-target-' + value).forEach(el => el.style.display = 'block');
-	    });
-
-	    document.getElementById('btnModal').addEventListener('click', function() {
-	        setRequiredAttribut(true);
-	    });
-	    document.getElementById('btnRemove').addEventListener('click', function() {
-	        setRequiredAttribut(false);
-	    });
+	document.getElementById('idForm').addEventListener('change', function() {
+		var value = this.value;
+		document.querySelectorAll('.question').forEach(el => el.style.display = 'none');
+		document.querySelectorAll('.form-' + value).forEach(el => el.style.display = 'block');
 	});
-	
-	function setRequiredAttribut(value) {
-	    document.getElementById('idForm').required = value;
-	    document.getElementById('idQuestionSource').required = value;
-	    document.getElementById('questionSourceValue').required = value;
-	    document.getElementById('idQuestionTarget').required = value;
-	    document.getElementById('questionTargetValue').required = value;
-	}
+
+	document.getElementById('idQuestionSource').addEventListener('change', function() {
+		var value = this.value;
+		document.querySelectorAll('.answer-choice-source').forEach(el => el.style.display = 'none');
+		document.querySelectorAll('.question-source-' + value).forEach(el => el.style.display = 'block');
+	});
+
+	document.getElementById('idQuestionTarget').addEventListener('change', function() {
+		var value = this.value;
+		document.querySelectorAll('.answer-choice-target').forEach(el => el.style.display = 'none');
+		document.querySelectorAll('.question-target-' + value).forEach(el => el.style.display = 'block');
+	});
+
+	document.getElementById('btn-offcanvasRule').addEventListener('click', function() {
+		setRequiredAttribut(true);
+	});
+	document.getElementById('btnRemove').addEventListener('click', function() {
+		setRequiredAttribut(false);
+	});
+});
+
+function setRequiredAttribut(value) {
+	document.getElementById('idForm').required = value;
+	document.getElementById('idQuestionSource').required = value;
+	document.getElementById('questionSourceValue').required = value;
+	document.getElementById('idQuestionTarget').required = value;
+	document.getElementById('questionTargetValue').required = value;
+}
 </script>
-
 <#function getLabelQuestion id>
-	<#if id?? && questions??>
-		<#list questions?keys as key >
-			<#if questions[key]??>
-				<#list questions[key] as question>
-					<#if question?? && question.id?? && question.title?? && question.id == id>
-						<#return question.title>
-					</#if>
-				</#list>
-			</#if>
-		</#list>
-	</#if>
-	<#return id>
+<#if id?? && questions??><#list questions?keys as key ><#if questions[key]??><#list questions[key] as question><#if question?? && question.id?? && question.title?? && question.id == id><#return question.title></#if></#list></#if></#list></#if>
+<#return id>
 </#function>
-
 <#macro labelForm id>
-	<#if forms??>
-		<#list forms as form>
-			<#if form.code == id>
-				${(form.name)!}
-			</#if>
-		</#list>
-	</#if>
+<#if forms??><#list forms as form><#if form.code == id>${(form.name)!}</#if></#list></#if>
 </#macro>

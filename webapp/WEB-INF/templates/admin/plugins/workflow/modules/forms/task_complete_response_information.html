@@ -1,7 +1,7 @@
 <#if config?exists>
     <#if edit_response?exists>
 	    <#if edit_response.message??>${edit_response.message}</#if>
-		<p>#i18n{module.workflow.forms.task_complete_response_information.label_is_complete}</p>
+		<@p>#i18n{module.workflow.forms.task_complete_response_information.label_is_complete}</@p>
 	    <#if edit_response.isComplete(  )>
 	    	<@alert color='success'>#i18n{module.workflow.forms.task_complete_response_information.label_completed} <#if edit_response.dateCompleted??>(${edit_response.dateCompleted})</#if></@alert>
 		<#else>
@@ -9,12 +9,12 @@
 		</#if>
 	</#if>
     <#if edit_response.listCompleteReponseValues?exists && edit_response.listCompleteReponseValues?has_content>
-		<p>#i18n{module.workflow.forms.task_complete_response_information.label_list_entries}</p>
+		<@p>#i18n{module.workflow.forms.task_complete_response_information.label_list_entries}</@p>
 		<#list edit_response.listCompleteReponseValues as reponseValues>
 			<#if list_entries?exists && list_entries?has_content>
 				<#list list_entries as entry>
 					<#if reponseValues.idEntry==entry.idEntry>
-						<b>${entry.title} <#if reponseValues.iterationNumber &gt; 0>(${reponseValues.iterationNumber+1})</#if></b>
+						<strong>${entry.title} <#if reponseValues.iterationNumber gt 0>(${reponseValues.iterationNumber+1})</#if></strong>
 						<#if list_history?exists && list_history?has_content>
 							<#list list_history as history>
 								<#if history.question.idEntry==reponseValues.idEntry && history.question.iterationNumber==reponseValues.iterationNumber >
@@ -22,9 +22,7 @@
 								</#if>
 							</#list>
 						</#if>
-						<#if reponseValues_has_next>
-							<br />
-						</#if>
+						<#if reponseValues_has_next><br /></#if>
 						<#break>
 					</#if>
 				</#list>
