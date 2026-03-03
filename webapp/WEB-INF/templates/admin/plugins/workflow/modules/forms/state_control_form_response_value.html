@@ -1,10 +1,5 @@
-<@formGroup>
-	<@inputGroup size='sm'>
-		<@checkBox labelFor='multiform' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' name='multiform' id='multiform' value='1' checked=multiform />
-		<@inputGroupItem>
-			<@button type='submit' buttonIcon='check' name='apply' value='select_multiform' size='sm'/>
-		</@inputGroupItem>
-	</@inputGroup>
+<@formGroup labelFor='multiform' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' hideLabel=['all'] >
+	<@checkBox orientation='switch' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' name='multiform' id='multiform' value='1' checked=multiform />
 </@formGroup>
 <#if multiform>
 	<@formGroup labelFor='code_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
@@ -17,30 +12,22 @@
 	<@formGroup labelFor='form_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
 		<@inputGroup>
 			<@select name='form_select' items=form_list default_value='${id_form!}' />
-			<@inputGroupItem>
-				<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
-			</@inputGroupItem>
+			<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
 		</@inputGroup>
 		<#if id_form??>
-			<@inputGroup params='style="margin-top:1rem;"'>
+			<@inputGroup class='mt-3'>
 				<@select name='step_select' items=list_step default_value='${id_step!}' />
-				<@inputGroupItem>
-					<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
-				</@inputGroupItem>
+				<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
 			</@inputGroup>
 		</#if>
 		<#if id_step??>
-			<@inputGroup params='style="margin-top:1rem;"'>
+			<@inputGroup class='mt-3'>
 				<@select name='question_select' items=question_list default_value='${id_question!}' />
-				<@inputGroupItem>
-					<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' />
-				</@inputGroupItem>
+				<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' />
 			</@inputGroup>
 		</#if>
 		<#if id_question??>
-			<@inputGroup params='style="margin-top:1rem;"'>
-				<@select name='response_value' items=value_list default_value='${response_value!}' />
-			</@inputGroup>
+			<@select name='response_value' items=value_list default_value='${response_value!}' />
 		</#if>
 	</@formGroup>
 </#if>
