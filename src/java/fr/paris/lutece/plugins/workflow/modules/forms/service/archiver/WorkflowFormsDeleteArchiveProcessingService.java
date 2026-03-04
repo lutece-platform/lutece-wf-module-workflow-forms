@@ -38,6 +38,7 @@ import fr.paris.lutece.plugins.forms.service.FormResponseService;
 import fr.paris.lutece.plugins.workflow.modules.archive.service.AbstractArchiveProcessingService;
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflow;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 /**
@@ -49,9 +50,12 @@ public class WorkflowFormsDeleteArchiveProcessingService extends AbstractArchive
 {
     public static final String BEAN_NAME = "workflow-forms.workflowFormsDeleteArchiveProcessingService";
 
+    @Inject
+    private FormResponseService _formResponseService;
+
     @Override
     public void archiveResource( ResourceWorkflow resourceWorkflow )
     {
-        FormResponseService.getInstance( ).deleteFormResponse( FormResponseHome.loadById( resourceWorkflow.getIdResource( ) ) );
+        _formResponseService.deleteFormResponse( FormResponseHome.loadById( resourceWorkflow.getIdResource( ) ) );
     }
 }
