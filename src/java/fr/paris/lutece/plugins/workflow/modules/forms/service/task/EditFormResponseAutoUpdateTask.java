@@ -76,6 +76,9 @@ public class EditFormResponseAutoUpdateTask extends SimpleTask
     @Named( "workflow-forms.editFormResponseConfigService" )
     private ITaskConfigService _taskEditFormConfigService;
 
+    @Inject
+    private FormResponseService _formResponseService;
+
     // Message
     private static final String MESSAGE_TASK_TITLE = "module.workflow.forms.task.editFormResponseAutoUpdate.title";
 
@@ -153,6 +156,6 @@ public class EditFormResponseAutoUpdateTask extends SimpleTask
             listFormQuestionResponseToSave.add( questionResponse );
         }
         _editFormResponseTaskService.saveResponses( formResponse, listFormQuestionResponseToSave );
-        FormResponseService.getInstance( ).saveFormResponse( formResponse );
+        _formResponseService.saveFormResponse( formResponse );
     }
 }
