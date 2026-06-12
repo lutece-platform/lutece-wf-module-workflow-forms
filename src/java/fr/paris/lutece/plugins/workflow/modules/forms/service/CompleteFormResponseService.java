@@ -42,6 +42,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import fr.paris.lutece.portal.service.util.AppLogService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -141,13 +142,19 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
             FormDisplay formdisplay = listFormDisplay.stream().filter( display -> display.getCompositeId() == question.getId()).findFirst().orElse( null );
             if( formdisplay != null && formdisplay.getParentId() > 0 )
             {
-                int nbIteration = idDisplayGroupNIterationMax.get( formdisplay.getParentId() );
-
-                for( int i =0 ; i<=nbIteration; i++)
+                final Integer nbIteration = idDisplayGroupNIterationMax.get( formdisplay.getParentId() );
+                if( nbIteration != null )
                 {
-                    Question copyQuestion = new Question( question );
-                    copyQuestion.setIterationNumber( i );
-                    listQuestionForm.add( copyQuestion );
+                    for( int i =0 ; i<=nbIteration; i++)
+                    {
+                        Question copyQuestion = new Question( question );
+                        copyQuestion.setIterationNumber( i );
+                        listQuestionForm.add( copyQuestion );
+                    }
+                }
+                else
+                {
+                    AppLogService.info("Form display parent {} is not in the list.", formdisplay.getParentId( ) );
                 }
             }
             else
