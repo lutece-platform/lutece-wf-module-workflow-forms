@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.workflow.modules.forms.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,6 +44,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
+import fr.paris.lutece.plugins.forms.util.FormsConstants;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
 import fr.paris.lutece.plugins.workflow.modules.forms.utils.EditableResponse;
@@ -55,8 +57,18 @@ import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowSe
 import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.workflow.WorkflowService;
+import org.apache.commons.lang3.StringUtils;
 
-public abstract class AbstractFormResponseService
+/**
+ * Base class shared by the task services that let an agent ask an end user to modifify part of an
+ * already submitted {@link FormResponse}.
+ * <p>
+ * It holds the common methods to handle the modification.
+ *
+ * @param <R>
+ *            the specific response type handled by the concrete task service
+ */
+public abstract class AbstractFormResponseService<R>
 {
     @Inject
     private IStateService _stateService;
@@ -75,6 +87,9 @@ public abstract class AbstractFormResponseService
     
     @Inject
     private WorkflowService _workflowService;
+
+    protected static final String ATTRIBUTE_SUBMITTED_RESPONSES = "workflow-forms.submittedFormQuestionResponses";
+    protected static final String ATTRIBUTE_ID_GROUP_TO_ITERATE = "workflow-forms.idGroupToIterate";
 
     protected void doChangeResponseState( ITask task, int idStateAfterEdition, int idHistory, Locale locale )
     {
@@ -112,9 +127,22 @@ public abstract class AbstractFormResponseService
         }
 
         _editFormResponseTaskService.saveResponses( response, listChangedResponseToSave );
+        _formsTaskService.removeHiddenConditionalTargetResponses( request, response, listQuestions );
+        _formsTaskService.removeOrphanIterations( response, listQuestions );
     }
 
     protected abstract void createTaskHistory( EditableResponse editableResponse, int idTask, int idHistory );
+
+    /**
+     * Get the list of editable Questions for the given specific response object.
+     *
+     * @param formResponse
+     *            the FormResponse being edited
+     * @param response
+     *            the specific response object
+     * @return the List of Questions that are editable for this response
+     */
+    protected abstract List<Question> getListQuestionToEditFromResponse( FormResponse formResponse, R response );
 
     protected boolean isRecordStateValid( ITask task, TaskConfig config, int idHistory )
     {
@@ -151,5 +179,103 @@ public abstract class AbstractFormResponseService
     protected boolean areFormResponsesValid( List<FormQuestionResponse> listFormQuestionResponse )
     {
         return _formsTaskService.areFormQuestionResponsesValid( listFormQuestionResponse );
+    }
+
+    /**
+     * Gets the List of FormQuestionResponse containing the values the user previously tried to submit, on this
+     * request.
+     *
+     * @param request
+     *            the HTTP request
+     * @return the List of FormQuestionResponse, or an empty List if nothing was submitted yet
+     */
+    @SuppressWarnings( "unchecked" )
+    public List<FormQuestionResponse> getSubmittedFormResponseList( HttpServletRequest request )
+    {
+        List<FormQuestionResponse> listSubmitted = (List<FormQuestionResponse>) request.getAttribute( ATTRIBUTE_SUBMITTED_RESPONSES );
+        return listSubmitted != null ? listSubmitted : Collections.emptyList( );
+    }
+
+    /**
+     * Adds an iteration to the given group.
+     *
+     * @param request
+     *            the HTTP request
+     * @param response
+     *            the specific response object (ResubmitFormResponse, CompleteFormResponse...)
+     * @param idHistory
+     *            the id of the resource history the FormResponse is attached to
+     * @param nIdGroupToIterate
+     *            the id of the FormDisplay (group) to add an iteration to
+     */
+    public void doAddIterationResponse( HttpServletRequest request, R response, int idHistory, int nIdGroupToIterate )
+    {
+        final FormResponse formResponse = _formsTaskService.getFormResponseFromIdHistory( idHistory );
+        if ( formResponse == null )
+        {
+            return;
+        }
+
+        final List<Question> listQuestionToEditFromResponse = this.getListQuestionToEditFromResponse(formResponse, response);
+        final List<Question> listQuestions = _formsTaskService.expandWithSubmittedIterations( request, listQuestionToEditFromResponse);
+        request.setAttribute( ATTRIBUTE_SUBMITTED_RESPONSES, _formsTaskService.getSubmittedFormQuestionResponses( request, formResponse, listQuestions ) );
+        request.setAttribute( ATTRIBUTE_ID_GROUP_TO_ITERATE, nIdGroupToIterate );
+    }
+
+    /**
+     * Gets the id of the group to be given one extra empty iteration on this render.
+     *
+     * @param request
+     *            the HTTP request
+     * @return the id of the FormDisplay (group) to iterate, or 0 if none
+     */
+    public int getIdGroupToIterate( HttpServletRequest request )
+    {
+        Object idGroupToIterate = request.getAttribute( ATTRIBUTE_ID_GROUP_TO_ITERATE );
+        return idGroupToIterate instanceof Integer ? (Integer) idGroupToIterate : 0;
+    }
+
+    /**
+     * Removes the given iteration from the given group.
+     *
+     * @param request the HTTP request
+     * @param response the specific response object (ResubmitFormResponse, CompleteFormResponse...)
+     * @param idHistory the id of the resource history the FormResponse is attached to
+     * @param strGroupAndIterationToRemove the "<idGroup>_<index>" identifying the group iteration to remove
+     */
+    public void doRemoveIterationResponse( HttpServletRequest request, R response, int idHistory, String strGroupAndIterationToRemove )
+    {
+        final FormResponse formResponse = _formsTaskService.getFormResponseFromIdHistory( idHistory );
+        if ( formResponse == null )
+        {
+            return;
+        }
+        List<Question> listQuestions = getListQuestionToEditFromResponse( formResponse, response );
+        listQuestions = _formsTaskService.expandWithSubmittedIterations( request, listQuestions );
+        List<FormQuestionResponse> listSubmitted = _formsTaskService.getSubmittedFormQuestionResponses( request, formResponse, listQuestions );
+
+        final String [ ] arrayInfo = StringUtils.split( strGroupAndIterationToRemove, FormsConstants.SEPARATOR_UNDERSCORE );
+        if ( arrayInfo != null && arrayInfo.length == 2 && StringUtils.isNumeric( arrayInfo [1] ) )
+        {
+            int nRemovedIteration = Integer.parseInt( arrayInfo [1] );
+            List<FormQuestionResponse> listReindexed = new ArrayList<>( );
+            for ( FormQuestionResponse fqr : listSubmitted )
+            {
+                int nIteration = fqr.getQuestion( ).getIterationNumber( );
+                if ( nIteration == nRemovedIteration )
+                {
+                    // don't index the value of the removed iteration
+                    continue;
+                }
+                if ( nIteration > nRemovedIteration )
+                {
+                    fqr.getQuestion( ).setIterationNumber( nIteration - 1 );
+                }
+                listReindexed.add( fqr );
+            }
+            listSubmitted = listReindexed;
+        }
+
+        request.setAttribute( ATTRIBUTE_SUBMITTED_RESPONSES, listSubmitted );
     }
 }

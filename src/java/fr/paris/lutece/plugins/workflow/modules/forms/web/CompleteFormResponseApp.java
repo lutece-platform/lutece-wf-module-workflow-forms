@@ -50,7 +50,7 @@ import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponse;
-import fr.paris.lutece.plugins.workflow.modules.forms.service.ICompleteFormResponseService;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.CompleteFormResponseService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.signrequest.CompleteFormResponseRequestAuthenticatorService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.SiteMessage;
@@ -79,7 +79,7 @@ public class CompleteFormResponseApp extends AbstractFormResponseApp<CompleteFor
 
     // SERVICES
     @Inject
-    private ICompleteFormResponseService _completeFormResponseService;
+    private CompleteFormResponseService _completeFormResponseService;
 
     /**
      * Get the CompleteFormResponse page
@@ -103,19 +103,20 @@ public class CompleteFormResponseApp extends AbstractFormResponseApp<CompleteFor
                 .collect( Collectors.toList( ) );
 
         // Get the List of Responses the user previously tried to submit
-        List<FormQuestionResponse> formQuestionResponseList = _completeFormResponseService.getSubmittedFormResponseList( );
+        final List<FormQuestionResponse> formQuestionResponseList = _completeFormResponseService.getSubmittedFormResponseList( request );
+        final int nIdGroupToIterate = _completeFormResponseService.getIdGroupToIterate( request );
         // If the List is empty, then it is likely the first submission attempt
         if ( formQuestionResponseList==null || formQuestionResponseList.isEmpty() )
         {
             // If the List has elements, then the user already tried to submit some Responses.
             // We make sure to retrieve their values, as well as the potential errors associated with them
             listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse,
-                    DisplayType.COMPLETE_FRONTOFFICE );
+                    DisplayType.COMPLETE_FRONTOFFICE, nIdGroupToIterate );
         }
         else
         {
             listStepDisplayTree = _formsTaskService.buildFormStepDisplayTree( request, listStep, listQuestions, formQuestionResponseList, formResponse,
-                    DisplayType.COMPLETE_FRONTOFFICE );
+                    DisplayType.COMPLETE_FRONTOFFICE, nIdGroupToIterate );
         }
 
         Map<String, Object> model = initModelFormPage( request, formResponse, listStepDisplayTree );
@@ -161,6 +162,25 @@ public class CompleteFormResponseApp extends AbstractFormResponseApp<CompleteFor
             _formsTaskService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP, request.getParameter( PARAMETER_URL_RETURN ) );
         }
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doAddIterationResponse(HttpServletRequest request, CompleteFormResponse response, int idHistory, int nIdGroupToIterate )
+    {
+        _completeFormResponseService.doAddIterationResponse( request, response, idHistory, nIdGroupToIterate );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doRemoveIterationResponse( HttpServletRequest request, CompleteFormResponse response, int idHistory,
+                                              String strIterationIdentifier)
+    {
+        _completeFormResponseService.doRemoveIterationResponse( request, response, idHistory, strIterationIdentifier);
     }
 
     @Override

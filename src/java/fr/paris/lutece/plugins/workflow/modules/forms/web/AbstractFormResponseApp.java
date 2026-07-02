@@ -66,6 +66,8 @@ public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResp
 
     // ACTIONS
     private static final String ACTION_DO_EDIT_RESPONSE = "doEditResponse";
+    private static final String PARAMETER_ACTION_ADD_ITERATION = "action_addIteration";
+    private static final String PARAMETER_ACTION_REMOVE_ITERATION = "action_removeIteration";
 
     // MARKS
     private static final String MARK_STEP_LIST = "list_step";
@@ -137,16 +139,44 @@ public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResp
         return page;
     }
 
+    /**
+     *
+     * Handles the action to be performed, based on a user click.
+     *
+     * @param request
+     *            the HTTP request
+     * @param completeFormResponse
+     *            the response being processed
+     * @param idTask
+     *            the id of the task being executed
+     * @param idHistory
+     *            the id of the resource history the FormResponse is attached to
+     * @throws SiteMessageException
+     *             a site message if there is a problem
+     */
     protected void doAction( HttpServletRequest request, R completeFormResponse, int idTask, int idHistory ) throws SiteMessageException
     {
-        String strAction = request.getParameter( PARAMETER_ACTION );
+        final String strGroupAndIterationToRemove = request.getParameter( PARAMETER_ACTION_REMOVE_ITERATION );
+        if ( StringUtils.isNotBlank( strGroupAndIterationToRemove ) )
+        {
+            this.doRemoveIterationResponse( request, completeFormResponse, idHistory, strGroupAndIterationToRemove );
+            return;
+        }
 
+        final String strIdGroupToIterate = request.getParameter( PARAMETER_ACTION_ADD_ITERATION );
+        if ( StringUtils.isNumeric( strIdGroupToIterate ) )
+        {
+            this.doAddIterationResponse( request, completeFormResponse, idHistory, Integer.parseInt( strIdGroupToIterate ) );
+            return;
+        }
+
+        final String strAction = request.getParameter( PARAMETER_ACTION );
         if ( StringUtils.isBlank( strAction ) )
         {
             return;
         }
 
-        if ( ACTION_DO_EDIT_RESPONSE.equals( strAction ) && doEditResponse( request, completeFormResponse, idTask, idHistory ) )
+        if ( ACTION_DO_EDIT_RESPONSE.equals( strAction ) && this.doEditResponse( request, completeFormResponse, idTask, idHistory ) )
         {
             // Back to home page
             String strUrlReturn = request.getParameter( PARAMETER_URL_RETURN );
@@ -185,6 +215,33 @@ public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResp
      *             a site message if there is a problem
      */
     protected abstract boolean doEditResponse( HttpServletRequest request, R response, int idTask, int idHistory ) throws SiteMessageException;
+
+    /**
+     * Handle a click on the "add <iteration>" button of an iterable group.
+     *
+     * @param request
+     *            the HTTP request
+     * @param response
+     *            the response
+     * @param idHistory
+     *            the history id
+     * @param nIdGroupToIterate
+     *            the id of the FormDisplay (group) to add an iteration to
+     */
+    protected abstract void doAddIterationResponse(HttpServletRequest request, R response, int idHistory, int nIdGroupToIterate );
+
+    /**
+     * Handle a click on the "remove <iteration>" button of an iterable group
+     * @param request
+     *          the HTTP request
+     * @param response
+     *          the response
+     * @param idHistory
+     *          the history id
+     * @param strIterationIdentifier
+     *          the identifier of the group iteration to remove
+     */
+    protected abstract void doRemoveIterationResponse( HttpServletRequest request, R response, int idHistory, String strIterationIdentifier );
 
     protected abstract AbstractPrivateKeyAuthenticator getRequestAuthenticator( );
 

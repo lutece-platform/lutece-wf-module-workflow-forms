@@ -38,7 +38,6 @@ import java.util.Locale;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
@@ -178,10 +177,4 @@ public interface IResubmitFormResponseService
      */
     void doCompleteResponse( ResubmitFormResponse resubmitFormResponse );
 
-    /**
-     * Get the List of FormQuestionResponse containing the new Responses that the user is trying to submit
-     * 
-     * @return A List of FormQuestionResponse
-     */
-    List<FormQuestionResponse> getSubmittedFormResponseList( );
 }
