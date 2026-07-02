@@ -38,7 +38,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +49,7 @@ import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponse;
-import fr.paris.lutece.plugins.workflow.modules.forms.service.IResubmitFormResponseService;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.ResubmitFormResponseService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.signrequest.ResubmitFormResponseRequestAuthenticatorService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.SiteMessage;
@@ -84,8 +83,7 @@ public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFor
     private static final String MARK_RESUBMIT_FORM = "resubmit_form";
 
     // SERVICES
-    @Inject
-    private IResubmitFormResponseService _resubmitFormResponseService = SpringContextService.getBean( "workflow-forms.taskResubmitResponseService" );
+    private final ResubmitFormResponseService _resubmitFormResponseService = SpringContextService.getBean( "workflow-forms.taskResubmitResponseService" );
 
     @Override
     public XPage getPage( HttpServletRequest request, int nMode, Plugin plugin ) throws UserNotSignedException, SiteMessageException
@@ -154,20 +152,22 @@ public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFor
         List<Step> listStep = listQuestions.stream( ).map( Question::getStep ).map( Step::getId ).distinct( ).map( StepHome::findByPrimaryKey )
                 .collect( Collectors.toList( ) );
 
-        // Get the List of Responses the user previously tried to submit
-        List<FormQuestionResponse> formQuestionResponseList = _resubmitFormResponseService.getSubmittedFormResponseList( );
+        // Get the List of Responses the user previously tried to submit (or just typed before clicking "add iteration")
+        List<FormQuestionResponse> formQuestionResponseList = _resubmitFormResponseService.getSubmittedFormResponseList( request );
+        final int nIdGroupToIterate = _resubmitFormResponseService.getIdGroupToIterate( request );
         // If the List is empty, then it is likely the first submission attempt
-        if ( formQuestionResponseList==null || formQuestionResponseList.isEmpty() )
+
+        if ( formQuestionResponseList == null || formQuestionResponseList.isEmpty() )
         {
             listStepDisplayTree = _formsTaskService.buildFormStepDisplayTreeList( request, listStep, listQuestions, formResponse,
-                    DisplayType.RESUBMIT_FRONTOFFICE );
+                    DisplayType.RESUBMIT_FRONTOFFICE, nIdGroupToIterate );
         }
         else
         {
             // If the List has elements, then the user already tried to submit some Responses.
             // We make sure to retrieve their values, as well as the potential errors associated with them
             listStepDisplayTree = _formsTaskService.buildFormStepDisplayTree( request, listStep, listQuestions, formQuestionResponseList, formResponse,
-                    DisplayType.RESUBMIT_FRONTOFFICE );
+                    DisplayType.RESUBMIT_FRONTOFFICE, nIdGroupToIterate );
         }
 
         Map<String, Object> model = initModelFormPage( request, formResponse, listStepDisplayTree );
@@ -213,6 +213,25 @@ public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFor
             _formsTaskService.setSiteMessage( request, Messages.USER_ACCESS_DENIED, SiteMessage.TYPE_STOP, request.getParameter( PARAMETER_URL_RETURN ) );
         }
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doAddIterationResponse(HttpServletRequest request, ResubmitFormResponse response, int idHistory, int nIdGroupToIterate )
+    {
+        _resubmitFormResponseService.doAddIterationResponse( request, response, idHistory, nIdGroupToIterate );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doRemoveIterationResponse( HttpServletRequest request, ResubmitFormResponse response, int idHistory,
+                                              String strIterationIdentifier)
+    {
+        _resubmitFormResponseService.doRemoveIterationResponse( request, response, idHistory, strIterationIdentifier);
     }
 
     @Override

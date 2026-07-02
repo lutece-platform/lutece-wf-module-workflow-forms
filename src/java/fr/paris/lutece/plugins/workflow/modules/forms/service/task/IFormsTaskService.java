@@ -97,8 +97,44 @@ public interface IFormsTaskService
      */
     FormResponse findFormResponseWithoutSteps( int nIdResource, String strResourceType );
 
+    /**
+     * Gets a List of Strings containing the models and values displayed to the user, for each existing Step
+     *
+     * @param request
+     *            the HTTP request
+     * @param listStep
+     *            the List of Steps being processed
+     * @param listQuestionToDisplay
+     *            the List of Question that should be displayed to the user
+     * @param formResponse
+     *            the FormResponse being processed
+     * @param displayType
+     *            the DisplayType used in the template
+     * @return a List of Strings containing the complete template, one per Step
+     */
     List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay, FormResponse formResponse,
-            DisplayType displayType );
+                                               DisplayType displayType );
+
+    /**
+     * Gets a List of Strings containing the models and values displayed to the user, for each existing Step, and adds
+     * an empty iteration to the given group before rendering
+     *
+     * @param request
+     *            the HTTP request
+     * @param listStep
+     *            the List of Steps being processed
+     * @param listQuestionToDisplay
+     *            the List of Question that should be displayed to the user
+     * @param formResponse
+     *            the FormResponse being processed
+     * @param displayType
+     *            the DisplayType used in the template
+     * @param nIdGroupToIterate
+     *            the id of the FormDisplay (group) to add an empty iteration to before rendering, or 0 for none
+     * @return a List of Strings containing the complete template, one per Step
+     */
+    List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay, FormResponse formResponse,
+                                               DisplayType displayType, int nIdGroupToIterate );
 
     /**
      * Get a List of Strings containing the models and values displayed to the user, for each existing Step
@@ -119,6 +155,30 @@ public interface IFormsTaskService
      */
     List<String> buildFormStepDisplayTree( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay,
             List<FormQuestionResponse> listFormQuestionResponse, FormResponse formResponse, DisplayType displayType );
+
+    /**
+     * Get a List of Strings containing the models and values displayed to the user, for each existing Step, and
+     * adds an empty iteration to the given group before rendering.
+     *
+     * @param request
+     *            the HTTP request
+     * @param listStep
+     *            the List of Steps being processed
+     * @param listQuestionToDisplay
+     *            the List of Question that should be resubmitted by the user
+     * @param listFormQuestionResponse
+     *            the List of new FormQuestionResponse being submitted by the user
+     * @param formResponse
+     *            the FormResponse being processed
+     * @param displayType
+     *            the DisplayType used in the template
+     * @param nIdGroupToIterate
+     *            the id of the FormDisplay (group) to add an empty iteration to before rendering, or 0 for none
+     * @return a List of Strings containing the complete template
+     */
+    List<String> buildFormStepDisplayTree( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay,
+                                           List<FormQuestionResponse> listFormQuestionResponse, FormResponse formResponse, DisplayType displayType,
+                                           int nIdGroupToIterate );
 
     /**
      * Finds the responses that have changed
@@ -217,4 +277,58 @@ public interface IFormsTaskService
      * @return true if all the Responses are valid, returns false otherwise
      */
     boolean areFormQuestionResponsesValid( List<FormQuestionResponse> formQuestionResponses );
+
+    /**
+     * Expand a list of questions selected for correction/completion with all the questions and groups that are
+     * conditionally displayed depending on them.
+     *
+     * @param listQuestion
+     *            the initial list of questions to edit
+     * @return the expanded list of questions (initial + conditional targets)
+     */
+    List<Question> expandWithConditionalTargetQuestions( List<Question> listQuestion );
+
+    /**
+     * Check whether a question is the target of a conditional display control
+     *
+     * @param nIdForm
+     *            the id of the form the question belongs to
+     * @param question
+     *            the question to test
+     * @return {@code true} if the question is the target of a conditional control, {@code false} otherwise
+     */
+    boolean isConditionalTarget( int nIdForm, Question question );
+
+    /**
+     * Expands the given question list with the iterations actually submitted in the request.
+     *
+     * @param request
+     *            the HTTP request being submitted
+     * @param listQuestions
+     *            the base list of questions to edit (typically one iteration each)
+     * @return a list containing one Question per (question x submitted iteration), each carrying its iterationNumber
+     */
+    List<Question> expandWithSubmittedIterations(HttpServletRequest request, List<Question> listQuestions);
+
+    /**
+     * Removes the persisted responses of the conditional target questions that were hidden at submit time.
+     *
+     * @param request
+     *            the HTTP request being submitted
+     * @param formResponse
+     *            the FormResponse being edited, loaded with its persisted responses
+     * @param listQuestions
+     *            the questions being edited, expanded to their concrete iterations
+     */
+    void removeHiddenConditionalTargetResponses( HttpServletRequest request, FormResponse formResponse, List<Question> listQuestions );
+
+    /**
+     * Removes the persisted responses of iterations that were removed by the user.
+     *
+     * @param formResponse
+     *            the FormResponse being edited, loaded with its persisted responses
+     * @param listSubmittedQuestions
+     *            the edited questions, expanded to the iterations actually submitted
+     */
+    void removeOrphanIterations( FormResponse formResponse, List<Question> listSubmittedQuestions );
 }
