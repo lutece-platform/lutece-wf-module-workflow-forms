@@ -35,7 +35,6 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -76,8 +75,7 @@ import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.util.AppLogService;
 
-public class CompleteFormResponseService extends AbstractFormResponseService implements ICompleteFormResponseService
-{
+public class CompleteFormResponseService extends AbstractFormResponseService<CompleteFormResponse> implements ICompleteFormResponseService{
 
     private static final String MESSAGE_APP_ERROR = "module.workflow.forms.message.app_error";
     private static final String PARAMETER_URL_RETURN = "url_return";
@@ -101,19 +99,20 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
     @Inject
     private ICompleteFormResponseTaskHistoryService _completeFormResponseTaskHistoryService;
 
-    // List of FormQuestionResponse to store the user's new Responses 
-    private List<FormQuestionResponse> _submittedFormResponses;
-
     @Override
     public List<Question> findListQuestionUsedCorrectForm( FormResponse formResponse )
     {
         List<FormDisplay> listFormDisplay = FormDisplayHome.getFormDisplayByForm(formResponse.getFormId() );
 
         List<Question> listBaseQuestionForm = QuestionHome.getListQuestionByIdForm( formResponse.getFormId( ) );
-        listBaseQuestionForm = listBaseQuestionForm.stream( ).filter( ( Question question ) -> {
-            Field fieldUsedCompleteResponse = question.getEntry( ).getFieldByCode( FormsConstants.PARAMETER_USED_COMPLETE_RESPONSE );
-            return fieldUsedCompleteResponse != null && Boolean.valueOf( fieldUsedCompleteResponse.getValue( ) );
-        } ).collect( Collectors.toList( ) );
+        listBaseQuestionForm = listBaseQuestionForm.stream( )
+                .filter( ( Question question ) -> {
+                    Field fieldUsedCompleteResponse = question.getEntry( ).getFieldByCode( FormsConstants.PARAMETER_USED_COMPLETE_RESPONSE );
+                    return fieldUsedCompleteResponse != null
+                            && Boolean.parseBoolean( fieldUsedCompleteResponse.getValue( ) )
+                            && !_formsTaskService.isConditionalTarget( formResponse.getFormId( ), question );
+                } )
+                .collect( Collectors.toList( ) );
 
         Map<Integer,Integer> idDisplayGroupNIterationMax = new HashMap<>();
 
@@ -269,13 +268,14 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
     {
         List<Question> listQuestions = findListQuestionUsedCorrectForm( formResponse );
 
-
-        return listQuestions.stream().filter(question ->
+        List<Question> listQuestionsFiltered = listQuestions.stream().filter(question ->
                         listEditRecordValues.stream().anyMatch(completeFormResponseValue ->
                                 completeFormResponseValue.getIdEntry() == question.getEntry().getIdEntry()
                                         && (completeFormResponseValue.getIterationNumber() == AbstractCompleteFormResponseValue.DEFAULT_ITERATION_NUMBER
                                         || completeFormResponseValue.getIterationNumber() == question.getIterationNumber())))
                 .collect(Collectors.toList());
+
+        return _formsTaskService.expandWithConditionalTargetQuestions( listQuestionsFiltered );
     }
 
     @Override
@@ -289,17 +289,18 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
 
             return false;
         }
-        List<Question> listQuestions = getListQuestionToEdit( response, completeFormResponse.getListCompleteReponseValues( ) );
+        final List<Question> listQuestions = getListQuestionToEdit( response, completeFormResponse.getListCompleteReponseValues( ) );
         // Get the values of the newly submitted Responses
-        _submittedFormResponses = _formsTaskService.getSubmittedFormQuestionResponses( request, response, listQuestions );
+        final List<Question> listQuestionsExpanded = _formsTaskService.expandWithSubmittedIterations( request, listQuestions );
+        final List<FormQuestionResponse> listSubmitted = _formsTaskService.getSubmittedFormQuestionResponses( request, response, listQuestionsExpanded );
         // Check if the new Responses are valid
-        if ( !areFormResponsesValid( _submittedFormResponses ) )
+        if ( !areFormResponsesValid( listSubmitted ) )
         {
+            // keep the submitted values on the request so the validation errors are re-displayed
+            request.setAttribute( ATTRIBUTE_SUBMITTED_RESPONSES, listSubmitted );
             return false;
         }
-        // Reset the content of the List
-        _submittedFormResponses = Collections.emptyList( );
-        doEditResponseData( request, response, listQuestions, idTask, idHistory );
+        doEditResponseData( request, response, listQuestionsExpanded, idTask, idHistory );
         return true;
     }
 
@@ -335,9 +336,12 @@ public class CompleteFormResponseService extends AbstractFormResponseService imp
         _completeFormResponseTaskHistoryService.create( history );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<FormQuestionResponse> getSubmittedFormResponseList( )
+    protected List<Question> getListQuestionToEditFromResponse( FormResponse formResponse, CompleteFormResponse response )
     {
-        return _submittedFormResponses;
+        return this.getListQuestionToEdit( formResponse, response.getListCompleteReponseValues( ) );
     }
 }
