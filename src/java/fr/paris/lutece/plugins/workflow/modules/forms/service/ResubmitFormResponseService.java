@@ -35,7 +35,6 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -82,7 +81,7 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
  */
 @ApplicationScoped
 @Named( "workflow-forms.taskResubmitResponseService" )
-public class ResubmitFormResponseService extends AbstractFormResponseService implements IResubmitFormResponseService
+public class ResubmitFormResponseService extends AbstractFormResponseService<ResubmitFormResponse> implements IResubmitFormResponseService
 {
 
     private static final String MESSAGE_APP_ERROR = "module.workflow.forms.message.app_error";
@@ -109,9 +108,6 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
 
     @Inject
     private IResubmitFormResponseTaskHistoryService _resubmitFormResponseTaskHistoryService;
-
-    // List of FormQuestionResponse to store the user's new Responses 
-    private List<FormQuestionResponse> _submittedFormQuestionResponses;
 
     @Override
     public ResubmitFormResponse find( int nIdHistory, int nIdTask )
@@ -160,10 +156,14 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
         Form form = FormHome.findByPrimaryKey( formResponse.getFormId( ) );
         List<Question> listFormQuestion = QuestionHome.getListQuestionByIdForm( form.getId( ) );
 
-        listFormQuestion = listFormQuestion.stream( ).filter( ( Question question ) -> {
-            Field fieldUsedCorrectResponse = question.getEntry( ).getFieldByCode( FormsConstants.PARAMETER_USED_CORRECT_RESPONSE );
-            return fieldUsedCorrectResponse != null && Boolean.valueOf( fieldUsedCorrectResponse.getValue( ) );
-        } ).collect( Collectors.toList( ) );
+        listFormQuestion = listFormQuestion.stream( )
+                .filter( ( Question question ) -> {
+                    Field fieldUsedCorrectResponse = question.getEntry( ).getFieldByCode( FormsConstants.PARAMETER_USED_CORRECT_RESPONSE );
+                    return fieldUsedCorrectResponse != null
+                            && Boolean.parseBoolean( fieldUsedCorrectResponse.getValue( ) )
+                            && !_formsTaskService.isConditionalTarget( form.getId( ), question );
+                } )
+                .collect( Collectors.toList( ) );
 
         List<FormQuestionResponse> listFormQuestionResponses = FormQuestionResponseHome.getFormQuestionResponseListByFormResponse( formResponse.getId( ) );
 
@@ -275,7 +275,7 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
             }
         }
 
-        return questionToEdit;
+        return _formsTaskService.expandWithConditionalTargetQuestions( questionToEdit );
     }
 
     @Override
@@ -290,16 +290,17 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
             return false;
         }
         List<Question> listQuestions = getListQuestionToEdit( response, resubmitFormResponse.getListResubmitReponseValues( ) );
+        List<Question> listQuestionsExpanded = _formsTaskService.expandWithSubmittedIterations( request, listQuestions );
         // Get the values of the newly submitted Responses
-        _submittedFormQuestionResponses = _formsTaskService.getSubmittedFormQuestionResponses( request, response, listQuestions );
+        final List<FormQuestionResponse> listSubmitted = _formsTaskService.getSubmittedFormQuestionResponses( request, response, listQuestionsExpanded );
         // Check if the new Responses are valid
-        if ( !areFormResponsesValid( _submittedFormQuestionResponses ) )
+        if ( !areFormResponsesValid( listSubmitted ) )
         {
+            // keep the submitted values on the request so the validation errors are re-displayed
+            request.setAttribute( ATTRIBUTE_SUBMITTED_RESPONSES, listSubmitted );
             return false;
         }
-        // Reset the content of the List
-        _submittedFormQuestionResponses = Collections.emptyList( );
-        doEditResponseData( request, response, listQuestions, idTask, idHistory );
+        doEditResponseData( request, response, listQuestionsExpanded, idTask, idHistory );
         return true;
     }
 
@@ -336,9 +337,12 @@ public class ResubmitFormResponseService extends AbstractFormResponseService imp
         update( resubmitFormResponse );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<FormQuestionResponse> getSubmittedFormResponseList( )
+    protected List<Question> getListQuestionToEditFromResponse( FormResponse formResponse, ResubmitFormResponse response )
     {
-        return _submittedFormQuestionResponses;
+        return getListQuestionToEdit( formResponse, response.getListResubmitReponseValues( ) );
     }
 }

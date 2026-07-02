@@ -33,8 +33,16 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -42,13 +50,20 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 
+import fr.paris.lutece.plugins.forms.business.CompositeDisplayType;
+import fr.paris.lutece.plugins.forms.business.FormDisplay;
+import fr.paris.lutece.plugins.forms.business.FormDisplayHome;
+import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.AbstractCompleteFormResponseValue;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.forms.business.Control;
+import fr.paris.lutece.plugins.forms.business.ControlGroup;
+import fr.paris.lutece.plugins.forms.business.ControlGroupHome;
 import fr.paris.lutece.plugins.forms.business.ControlHome;
 import fr.paris.lutece.plugins.forms.business.ControlType;
+import fr.paris.lutece.plugins.forms.business.LogicalOperator;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponseHome;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
@@ -60,6 +75,7 @@ import fr.paris.lutece.plugins.forms.service.EntryServiceManager;
 import fr.paris.lutece.plugins.forms.service.entrytype.EntryTypeDate;
 import fr.paris.lutece.plugins.forms.validation.IValidator;
 import fr.paris.lutece.plugins.forms.web.StepDisplayTree;
+import fr.paris.lutece.plugins.forms.web.http.IterationHttpServletRequestWrapper;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.forms.web.entrytype.IEntryDataService;
 import fr.paris.lutece.plugins.genericattributes.business.GenericAttributeError;
@@ -91,6 +107,7 @@ public class FormsTaskService implements IFormsTaskService
 {
     private static final String NULL = "null";
     private static final String SEPARATOR = ", ";
+    private static final int DEFAULT_ITERATION_NUMBER = -1;
 
     @Inject
     private IResourceHistoryService _resourceHistoryService;
@@ -148,9 +165,22 @@ public class FormsTaskService implements IFormsTaskService
         return formResponse;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<String> buildFormStepDisplayTreeList( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay,
-            FormResponse formResponse, DisplayType displayType )
+    public List<String> buildFormStepDisplayTreeList( final HttpServletRequest request, final List<Step> listStep, final List<Question> listQuestionToDisplay,
+                                                      final FormResponse formResponse, final DisplayType displayType )
+    {
+        return buildFormStepDisplayTreeList( request, listStep, listQuestionToDisplay, formResponse, displayType, 0 );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> buildFormStepDisplayTreeList( final HttpServletRequest request, final List<Step> listStep, final List<Question> listQuestionToDisplay,
+                                                      final FormResponse formResponse, final DisplayType displayType, final int nIdGroupToIterate )
     {
         List<String> listFormDisplayTrees = new ArrayList<>( );
 
@@ -182,6 +212,10 @@ public class FormsTaskService implements IFormsTaskService
                 int nIdStep = step.getId( );
 
                 StepDisplayTree stepDisplayTree = new StepDisplayTree( nIdStep, listQuestionToDisplay, formResponse );
+                if ( nIdGroupToIterate > 0 )
+                {
+                    stepDisplayTree.iterate( nIdGroupToIterate );
+                }
                 listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, listFormQuestionResponse, request.getLocale( ), displayType ) );
             }
         }
@@ -189,19 +223,39 @@ public class FormsTaskService implements IFormsTaskService
         return listFormDisplayTrees;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<String> buildFormStepDisplayTree( HttpServletRequest request, List<Step> listStep, List<Question> listQuestionToDisplay,
-            List<FormQuestionResponse> listFormQuestionResponse, FormResponse formResponse, DisplayType displayType )
+    public List<String> buildFormStepDisplayTree( final HttpServletRequest request, final List<Step> listStep, final List<Question> listQuestionToDisplay,
+                                                  final List<FormQuestionResponse> listFormQuestionResponse, final FormResponse formResponse, final DisplayType displayType )
+    {
+        return buildFormStepDisplayTree( request, listStep, listQuestionToDisplay, listFormQuestionResponse, formResponse, displayType, 0 );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> buildFormStepDisplayTree( final HttpServletRequest request, final List<Step> listStep, final List<Question> listQuestionToDisplay,
+                                                  final List<FormQuestionResponse> listFormQuestionResponse, final FormResponse formResponse,
+                                                  final DisplayType displayType, final int nIdGroupToIterate )
     {
         List<String> listFormDisplayTrees = new ArrayList<>( );
 
         if ( !CollectionUtils.isEmpty( listStep ) )
         {
-            for ( Step step : listStep )
+            // synchronize the already submitted responses when modifying the iterations
+            this.mergeSubmittedResponsesIntoFormResponse( formResponse, listFormQuestionResponse );
+
+            for ( final Step step : listStep )
             {
                 int nIdStep = step.getId( );
-
                 StepDisplayTree stepDisplayTree = new StepDisplayTree(nIdStep, listQuestionToDisplay, formResponse);
+                if ( nIdGroupToIterate > 0 )
+                {
+                    stepDisplayTree.iterate( nIdGroupToIterate );
+                }
                 listFormDisplayTrees.add( stepDisplayTree.getCompositeHtml( request, listFormQuestionResponse, request.getLocale( ), displayType ) );
             }
         }
@@ -209,16 +263,38 @@ public class FormsTaskService implements IFormsTaskService
     }
 
     @Override
-    public List<EditableResponse> findChangedResponses( List<EditableResponse> listEditableResponse )
+    public List<EditableResponse> findChangedResponses( final List<EditableResponse> listEditableResponse )
     {
-        List<EditableResponse> listChangedResponse = new ArrayList<>( );
+        final List<EditableResponse> listChangedResponse = new ArrayList<>( );
 
-        for ( EditableResponse editableResponse : listEditableResponse )
+        for ( final EditableResponse editableResponse : listEditableResponse )
         {
-            IEntryDataService dataService = EntryServiceManager.getInstance( )
+            final IEntryDataService dataService = EntryServiceManager.getInstance( )
                     .getEntryDataService( editableResponse.getQuestion( ).getEntry( ).getEntryType( ) );
 
-            if ( dataService.isResponseChanged( editableResponse.getResponseSaved( ), editableResponse.getResponseFromForm( ) ) )
+            final FormQuestionResponse savedResponse = editableResponse.getResponseSaved( );
+            final FormQuestionResponse formResponse = editableResponse.getResponseFromForm( );
+
+            final boolean bSavedEmpty = CollectionUtils.isEmpty( savedResponse == null ? null : savedResponse.getEntryResponse( ) );
+            final boolean bFromFormEmpty = CollectionUtils.isEmpty( formResponse == null ? null : formResponse.getEntryResponse( ) );
+
+            boolean bChanged;
+            if ( bSavedEmpty && bFromFormEmpty )
+            {
+                // no value, or hidden fields
+                bChanged = false;
+            }
+            else if ( bSavedEmpty != bFromFormEmpty )
+            {
+                // one of the list is empty, so a changed occured
+                bChanged = true;
+            }
+            else
+            {
+                bChanged = dataService.isResponseChanged( savedResponse, formResponse );
+            }
+
+            if ( bChanged )
             {
                 listChangedResponse.add( editableResponse );
             }
@@ -228,12 +304,17 @@ public class FormsTaskService implements IFormsTaskService
     }
 
     @Override
-    public List<EditableResponse> createEditableResponses( FormResponse formResponse, List<Question> listQuestion, HttpServletRequest request )
+    public List<EditableResponse> createEditableResponses( final FormResponse formResponse, final List<Question> listQuestion, final HttpServletRequest request )
     {
-        List<EditableResponse> listEditableResponse = new ArrayList<>( );
+        final List<EditableResponse> listEditableResponse = new ArrayList<>( );
 
-        for ( Question question : listQuestion )
+        for ( final Question question : listQuestion )
         {
+            if ( !isConditionalTargetDisplayed( formResponse, question, request ) )
+            {
+                continue;
+            }
+
             IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
             FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, false );
             responseFromForm.setIdFormResponse( formResponse.getId( ) );
@@ -271,6 +352,50 @@ public class FormsTaskService implements IFormsTaskService
         }
 
         return listEditableResponse;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeHiddenConditionalTargetResponses( final HttpServletRequest request, final FormResponse formResponse, final List<Question> listQuestions )
+    {
+        for ( final Question question : listQuestions )
+        {
+            if ( !isConditionalTargetDisplayed( formResponse, question, request ) )
+            {
+                final FormQuestionResponse savedResponse = findSavedResponse( formResponse, question );
+                if ( savedResponse != null )
+                {
+                    FormQuestionResponseHome.remove( savedResponse );
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeOrphanIterations( final FormResponse formResponse, final List<Question> listSubmittedQuestions )
+    {
+        final Map<Integer, Integer> maxSubmittedIteration = new HashMap<>( );
+        for ( final Question question : listSubmittedQuestions )
+        {
+            maxSubmittedIteration.merge( question.getId( ), question.getIterationNumber( ), Math::max );
+        }
+
+        for ( final FormResponseStep formResponseStep : formResponse.getSteps( ) )
+        {
+            for ( final FormQuestionResponse formQuestionResponse : new ArrayList<>( formResponseStep.getQuestions( ) ) )
+            {
+                final Integer nMaxSubmitted = maxSubmittedIteration.get( formQuestionResponse.getQuestion( ).getId( ) );
+                if ( nMaxSubmitted != null && formQuestionResponse.getQuestion( ).getIterationNumber( ) > nMaxSubmitted )
+                {
+                    FormQuestionResponseHome.remove( formQuestionResponse );
+                }
+            }
+        }
     }
 
     private FormQuestionResponse findSavedResponse( FormResponse formResponse, Question question )
@@ -397,18 +522,202 @@ public class FormsTaskService implements IFormsTaskService
         return value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<FormQuestionResponse> getSubmittedFormQuestionResponses( HttpServletRequest request, FormResponse formResponse, List<Question> listQuestions )
     {
-        List<FormQuestionResponse> submittedFormResponses = new ArrayList<>( );
-        for ( Question question : listQuestions )
+        final List<FormQuestionResponse> submittedFormResponses = new ArrayList<>( );
+
+        for ( final Question question : listQuestions )
         {
-            IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
-            FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, false );
+            final IEntryDataService entryDataService = EntryServiceManager.getInstance( ).getEntryDataService( question.getEntry( ).getEntryType( ) );
+            final FormQuestionResponse responseFromForm = entryDataService.createResponseFromRequest( question, request, true );
             responseFromForm.setIdFormResponse( formResponse.getId( ) );
+
+            if ( !isConditionalTargetDisplayed( formResponse, question, request ) )
+            {
+                responseFromForm.setEntryResponse( new ArrayList<>( ) );
+                responseFromForm.setError( null );
+            }
+
             submittedFormResponses.add( responseFromForm );
         }
         return submittedFormResponses;
+    }
+
+    /**
+     * Check whether a conditional target question is currently displayed
+     *
+     * @param formResponse
+     *            the FormResponse being edited
+     * @param question
+     *            the conditional target question
+     * @param request
+     *            the HTTP request being submitted
+     * @return {@code true} if the question is displayed, {@code false} otherwise
+     */
+    private boolean isConditionalTargetDisplayed( final FormResponse formResponse, final Question question, final HttpServletRequest request )
+    {
+        final FormDisplay formDisplay = FormDisplayHome.getFormDisplayByFormStepAndComposite( formResponse.getFormId( ), question.getIdStep( ), question.getId( ) );
+        if ( formDisplay == null || formDisplay.getDisplayControl( ) == null )
+        {
+            return true;
+        }
+
+        final List<Control> listControl = ControlHome.getControlByControlTargetAndType( formDisplay.getId( ), ControlType.CONDITIONAL );
+        if ( CollectionUtils.isEmpty( listControl ) )
+        {
+            return true;
+        }
+
+        // check if the control is a OR, or an AND
+        final ControlGroup controlGroup = ControlGroupHome.findByPrimaryKey( listControl.get( 0 ).getIdControlGroup( ) ).orElse( null );
+        final boolean bOr = controlGroup != null && LogicalOperator.OR.getLabel( ).equals( controlGroup.getLogicalOperator( ).getLabel( ) );
+
+        int nValid = 0;
+        int nNotValid = 0;
+        boolean bHasUnevaluable = false;
+
+        for ( final Control control : listControl )
+        {
+            final List<FormQuestionResponse> listControllerResponses = buildControllerResponses( control, request, question.getIterationNumber( ) );
+            final IValidator validator = EntryServiceManager.getInstance( ).getValidator( control.getValidatorName( ) );
+            if ( listControllerResponses == null || validator == null )
+            {
+                bHasUnevaluable = true;
+                continue;
+            }
+            if ( validator.validate( listControllerResponses, control ) )
+            {
+                nValid++;
+            }
+            else
+            {
+                nNotValid++;
+            }
+        }
+
+        if ( bOr )
+        {
+            // OR
+            return nValid > 0 || bHasUnevaluable;
+        }
+        // AND
+        return nNotValid == 0;
+    }
+
+    /**
+     * Get the submitted responses from inside the iteration group, or, from outside (0)
+     *
+     * @param control
+     *            the conditional control
+     * @param request
+     *            the HTTP request being submitted
+     * @param nTargetIteration
+     *            the iteration of the conditional target being evaluated
+     * @return the controlling responses, or {@code null} if any controlling question is absent from the request
+     *         (the control then cannot be evaluated)
+     */
+    private List<FormQuestionResponse> buildControllerResponses( final Control control, final HttpServletRequest request, final int nTargetIteration )
+    {
+        if ( CollectionUtils.isEmpty( control.getListIdQuestion( ) ) )
+        {
+            return null;
+        }
+
+        final List<FormQuestionResponse> listResponses = new ArrayList<>( );
+        for ( final Integer nIdQuestion : control.getListIdQuestion( ) )
+        {
+            final Question controllerQuestion = QuestionHome.findByPrimaryKey( nIdQuestion );
+            if ( controllerQuestion == null || controllerQuestion.getEntry( ) == null )
+            {
+                return null;
+            }
+
+            final FormQuestionResponse controllerResponse = readControllerResponse( controllerQuestion, request, nTargetIteration );
+            if ( controllerResponse == null )
+            {
+                return null;
+            }
+            listResponses.add( controllerResponse );
+        }
+        return listResponses;
+    }
+
+    /**
+     * Reads a controlling question's submitted response.
+     *
+     * @param controllerQuestion
+     *            the controlling question
+     * @param request
+     *            the HTTP request being submitted
+     * @param nTargetIteration
+     *            the iteration of the conditional target being evaluated
+     * @return the first non-empty response found, or {@code null} if the controller carries no submitted value
+     */
+    private FormQuestionResponse readControllerResponse( final Question controllerQuestion, final HttpServletRequest request, final int nTargetIteration )
+    {
+        final IEntryTypeService entryTypeService = EntryTypeServiceManager.getEntryTypeService( controllerQuestion.getEntry( ) );
+        if ( entryTypeService == null )
+        {
+            return null;
+        }
+
+        FormQuestionResponse controllerResponse = readControllerResponseIteration( entryTypeService, controllerQuestion, request, nTargetIteration );
+        if ( controllerResponse == null && nTargetIteration != 0 )
+        {
+            controllerResponse = readControllerResponseIteration( entryTypeService, controllerQuestion, request, 0 );
+        }
+        return controllerResponse;
+    }
+
+    /**
+     * Reads a controlling question's submitted response iteration.
+     *
+     * @param entryTypeService
+     *            the entry type service of the controlling question's entry
+     * @param controllerQuestion
+     *            the controlling question
+     * @param request
+     *            the HTTP request being submitted
+     * @param nIteration
+     *            the iteration to read the controller at
+     * @return the response if it holds a submitted value at this iteration, {@code null} otherwise
+     */
+    private FormQuestionResponse readControllerResponseIteration(final IEntryTypeService entryTypeService, final Question controllerQuestion,
+                                                                 final HttpServletRequest request, final int nIteration )
+    {
+        final HttpServletRequest iterationRequest = new IterationHttpServletRequestWrapper( request, nIteration );
+        final List<Response> listResponse = new ArrayList<>( );
+        entryTypeService.getResponseData( controllerQuestion.getEntry( ), iterationRequest, listResponse, request.getLocale( ) );
+
+        if ( !this.hasSubmittedValue( listResponse ) )
+        {
+            return null;
+        }
+        final Question controllerAtIteration = new Question( controllerQuestion );
+        controllerAtIteration.setIterationNumber( nIteration );
+        final FormQuestionResponse response = new FormQuestionResponse( );
+        response.setQuestion( controllerAtIteration );
+        response.setEntryResponse( listResponse );
+        return response;
+    }
+
+    /**
+     * Check if there is submitted value(s) in a list of responses.
+     *
+     * @param listResponse
+     *            the responses read from the request
+     * @return {@code true} if at least one response holds a value
+     */
+    private boolean hasSubmittedValue( final List<Response> listResponse )
+    {
+        return !CollectionUtils.isEmpty( listResponse ) && listResponse.stream( )
+                .anyMatch(response -> ( response.getField( ) != null && response.getField( ).getIdField() > 0 )
+                                                || StringUtils.isNotBlank( response.getResponseValue( ) )
+                                                || response.getFile( ) != null );
     }
 
     @Override
@@ -458,5 +767,191 @@ public class FormsTaskService implements IFormsTaskService
             }
         }
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Question> expandWithConditionalTargetQuestions( List<Question> listQuestion )
+    {
+        final Map<Integer, Question> mapResult = new LinkedHashMap<>( );
+        listQuestion.forEach( q -> mapResult.put( q.getId( ), q ) );
+
+        // handle potential recursive controlling
+        final Deque<Question> toProcess = new ArrayDeque<>( listQuestion );
+
+        while ( !toProcess.isEmpty( ) )
+        {
+            final Question question = toProcess.poll( );
+
+            for ( final Control control : ControlHome.getControlByQuestion( question.getId( ) ) )
+            {
+                if ( !ControlType.CONDITIONAL.getLabel( ).equals( control.getControlType( ) ) )
+                {
+                    continue;
+                }
+                for ( final Question target : resolveTargetQuestions( control.getIdControlTarget( ) ) )
+                {
+                    if ( mapResult.putIfAbsent( target.getId( ), target ) == null )
+                    {
+                        toProcess.add( target );
+                    }
+                }
+            }
+        }
+        return new ArrayList<>( mapResult.values( ) );
+    }
+
+    /**
+     * Recursively find questions in target's children
+     *
+     * @param nIdControlTarget
+     *            the id of the target FormDisplay
+     * @return the List of Question found under that target, possibly empty
+     */
+    private List<Question> resolveTargetQuestions( final int nIdControlTarget )
+    {
+        final List<Question> listResult = new ArrayList<>( );
+        final FormDisplay formDisplay = FormDisplayHome.findByPrimaryKey( nIdControlTarget );
+        if ( formDisplay == null )
+        {
+            return listResult;
+        }
+
+        if ( CompositeDisplayType.QUESTION.getLabel( ).equals( formDisplay.getCompositeType( ) ) )
+        {
+            final Question question = QuestionHome.findByPrimaryKey( formDisplay.getCompositeId( ) );
+            if ( question != null )
+            {
+                question.setIterationNumber( DEFAULT_ITERATION_NUMBER );
+                listResult.add( question );
+            }
+        }
+        else
+        {
+            for ( final FormDisplay child : FormDisplayHome.getFormDisplayListByParent( formDisplay.getStepId( ), formDisplay.getId( ) ) )
+            {
+                if ( CompositeDisplayType.QUESTION.getLabel( ).equals( child.getCompositeType( ) ) )
+                {
+                    final Question question = QuestionHome.findByPrimaryKey( child.getCompositeId( ) );
+                    if ( question != null )
+                    {
+                        question.setIterationNumber( DEFAULT_ITERATION_NUMBER );
+                        listResult.add( question );
+                    }
+                }
+                else
+                {
+                    listResult.addAll( resolveTargetQuestions( child.getId( ) ) );
+                }
+            }
+        }
+        return listResult;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     */
+    @Override
+    public boolean isConditionalTarget( final int nIdForm, final Question question )
+    {
+        final FormDisplay formDisplay = FormDisplayHome.getFormDisplayByFormStepAndComposite( nIdForm, question.getIdStep( ), question.getId( ) );
+        return formDisplay != null && formDisplay.getDisplayControl( ) != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Question> expandWithSubmittedIterations( final HttpServletRequest request, final List<Question> listQuestions )
+    {
+        final List<Question> listExpanded = new ArrayList<>( );
+
+        for ( final Question question : listQuestions )
+        {
+            final int nIdEntry = question.getEntry( ).getIdEntry( );
+            final TreeSet<Integer> setIterations = new TreeSet<>( );
+            final Enumeration<String> paramNames = request.getParameterNames( );
+            while ( paramNames.hasMoreElements( ) )
+            {
+                final String strParam = paramNames.nextElement( );
+                if ( strParam.matches( "^nIt\\d+_" + IEntryTypeService.PREFIX_ATTRIBUTE + nIdEntry + "(_.*)?$" ) )
+                {
+                    final String strIndex = strParam.substring( 3, strParam.indexOf( '_' ) );
+                    if ( StringUtils.isNumeric( strIndex ) )
+                    {
+                        setIterations.add( Integer.parseInt( strIndex ) );
+                    }
+                }
+            }
+
+            if ( setIterations.isEmpty( ) )
+            {
+                if ( question.getIterationNumber( ) == DEFAULT_ITERATION_NUMBER )
+                {
+                    final Question questionIteration = new Question( question );
+                    questionIteration.setIterationNumber( 0 );
+                    listExpanded.add( questionIteration );
+                }
+                else
+                {
+                    listExpanded.add( question );
+                }
+            }
+            else
+            {
+                for ( final Integer nIteration : setIterations )
+                {
+                    final Question questionIteration = new Question( question );
+                    questionIteration.setIterationNumber( nIteration );
+                    listExpanded.add( questionIteration );
+                }
+            }
+        }
+
+        return listExpanded;
+    }
+
+    /**
+     * Merge submitted responses into existing form resonse
+     * @param formResponse
+     *           the form response to be merged
+     * @param listSubmitted
+     *           the submitted reponses to merge
+     */
+    private void mergeSubmittedResponsesIntoFormResponse( final FormResponse formResponse, final List<FormQuestionResponse> listSubmitted )
+    {
+        if ( CollectionUtils.isEmpty( listSubmitted ) || formResponse == null || CollectionUtils.isEmpty( formResponse.getSteps( ) ) )
+        {
+            return;
+        }
+
+        final Set<Integer> editedQuestionIds = listSubmitted.stream( ).map( s -> s.getQuestion( ).getId( ) ).collect( Collectors.toSet( ) );
+
+        for ( final FormResponseStep formResponseStep : formResponse.getSteps( ) )
+        {
+            final int nIdStep = formResponseStep.getStep( ).getId( );
+            final List<FormQuestionResponse> listMerged = new ArrayList<>( );
+
+            for ( final FormQuestionResponse existing : formResponseStep.getQuestions( ) )
+            {
+                if ( !editedQuestionIds.contains( existing.getQuestion( ).getId( ) ) )
+                {
+                    listMerged.add( existing );
+                }
+            }
+
+            for ( final FormQuestionResponse submitted : listSubmitted )
+            {
+                if ( submitted.getQuestion( ).getIdStep( ) == nIdStep )
+                {
+                    listMerged.add( submitted );
+                }
+            }
+
+            formResponseStep.setQuestions( listMerged );
+        }
     }
 }
