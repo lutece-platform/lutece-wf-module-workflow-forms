@@ -44,6 +44,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
+import fr.paris.lutece.plugins.forms.service.FormsPlugin;
 import fr.paris.lutece.plugins.forms.util.FormsConstants;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
@@ -57,6 +58,7 @@ import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowSe
 import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.workflow.WorkflowService;
+import fr.paris.lutece.util.sql.TransactionManager;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -120,15 +122,27 @@ public abstract class AbstractFormResponseService<R>
         List<EditableResponse> listChangedResponse = _formsTaskService.findChangedResponses( listEditableResponse );
         List<FormQuestionResponse> listChangedResponseToSave = new ArrayList<>( );
 
-        for ( EditableResponse editableResponse : listChangedResponse )
+        TransactionManager.beginTransaction( FormsPlugin.getPlugin( ) );
+        try
         {
-            listChangedResponseToSave.add( editableResponse.getResponseFromForm( ) );
-            createTaskHistory( editableResponse, idTask, idHistory );
-        }
+            for ( EditableResponse editableResponse : listChangedResponse )
+            {
+                listChangedResponseToSave.add( editableResponse.getResponseFromForm( ) );
+                createTaskHistory( editableResponse, idTask, idHistory );
+            }
 
-        _editFormResponseTaskService.saveResponses( response, listChangedResponseToSave );
-        _formsTaskService.removeHiddenConditionalTargetResponses( request, response, listQuestions );
-        _formsTaskService.removeOrphanIterations( response, listQuestions );
+            _editFormResponseTaskService.persistResponses( response, listChangedResponseToSave );
+            _formsTaskService.removeHiddenConditionalTargetResponses( request, response, listQuestions );
+            _formsTaskService.removeOrphanIterations( response, listQuestions );
+
+            TransactionManager.commitTransaction( FormsPlugin.getPlugin( ) );
+        }
+        catch( Exception e )
+        {
+            TransactionManager.rollBack( FormsPlugin.getPlugin( ) );
+            throw e;
+        }
+        _editFormResponseTaskService.fireFormResponseUpdate( response );
     }
 
     protected abstract void createTaskHistory( EditableResponse editableResponse, int idTask, int idHistory );

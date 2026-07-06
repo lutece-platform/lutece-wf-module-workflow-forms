@@ -57,13 +57,31 @@ public interface IEditFormResponseTaskService
     List<Question> findQuestionsToEdit( ITask task, FormResponse formResponse );
 
     /**
-     * Saves the specified responses
-     * 
+     * Saves the specified responses and fires the {@code FormResponse} update event.
+     *
      * @param formResponse
      * @param listFormQuestionResponse
      *            the responses to save
      */
     void saveResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse );
+
+    /**
+     * Persists the specified responses <b>without</b> firing the {@code FormResponse} update event.
+     *
+     * @param formResponse
+     *            the form response the saved responses belong to
+     * @param listFormQuestionResponse
+     *            the responses to persist
+     */
+    void persistResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse );
+
+    /**
+     * Fires the update event for the specified {@code FormResponse}.
+     *
+     * @param formResponse
+     *            the form response whose update must be notified
+     */
+    void fireFormResponseUpdate( FormResponse formResponse );
 
     /**
      * Create a {@link ReferenceList} containing all questions code

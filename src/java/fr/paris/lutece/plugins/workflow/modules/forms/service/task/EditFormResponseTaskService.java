@@ -152,13 +152,26 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
         return listQuestionIteration;
     }
 
+    @Override
     public void saveResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse )
+    {
+        persistResponses( formResponse, listFormQuestionResponse );
+        fireFormResponseUpdate( formResponse );
+    }
+
+    @Override
+    public void persistResponses( FormResponse formResponse, List<FormQuestionResponse> listFormQuestionResponse )
     {
         for ( FormQuestionResponse formQuestionResponse : listFormQuestionResponse )
         {
             saveStep( formQuestionResponse );
             saveResponses( formQuestionResponse );
         }
+    }
+
+    @Override
+    public void fireFormResponseUpdate( FormResponse formResponse )
+    {
         _formService.fireFormResponseEventUpdate( formResponse );
     }
 
