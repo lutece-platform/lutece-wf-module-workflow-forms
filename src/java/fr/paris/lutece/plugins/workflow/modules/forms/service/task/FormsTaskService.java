@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -375,12 +377,34 @@ public class FormsTaskService implements IFormsTaskService
     @Override
     public void removeOrphanIterations( final FormResponse formResponse, final List<Question> listSubmittedQuestions )
     {
+        for ( final FormQuestionResponse formQuestionResponse : this.findOrphanIterationResponses( formResponse, listSubmittedQuestions ) )
+        {
+            FormQuestionResponseHome.remove( formQuestionResponse );
+        }
+    }
+
+    /**
+     * Compute the persisted responses whose iteration is beyond the highest iteration submitted for their
+     * question
+     * <p>
+     * A question absent from the submitted list is left untouched : only the
+     * questions actually edited on this request have their surplus iterations reclaimed.
+     *
+     * @param formResponse
+     *            the persisted form response being edited
+     * @param listSubmittedQuestions
+     *            the questions (with their iteration number) present in the submitted responses
+     * @return the persisted responses to remove, in encounter order
+     */
+    public List<FormQuestionResponse> findOrphanIterationResponses( final FormResponse formResponse, final List<Question> listSubmittedQuestions )
+    {
         final Map<Integer, Integer> maxSubmittedIteration = new HashMap<>( );
         for ( final Question question : listSubmittedQuestions )
         {
             maxSubmittedIteration.merge( question.getId( ), question.getIterationNumber( ), Math::max );
         }
 
+        final List<FormQuestionResponse> listOrphan = new ArrayList<>( );
         for ( final FormResponseStep formResponseStep : formResponse.getSteps( ) )
         {
             for ( final FormQuestionResponse formQuestionResponse : new ArrayList<>( formResponseStep.getQuestions( ) ) )
@@ -388,10 +412,11 @@ public class FormsTaskService implements IFormsTaskService
                 final Integer nMaxSubmitted = maxSubmittedIteration.get( formQuestionResponse.getQuestion( ).getId( ) );
                 if ( nMaxSubmitted != null && formQuestionResponse.getQuestion( ).getIterationNumber( ) > nMaxSubmitted )
                 {
-                    FormQuestionResponseHome.remove( formQuestionResponse );
+                    listOrphan.add( formQuestionResponse );
                 }
             }
         }
+        return listOrphan;
     }
 
     private FormQuestionResponse findSavedResponse( FormResponse formResponse, Question question )
@@ -594,12 +619,28 @@ public class FormsTaskService implements IFormsTaskService
             }
         }
 
+        return this.isDisplayedFromControlOutcomes( bOr, nValid, nNotValid, bHasUnevaluable );
+    }
+
+    /**
+     * Decide whether a conditional target is displayed or not
+     *
+     * @param bOr
+     *            {@code true} if the controls are combined with OR, {@code false} for AND
+     * @param nValid
+     *            number of controls that evaluated to "displayed"
+     * @param nNotValid
+     *            number of controls that evaluated to "not displayed"
+     * @param bHasUnevaluable
+     *            {@code true} if at least one control could not be evaluated
+     * @return {@code true} if the target is displayed (kept), {@code false} if it is hidden (removed)
+     */
+    public boolean isDisplayedFromControlOutcomes( final boolean bOr, final int nValid, final int nNotValid, final boolean bHasUnevaluable )
+    {
         if ( bOr )
         {
-            // OR
             return nValid > 0 || bHasUnevaluable;
         }
-        // AND
         return nNotValid == 0;
     }
 
