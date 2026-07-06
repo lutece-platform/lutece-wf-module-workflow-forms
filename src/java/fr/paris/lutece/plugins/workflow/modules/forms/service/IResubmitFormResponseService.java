@@ -38,6 +38,7 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.genericattributes.business.Entry;
@@ -171,10 +172,58 @@ public interface IResubmitFormResponseService
 
     /**
      * Do change the Response to complete
-     * 
+     *
      * @param resubmitFormResponse
      *            the Response
      */
     void doCompleteResponse( ResubmitFormResponse resubmitFormResponse );
+
+    /**
+     * Gets the List of FormQuestionResponse containing the values the user previously tried to submit, on
+     * this request.
+     *
+     * @param request
+     *            the HTTP request
+     * @return the List of FormQuestionResponse, or an empty List if nothing was submitted yet
+     */
+    List<FormQuestionResponse> getSubmittedFormResponseList( HttpServletRequest request );
+
+    /**
+     * Gets the id of the group to be given one extra empty iteration on this render.
+     *
+     * @param request
+     *            the HTTP request
+     * @return the id of the FormDisplay (group) to iterate, or 0 if none
+     */
+    int getIdGroupToIterate( HttpServletRequest request );
+
+    /**
+     * Adds an iteration to the given group.
+     *
+     * @param request
+     *            the HTTP request
+     * @param resubmitFormResponse
+     *            the response being edited
+     * @param idHistory
+     *            the id of the resource history the FormResponse is attached to
+     * @param nIdGroupToIterate
+     *            the id of the FormDisplay (group) to add an iteration to
+     */
+    void doAddIterationResponse( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse, int idHistory, int nIdGroupToIterate );
+
+    /**
+     * Removes the given iteration from the given group.
+     *
+     * @param request
+     *            the HTTP request
+     * @param resubmitFormResponse
+     *            the response being edited
+     * @param idHistory
+     *            the id of the resource history the FormResponse is attached to
+     * @param strGroupAndIterationToRemove
+     *            the "&lt;idGroup&gt;_&lt;index&gt;" identifying the group iteration to remove
+     */
+    void doRemoveIterationResponse( HttpServletRequest request, ResubmitFormResponse resubmitFormResponse, int idHistory,
+            String strGroupAndIterationToRemove );
 
 }
