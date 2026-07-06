@@ -49,7 +49,7 @@ import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.ResubmitFormResponse;
-import fr.paris.lutece.plugins.workflow.modules.forms.service.ResubmitFormResponseService;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.IResubmitFormResponseService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.signrequest.ResubmitFormResponseRequestAuthenticatorService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.SiteMessage;
@@ -83,7 +83,7 @@ public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFor
     private static final String MARK_RESUBMIT_FORM = "resubmit_form";
 
     // SERVICES
-    private final ResubmitFormResponseService _resubmitFormResponseService = SpringContextService.getBean( "workflow-forms.taskResubmitResponseService" );
+    private final IResubmitFormResponseService _resubmitFormResponseService = SpringContextService.getBean( "workflow-forms.taskResubmitResponseService" );
 
     @Override
     public XPage getPage( HttpServletRequest request, int nMode, Plugin plugin ) throws UserNotSignedException, SiteMessageException
