@@ -44,7 +44,7 @@
         <dependency>
             <groupId>fr.paris.lutece.plugins</groupId>
             <artifactId>plugin-forms</artifactId>
-            <version>[3.1.2-SNAPSHOT,3.9.9)</version>
+            <version>[3.1.6-SNAPSHOT,3.9.9)</version>
             <type>lutece-plugin</type>
         </dependency>
         <dependency>
