@@ -872,14 +872,16 @@ public class FormsTaskService implements IFormsTaskService
         for ( final Question question : listQuestions )
         {
             final int nIdEntry = question.getEntry( ).getIdEntry( );
+            final Pattern iterationPattern = Pattern.compile( "^" + IEntryTypeService.PREFIX_ITERATION_ATTRIBUTE + "(\\d+)_" + IEntryTypeService.PREFIX_ATTRIBUTE + nIdEntry + "(?:_.*)?$" );
             final TreeSet<Integer> setIterations = new TreeSet<>( );
             final Enumeration<String> paramNames = request.getParameterNames( );
             while ( paramNames.hasMoreElements( ) )
             {
-                final String strParam = paramNames.nextElement( );
-                if ( strParam.matches( "^nIt\\d+_" + IEntryTypeService.PREFIX_ATTRIBUTE + nIdEntry + "(_.*)?$" ) )
+                final String strParam = paramNames.nextElement();
+                final Matcher iterationMatcher = iterationPattern.matcher(strParam);
+                if (  iterationMatcher.matches( ) )
                 {
-                    final String strIndex = strParam.substring( 3, strParam.indexOf( '_' ) );
+                    final String strIndex = iterationMatcher.group( 1 );
                     if ( StringUtils.isNumeric( strIndex ) )
                     {
                         setIterations.add( Integer.parseInt( strIndex ) );
