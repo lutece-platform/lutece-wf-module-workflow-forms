@@ -50,7 +50,7 @@ import fr.paris.lutece.plugins.forms.business.Step;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.forms.web.entrytype.DisplayType;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.CompleteFormResponse;
-import fr.paris.lutece.plugins.workflow.modules.forms.service.CompleteFormResponseService;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.ICompleteFormResponseService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.signrequest.CompleteFormResponseRequestAuthenticatorService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.SiteMessage;
@@ -79,7 +79,7 @@ public class CompleteFormResponseApp extends AbstractFormResponseApp<CompleteFor
 
     // SERVICES
     @Inject
-    private CompleteFormResponseService _completeFormResponseService;
+    private ICompleteFormResponseService _completeFormResponseService;
 
     /**
      * Get the CompleteFormResponse page
