@@ -66,4 +66,13 @@ public interface IResubmitFormResponseTaskHistoryDAO
      *            id
      */
     void deleteByIdHistoryAndTask( int nIdHistory, int nIdTask );
+
+    /**
+     * Updates the new value of the ResubmitFormResponseTaskHistory identified by the same history, task, question and iteration number. The previous value of the existing entry is kept.
+     * 
+     * @param resubmitFormResponseTaskHistory
+     *            the history entry holding the key and the new value
+     * @return true if an existing entry has been updated, false if no entry matches the key
+     */
+    boolean store( ResubmitFormResponseTaskHistory resubmitFormResponseTaskHistory );
 }

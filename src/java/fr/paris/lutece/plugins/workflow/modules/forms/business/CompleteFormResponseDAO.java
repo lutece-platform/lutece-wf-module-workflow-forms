@@ -62,6 +62,8 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
     private static final String SQL_QUERY_DELETE_BY_ID_HISTORY = " DELETE FROM workflow_task_complete_response WHERE id_history = ? AND id_task = ? ";
     private static final String SQL_QUERY_DELETE_BY_TASK = " DELETE FROM workflow_task_complete_response WHERE id_task = ? ";
     private static final String SQL_QUERY_UPDATE = " UPDATE workflow_task_complete_response SET message = ?, is_complete = ?, date_completed = ? WHERE id_history = ? AND id_task = ? ";
+    private static final String SQL_QUERY_MARK_AS_COMPLETE = " UPDATE workflow_task_complete_response SET is_complete = 1, date_completed = ? WHERE id_history = ? AND id_task = ? AND is_complete = 0 ";
+    private static final String SQL_QUERY_REOPEN = " UPDATE workflow_task_complete_response SET is_complete = 0, date_completed = NULL WHERE id_history = ? AND id_task = ? ";
 
     /**
      * {@inheritDoc}
@@ -186,6 +188,41 @@ public class CompleteFormResponseDAO implements ICompleteFormResponseDAO
     /**
      * {@inheritDoc}
      */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean markAsComplete( int nIdHistory, int nIdTask, Timestamp dateCompleted, Plugin plugin )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_MARK_AS_COMPLETE, plugin ) )
+        {
+            int nIndex = 1;
+            daoUtil.setTimestamp( nIndex++, dateCompleted );
+            daoUtil.setInt( nIndex++, nIdHistory );
+            daoUtil.setInt( nIndex++, nIdTask );
+
+            daoUtil.executeUpdate( );
+
+            return daoUtil.getReturnedRowCount( ) > 0;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reopen( int nIdHistory, int nIdTask, Plugin plugin )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_REOPEN, plugin ) )
+        {
+            int nIndex = 1;
+            daoUtil.setInt( nIndex++, nIdHistory );
+            daoUtil.setInt( nIndex++, nIdTask );
+
+            daoUtil.executeUpdate( );
+        }
+    }
+
     @Override
     public void deleteByIdTask( int nIdTask, Plugin plugin )
     {

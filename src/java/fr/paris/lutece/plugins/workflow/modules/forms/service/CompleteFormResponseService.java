@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.workflow.modules.forms.service;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,6 +83,7 @@ public class CompleteFormResponseService extends AbstractFormResponseService<Com
 
     private static final String MESSAGE_APP_ERROR = "module.workflow.forms.message.app_error";
     private static final String PARAMETER_URL_RETURN = "url_return";
+    private static final String MESSAGE_RECORD_ALREADY_COMPLETED = "module.workflow.forms.message.response_already_completed";
 
     @Inject
     private ICompleteFormResponseDAO _completeFormResponseDAO;
@@ -303,8 +305,53 @@ public class CompleteFormResponseService extends AbstractFormResponseService<Com
             request.setAttribute( ATTRIBUTE_SUBMITTED_RESPONSES, listSubmitted );
             return false;
         }
-        doEditResponseData( request, response, listQuestionsExpanded, idTask, idHistory );
+        // Claim the response before saving anything: a concurrent or repeated submission of the same form must not be processed twice
+        if ( !doClaimResponse( completeFormResponse ) )
+        {
+            _formsTaskService.setSiteMessage( request, MESSAGE_RECORD_ALREADY_COMPLETED, SiteMessage.TYPE_INFO, request.getParameter( PARAMETER_URL_RETURN ) );
+
+            return false;
+        }
+        try
+        {
+            doEditResponseData( request, response, listQuestionsExpanded, idTask, idHistory );
+        }
+        catch( RuntimeException e )
+        {
+            // nothing has been saved: let the user submit the form again
+            doReopenResponse( completeFormResponse );
+            throw e;
+        }
         return true;
+    }
+
+    /**
+     * Atomically marks the response as complete, if it is not complete yet
+     * 
+     * @param completeFormResponse
+     *            the response
+     * @return true if the response has been claimed by this call, false if it was already complete
+     */
+    private boolean doClaimResponse( CompleteFormResponse completeFormResponse )
+    {
+        Date dateCompleted = new Date( System.currentTimeMillis( ) );
+        boolean bClaimed = _completeFormResponseDAO.markAsComplete( completeFormResponse.getIdHistory( ), completeFormResponse.getIdTask( ),
+                new Timestamp( dateCompleted.getTime( ) ), WorkflowUtils.getPlugin( ) );
+
+        if ( bClaimed )
+        {
+            completeFormResponse.setIsComplete( true );
+            completeFormResponse.setDateCompleted( dateCompleted );
+        }
+        return bClaimed;
+    }
+
+    @Override
+    public void doReopenResponse( CompleteFormResponse completeFormResponse )
+    {
+        _completeFormResponseDAO.reopen( completeFormResponse.getIdHistory( ), completeFormResponse.getIdTask( ), WorkflowUtils.getPlugin( ) );
+        completeFormResponse.setIsComplete( false );
+        completeFormResponse.setDateCompleted( null );
     }
 
     @Override
@@ -336,7 +383,7 @@ public class CompleteFormResponseService extends AbstractFormResponseService<Com
         history.setQuestion( editableResponse.getQuestion( ) );
         history.setNewValue( _formsTaskService.createPreviousNewValue( editableResponse.getResponseFromForm( ) ) );
 
-        _completeFormResponseTaskHistoryService.create( history );
+        _completeFormResponseTaskHistoryService.createOrUpdate( history );
     }
 
     /**

@@ -51,6 +51,15 @@ public interface ICompleteFormResponseTaskHistoryService
     void create( CompleteFormResponseTaskHistory completeFormResponseTaskHistory );
 
     /**
+     * Creates the CompleteFormResponseTaskHistory, or only updates its new value when an entry already exists for the same history, task, question and iteration
+     * number (the form was submitted again for the same task).
+     * 
+     * @param completeFormResponseTaskHistory
+     *            the history entry to save
+     */
+    void createOrUpdate( CompleteFormResponseTaskHistory completeFormResponseTaskHistory );
+
+    /**
      * Return a list of CompleteFormResponseTaskHistory with an idHistory and an idTask
      * 
      * @param nIdHistory

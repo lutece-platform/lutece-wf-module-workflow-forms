@@ -205,7 +205,16 @@ public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFor
         {
             if ( _resubmitFormResponseService.doEditResponseData( request, response, idTask, idHistory ) )
             {
-                _resubmitFormResponseService.doChangeResponseState( response, request.getLocale( ) );
+                try
+                {
+                    _resubmitFormResponseService.doChangeResponseState( response, request.getLocale( ) );
+                }
+                catch( RuntimeException e )
+                {
+                    // the data is saved but the workflow state has not changed: let the user submit the form again
+                    _resubmitFormResponseService.doReopenResponse( response );
+                    throw e;
+                }
 
                 _resubmitFormResponseService.doCompleteResponse( response );
 

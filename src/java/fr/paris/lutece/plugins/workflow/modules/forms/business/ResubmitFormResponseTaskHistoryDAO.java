@@ -52,6 +52,8 @@ public class ResubmitFormResponseTaskHistoryDAO implements IResubmitFormResponse
             + "(id_history, id_task, id_question, iteration_number, previous_value, new_value) VALUES (?,?,?,?,?,?)";
     private static final String SQL_FILTER_IDHISTORY_IDTASK = SQL_QUERY_SELECT + "WHERE id_history = ? AND id_task = ?";
     private static final String SQL_QUERY_DELETE = "DELETE FROM workflow_task_resubmit_response_history WHERE id_history = ? AND id_task = ? ";
+    private static final String SQL_QUERY_UPDATE_NEW_VALUE = "UPDATE workflow_task_resubmit_response_history SET new_value = ? "
+            + "WHERE id_history = ? AND id_task = ? AND id_question = ? AND iteration_number = ?";
 
     @Override
     public synchronized void insert( ResubmitFormResponseTaskHistory resubmitFormResponseTaskHistory )
@@ -67,6 +69,27 @@ public class ResubmitFormResponseTaskHistoryDAO implements IResubmitFormResponse
             daoUtil.setString( ++nPos, resubmitFormResponseTaskHistory.getNewValue( ) );
 
             daoUtil.executeUpdate( );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean store( ResubmitFormResponseTaskHistory resubmitFormResponseTaskHistory )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_NEW_VALUE, WorkflowUtils.getPlugin( ) ) )
+        {
+            int nPos = 0;
+            daoUtil.setString( ++nPos, resubmitFormResponseTaskHistory.getNewValue( ) );
+            daoUtil.setInt( ++nPos, resubmitFormResponseTaskHistory.getIdHistory( ) );
+            daoUtil.setInt( ++nPos, resubmitFormResponseTaskHistory.getIdTask( ) );
+            daoUtil.setInt( ++nPos, resubmitFormResponseTaskHistory.getQuestion( ).getId( ) );
+            daoUtil.setInt( ++nPos, resubmitFormResponseTaskHistory.getQuestion( ).getIterationNumber( ) );
+
+            daoUtil.executeUpdate( );
+
+            return daoUtil.getReturnedRowCount( ) > 0;
         }
     }
 

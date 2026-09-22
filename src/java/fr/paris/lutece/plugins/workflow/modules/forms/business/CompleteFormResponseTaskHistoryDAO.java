@@ -52,6 +52,8 @@ public class CompleteFormResponseTaskHistoryDAO implements ICompleteFormResponse
             + "(id_history, id_task, id_question, iteration_number, new_value) VALUES (?,?,?,?,?)";
     private static final String SQL_FILTER_IDHISTORY_IDTASK = SQL_QUERY_SELECT + "WHERE id_history = ? AND id_task = ?";
     private static final String SQL_QUERY_DELETE = "DELETE FROM workflow_task_complete_response_history WHERE id_history = ? AND id_task = ? ";
+    private static final String SQL_QUERY_UPDATE_NEW_VALUE = "UPDATE workflow_task_complete_response_history SET new_value = ? "
+            + "WHERE id_history = ? AND id_task = ? AND id_question = ? AND iteration_number = ?";
 
     /**
      * {@inheritDoc}
@@ -69,6 +71,27 @@ public class CompleteFormResponseTaskHistoryDAO implements ICompleteFormResponse
             daoUtil.setString( ++nPos, completeFormResponseTaskHistory.getNewValue( ) );
 
             daoUtil.executeUpdate( );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean store( CompleteFormResponseTaskHistory completeFormResponseTaskHistory )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_NEW_VALUE, WorkflowUtils.getPlugin( ) ) )
+        {
+            int nPos = 0;
+            daoUtil.setString( ++nPos, completeFormResponseTaskHistory.getNewValue( ) );
+            daoUtil.setInt( ++nPos, completeFormResponseTaskHistory.getIdHistory( ) );
+            daoUtil.setInt( ++nPos, completeFormResponseTaskHistory.getIdTask( ) );
+            daoUtil.setInt( ++nPos, completeFormResponseTaskHistory.getQuestion( ).getId( ) );
+            daoUtil.setInt( ++nPos, completeFormResponseTaskHistory.getQuestion( ).getIterationNumber( ) );
+
+            daoUtil.executeUpdate( );
+
+            return daoUtil.getReturnedRowCount( ) > 0;
         }
     }
 

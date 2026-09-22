@@ -179,6 +179,15 @@ public interface IResubmitFormResponseService
     void doCompleteResponse( ResubmitFormResponse resubmitFormResponse );
 
     /**
+     * Marks the response as not complete again, after a failure that happened once the response had been claimed by {@link #doEditResponseData},
+     * so the user can submit the form another time.
+     * 
+     * @param resubmitFormResponse
+     *            the response to reopen
+     */
+    void doReopenResponse( ResubmitFormResponse resubmitFormResponse );
+
+    /**
      * Gets the List of FormQuestionResponse containing the values the user previously tried to submit, on
      * this request.
      *

@@ -59,6 +59,15 @@ public class CompleteFormResponseTaskHistoryService implements ICompleteFormResp
     }
 
     @Override
+    public void createOrUpdate( CompleteFormResponseTaskHistory completeFormResponseTaskHistory )
+    {
+        if ( !_completeFormResponseTaskHistoryDAO.store( completeFormResponseTaskHistory ) )
+        {
+            _completeFormResponseTaskHistoryDAO.insert( completeFormResponseTaskHistory );
+        }
+    }
+
+    @Override
     public List<CompleteFormResponseTaskHistory> load( int nIdHistory, int nIdTask )
     {
         List<CompleteFormResponseTaskHistory> listCompleteFormResponseTaskHistory = _completeFormResponseTaskHistoryDAO
