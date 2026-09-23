@@ -32,4 +32,33 @@
 <@addRequiredJsFiles />
 <script src="jsp/site/plugins/asynchronousupload/GetMainUploadJs.jsp?handler=formsAsynchronousUploadHandler" ></script>
 <@initEditor />
+<script>
+document.addEventListener( 'DOMContentLoaded', function() {
+	var saveBtn = document.querySelector( '[name="save"]' );
+	if ( !saveBtn || !saveBtn.form ) return;
+	var submitting = false;
+	saveBtn.form.addEventListener( 'submit', function( e ) {
+		// Only guard the final save: upload and iteration buttons also submit this form
+		if ( e.submitter && e.submitter !== saveBtn ) return;
+		if ( submitting ) {
+			e.preventDefault();
+			return;
+		}
+		submitting = true;
+		// Disable after the form data is built so the "save" parameter is still sent
+		setTimeout( function() {
+			saveBtn.disabled = true;
+			saveBtn.setAttribute( 'aria-disabled', 'true' );
+		}, 0 );
+	});
+	// Re-enable when the page is restored from the back/forward cache
+	window.addEventListener( 'pageshow', function( e ) {
+		if ( e.persisted ) {
+			submitting = false;
+			saveBtn.disabled = false;
+			saveBtn.removeAttribute( 'aria-disabled' );
+		}
+	});
+});
+</script>
 </@cTpl>
