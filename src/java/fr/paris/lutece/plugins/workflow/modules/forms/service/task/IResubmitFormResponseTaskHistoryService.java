@@ -51,6 +51,15 @@ public interface IResubmitFormResponseTaskHistoryService
     void create( ResubmitFormResponseTaskHistory resubmitFormResponseTaskHistory );
 
     /**
+     * Creates the ResubmitFormResponseTaskHistory, or only updates its new value when an entry already exists for the same history, task, question and iteration
+     * number (the form was submitted again for the same task). The previous value of the existing entry is kept.
+     * 
+     * @param resubmitFormResponseTaskHistory
+     *            the history entry to save
+     */
+    void createOrUpdate( ResubmitFormResponseTaskHistory resubmitFormResponseTaskHistory );
+
+    /**
      * Return a list of ResubmitFormResponseTaskHistory with an idHistory and an idTask
      * 
      * @param nIdHistory

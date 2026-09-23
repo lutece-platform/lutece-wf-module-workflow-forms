@@ -35,6 +35,8 @@ package fr.paris.lutece.plugins.workflow.modules.forms.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 
+import java.sql.Timestamp;
+
 import java.util.List;
 
 /**
@@ -109,4 +111,32 @@ public interface ICompleteFormResponseDAO
      *            the plugin
      */
     void deleteByIdTask( int nIdTask, Plugin plugin );
+
+    /**
+     * Marks the CompleteFormResponse as complete, only if it is not complete yet. The update is atomic: when two requests submit the same form at the
+     * same time, exactly one of them gets true.
+     * 
+     * @param nIdHistory
+     *            the history id
+     * @param nIdTask
+     *            the task id
+     * @param dateCompleted
+     *            the completion date
+     * @param plugin
+     *            the plugin
+     * @return true if the response has been marked as complete by this call, false if it was already complete or does not exist
+     */
+    boolean markAsComplete( int nIdHistory, int nIdTask, Timestamp dateCompleted, Plugin plugin );
+
+    /**
+     * Marks the CompleteFormResponse as not complete again, so the form can be submitted another time.
+     * 
+     * @param nIdHistory
+     *            the history id
+     * @param nIdTask
+     *            the task id
+     * @param plugin
+     *            the plugin
+     */
+    void reopen( int nIdHistory, int nIdTask, Plugin plugin );
 }

@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.workflow.modules.forms.service;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -86,6 +87,7 @@ public class ResubmitFormResponseService extends AbstractFormResponseService<Res
 
     private static final String MESSAGE_APP_ERROR = "module.workflow.forms.message.app_error";
     private static final String PARAMETER_URL_RETURN = "url_return";
+    private static final String MESSAGE_RECORD_ALREADY_COMPLETED = "module.workflow.forms.message.response_already_completed";
 
     @Inject
     private ITaskService _taskService;
@@ -300,8 +302,53 @@ public class ResubmitFormResponseService extends AbstractFormResponseService<Res
             request.setAttribute( ATTRIBUTE_SUBMITTED_RESPONSES, listSubmitted );
             return false;
         }
-        doEditResponseData( request, response, listQuestionsExpanded, idTask, idHistory );
+        // Claim the response before saving anything: a concurrent or repeated submission of the same form must not be processed twice
+        if ( !doClaimResponse( resubmitFormResponse ) )
+        {
+            _formsTaskService.setSiteMessage( request, MESSAGE_RECORD_ALREADY_COMPLETED, SiteMessage.TYPE_INFO, request.getParameter( PARAMETER_URL_RETURN ) );
+
+            return false;
+        }
+        try
+        {
+            doEditResponseData( request, response, listQuestionsExpanded, idTask, idHistory );
+        }
+        catch( RuntimeException e )
+        {
+            // nothing has been saved: let the user submit the form again
+            doReopenResponse( resubmitFormResponse );
+            throw e;
+        }
         return true;
+    }
+
+    /**
+     * Atomically marks the response as complete, if it is not complete yet
+     * 
+     * @param resubmitFormResponse
+     *            the response
+     * @return true if the response has been claimed by this call, false if it was already complete
+     */
+    private boolean doClaimResponse( ResubmitFormResponse resubmitFormResponse )
+    {
+        Date dateCompleted = new Date( System.currentTimeMillis( ) );
+        boolean bClaimed = _resubmitFormResponseDAO.markAsComplete( resubmitFormResponse.getIdHistory( ), resubmitFormResponse.getIdTask( ),
+                new Timestamp( dateCompleted.getTime( ) ), WorkflowUtils.getPlugin( ) );
+
+        if ( bClaimed )
+        {
+            resubmitFormResponse.setIsComplete( true );
+            resubmitFormResponse.setDateCompleted( dateCompleted );
+        }
+        return bClaimed;
+    }
+
+    @Override
+    public void doReopenResponse( ResubmitFormResponse resubmitFormResponse )
+    {
+        _resubmitFormResponseDAO.reopen( resubmitFormResponse.getIdHistory( ), resubmitFormResponse.getIdTask( ), WorkflowUtils.getPlugin( ) );
+        resubmitFormResponse.setIsComplete( false );
+        resubmitFormResponse.setDateCompleted( null );
     }
 
     @Override
@@ -314,7 +361,7 @@ public class ResubmitFormResponseService extends AbstractFormResponseService<Res
         history.setPreviousValue( _formsTaskService.createPreviousNewValue( editableResponse.getResponseSaved( ) ) );
         history.setNewValue( _formsTaskService.createPreviousNewValue( editableResponse.getResponseFromForm( ) ) );
 
-        _resubmitFormResponseTaskHistoryService.create( history );
+        _resubmitFormResponseTaskHistoryService.createOrUpdate( history );
     }
 
     @Override

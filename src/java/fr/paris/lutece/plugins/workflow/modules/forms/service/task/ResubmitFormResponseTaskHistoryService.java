@@ -59,6 +59,15 @@ public class ResubmitFormResponseTaskHistoryService implements IResubmitFormResp
     }
 
     @Override
+    public void createOrUpdate( ResubmitFormResponseTaskHistory resubmitFormResponseTaskHistory )
+    {
+        if ( !_resubmitFormResponseTaskHistoryDAO.store( resubmitFormResponseTaskHistory ) )
+        {
+            _resubmitFormResponseTaskHistoryDAO.insert( resubmitFormResponseTaskHistory );
+        }
+    }
+
+    @Override
     public List<ResubmitFormResponseTaskHistory> load( int nIdHistory, int nIdTask )
     {
         List<ResubmitFormResponseTaskHistory> listResubmitFormResponseTaskHistory = _resubmitFormResponseTaskHistoryDAO

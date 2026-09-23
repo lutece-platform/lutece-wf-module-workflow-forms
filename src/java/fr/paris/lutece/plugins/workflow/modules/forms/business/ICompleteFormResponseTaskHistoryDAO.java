@@ -66,4 +66,13 @@ public interface ICompleteFormResponseTaskHistoryDAO
      *            id
      */
     void deleteByIdHistoryAndTask( int nIdHistory, int nIdTask );
+
+    /**
+     * Updates the new value of the CompleteFormResponseTaskHistory identified by the same history, task, question and iteration number.
+     * 
+     * @param completeFormResponseTaskHistory
+     *            the history entry holding the key and the new value
+     * @return true if an existing entry has been updated, false if no entry matches the key
+     */
+    boolean store( CompleteFormResponseTaskHistory completeFormResponseTaskHistory );
 }

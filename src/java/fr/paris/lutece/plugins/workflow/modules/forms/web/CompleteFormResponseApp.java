@@ -149,7 +149,16 @@ public class CompleteFormResponseApp extends AbstractFormResponseApp<CompleteFor
         {
             if ( _completeFormResponseService.doEditResponseData( request, response, idTask, idHistory ) )
             {
-                _completeFormResponseService.doChangeResponseState( response, request.getLocale( ) );
+                try
+                {
+                    _completeFormResponseService.doChangeResponseState( response, request.getLocale( ) );
+                }
+                catch( RuntimeException e )
+                {
+                    // the data is saved but the workflow state has not changed: let the user submit the form again
+                    _completeFormResponseService.doReopenResponse( response );
+                    throw e;
+                }
 
                 _completeFormResponseService.doCompleteResponse( response );
 
