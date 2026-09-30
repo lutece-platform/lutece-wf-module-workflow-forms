@@ -1,5 +1,4 @@
 <@cTpl>
-<#include "/admin/util/editor/editor.html" />
 <#include "/skin/plugins/asynchronousupload/upload_commons.html" />
 <@cContainer>
 	<@cRow>
@@ -31,7 +30,6 @@
 </@cContainer>
 <@addRequiredJsFiles />
 <script src="jsp/site/plugins/asynchronousupload/GetMainUploadJs.jsp?handler=formsAsynchronousUploadHandler" ></script>
-<@initEditor />
 <script>
 document.addEventListener( 'DOMContentLoaded', function() {
 	var saveBtn = document.querySelector( '[name="save"]' );
