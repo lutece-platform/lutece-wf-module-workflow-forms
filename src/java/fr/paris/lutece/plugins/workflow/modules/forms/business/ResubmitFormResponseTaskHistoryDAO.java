@@ -54,7 +54,7 @@ public class ResubmitFormResponseTaskHistoryDAO implements IResubmitFormResponse
     private static final String SQL_QUERY_DELETE = "DELETE FROM workflow_task_resubmit_response_history WHERE id_history = ? AND id_task = ? ";
 
     @Override
-    public synchronized void insert( ResubmitFormResponseTaskHistory resubmitFormResponseTaskHistory )
+    public void insert( ResubmitFormResponseTaskHistory resubmitFormResponseTaskHistory )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, WorkflowUtils.getPlugin( ) ) )
         {

@@ -59,7 +59,7 @@ public class CompleteFormResponseTaskConfigDAO implements ITaskConfigDAO<Complet
      * {@inheritDoc}
      */
     @Override
-    public synchronized void insert( CompleteFormResponseTaskConfig config )
+    public void insert( CompleteFormResponseTaskConfig config )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, WorkflowUtils.getPlugin( ) ) )
         {

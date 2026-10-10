@@ -60,7 +60,7 @@ public class ResubmitFormResponseTaskConfigDAO implements ITaskConfigDAO<Resubmi
      * {@inheritDoc}
      */
     @Override
-    public synchronized void insert( ResubmitFormResponseTaskConfig config )
+    public void insert( ResubmitFormResponseTaskConfig config )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, WorkflowUtils.getPlugin( ) ) )
         {

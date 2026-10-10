@@ -57,7 +57,7 @@ public class CompleteFormResponseTaskHistoryDAO implements ICompleteFormResponse
      * {@inheritDoc}
      */
     @Override
-    public synchronized void insert( CompleteFormResponseTaskHistory completeFormResponseTaskHistory )
+    public void insert( CompleteFormResponseTaskHistory completeFormResponseTaskHistory )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, WorkflowUtils.getPlugin( ) ) )
         {

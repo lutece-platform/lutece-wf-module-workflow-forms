@@ -57,7 +57,7 @@ public class EditFormResponseTaskHistoryDAO implements IEditFormResponseTaskHist
      * {@inheritDoc}
      */
     @Override
-    public synchronized void insert( EditFormResponseTaskHistory editFormResponseTaskHistory )
+    public void insert( EditFormResponseTaskHistory editFormResponseTaskHistory )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, WorkflowUtils.getPlugin( ) ) )
         {

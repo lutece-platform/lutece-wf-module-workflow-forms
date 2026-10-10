@@ -58,7 +58,7 @@ public class CompleteFormResponseValueDAO implements ICompleteFormResponseValueD
      * {@inheritDoc}
      */
     @Override
-    public synchronized void insert( CompleteFormResponseValue completeFormResponseValue, Plugin plugin )
+    public void insert( CompleteFormResponseValue completeFormResponseValue, Plugin plugin )
     {
         int nIndex = 1;
 

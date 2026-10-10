@@ -67,7 +67,7 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
      * {@inheritDoc}
      */
     @Override
-    public synchronized void insert( ResubmitFormResponse resubmitFormResponse, Plugin plugin )
+    public void insert( ResubmitFormResponse resubmitFormResponse, Plugin plugin )
     {
         int nIndex = 1;
 
