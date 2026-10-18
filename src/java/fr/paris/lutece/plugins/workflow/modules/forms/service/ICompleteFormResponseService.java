@@ -165,6 +165,24 @@ public interface ICompleteFormResponseService
     void doCompleteResponse( CompleteFormResponse completeFormResponse );
 
     /**
+     * Claims the Response before processing a submission: only one of several concurrent submissions on the same Response
+     * can claim it
+     *
+     * @param completeFormResponse
+     *            the Response
+     * @return true if the Response was claimed by this call, false if it is already complete or claimed by another request
+     */
+    boolean doClaimResponse( CompleteFormResponse completeFormResponse );
+
+    /**
+     * Releases a claimed Response whose submission was not processed (invalid values, error), so it can be submitted again
+     *
+     * @param completeFormResponse
+     *            the Response
+     */
+    void doReleaseResponse( CompleteFormResponse completeFormResponse );
+
+    /**
      * Gets the List of FormQuestionResponse containing the values the user previously tried to submit, on
      * this request.
      *

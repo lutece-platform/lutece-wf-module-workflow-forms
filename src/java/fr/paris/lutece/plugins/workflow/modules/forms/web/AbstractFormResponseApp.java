@@ -88,7 +88,7 @@ public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResp
 
     // MESSAGES
     private static final String MESSAGE_EDITION_COMPLETE = "module.workflow.forms.message.edition_complete";
-    private static final String MESSAGE_RECORD_ALREADY_COMPLETED = "module.workflow.forms.message.response_already_completed";
+    protected static final String MESSAGE_RECORD_ALREADY_COMPLETED = "module.workflow.forms.message.response_already_completed";
 
     @Inject
     protected IFormsTaskService _formsTaskService;

@@ -109,4 +109,30 @@ public interface IResubmitFormResponseDAO
      *            the plugin
      */
     void deleteByIdTask( int nIdTask, Plugin plugin );
+
+    /**
+     * Claims a ResubmitFormResponse that is not complete yet: marks it complete in one conditional update, so that only one
+     * of several concurrent submissions can process it.
+     * 
+     * @param nIdHistory
+     *            the id history
+     * @param nIdTask
+     *            the task id
+     * @param plugin
+     *            the plugin
+     * @return true if this call claimed the response, false if it was already complete (or claimed by another request)
+     */
+    boolean claim( int nIdHistory, int nIdTask, Plugin plugin );
+
+    /**
+     * Releases a claimed ResubmitFormResponse, when its processing did not complete
+     * 
+     * @param nIdHistory
+     *            the id history
+     * @param nIdTask
+     *            the task id
+     * @param plugin
+     *            the plugin
+     */
+    void release( int nIdHistory, int nIdTask, Plugin plugin );
 }

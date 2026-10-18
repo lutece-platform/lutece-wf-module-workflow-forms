@@ -328,6 +328,18 @@ public class CompleteFormResponseService extends AbstractFormResponseService<Com
     }
 
     @Override
+    public boolean doClaimResponse( CompleteFormResponse completeFormResponse )
+    {
+        return _completeFormResponseDAO.claim( completeFormResponse.getIdHistory( ), completeFormResponse.getIdTask( ), WorkflowUtils.getPlugin( ) );
+    }
+
+    @Override
+    public void doReleaseResponse( CompleteFormResponse completeFormResponse )
+    {
+        _completeFormResponseDAO.release( completeFormResponse.getIdHistory( ), completeFormResponse.getIdTask( ), WorkflowUtils.getPlugin( ) );
+    }
+
+    @Override
     protected void createTaskHistory( EditableResponse editableResponse, int idTask, int idHistory )
     {
         CompleteFormResponseTaskHistory history = new CompleteFormResponseTaskHistory( );

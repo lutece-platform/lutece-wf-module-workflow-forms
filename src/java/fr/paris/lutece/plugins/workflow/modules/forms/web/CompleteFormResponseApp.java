@@ -147,7 +147,27 @@ public class CompleteFormResponseApp extends AbstractFormResponseApp<CompleteFor
     {
         if ( isRecordStateValid( response, request.getLocale( ) ) )
         {
-            if ( _completeFormResponseService.doEditResponseData( request, response, idTask, idHistory ) )
+            // One-shot: of several concurrent submissions of the same response, only the one that claims it is processed
+            if ( !_completeFormResponseService.doClaimResponse( response ) )
+            {
+                _formsTaskService.setSiteMessage( request, MESSAGE_RECORD_ALREADY_COMPLETED, SiteMessage.TYPE_INFO,
+                        request.getParameter( PARAMETER_URL_RETURN ) );
+                return false;
+            }
+            boolean bEdited = false;
+            try
+            {
+                bEdited = _completeFormResponseService.doEditResponseData( request, response, idTask, idHistory );
+            }
+            finally
+            {
+                if ( !bEdited )
+                {
+                    // nothing was saved: the response can be submitted again
+                    _completeFormResponseService.doReleaseResponse( response );
+                }
+            }
+            if ( bEdited )
             {
                 _completeFormResponseService.doChangeResponseState( response, request.getLocale( ) );
 

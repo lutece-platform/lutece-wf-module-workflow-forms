@@ -337,6 +337,18 @@ public class ResubmitFormResponseService extends AbstractFormResponseService<Res
         update( resubmitFormResponse );
     }
 
+    @Override
+    public boolean doClaimResponse( ResubmitFormResponse resubmitFormResponse )
+    {
+        return _resubmitFormResponseDAO.claim( resubmitFormResponse.getIdHistory( ), resubmitFormResponse.getIdTask( ), WorkflowUtils.getPlugin( ) );
+    }
+
+    @Override
+    public void doReleaseResponse( ResubmitFormResponse resubmitFormResponse )
+    {
+        _resubmitFormResponseDAO.release( resubmitFormResponse.getIdHistory( ), resubmitFormResponse.getIdTask( ), WorkflowUtils.getPlugin( ) );
+    }
+
     /**
      * {@inheritDoc}
      */

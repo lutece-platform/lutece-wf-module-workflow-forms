@@ -62,6 +62,8 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
     private static final String SQL_QUERY_DELETE_BY_ID_HISTORY = " DELETE FROM workflow_task_resubmit_response WHERE id_history = ? AND id_task = ? ";
     private static final String SQL_QUERY_DELETE_BY_TASK = " DELETE FROM workflow_task_resubmit_response WHERE id_task = ? ";
     private static final String SQL_QUERY_UPDATE = " UPDATE workflow_task_resubmit_response SET message = ?, is_complete = ?, date_completed = ? WHERE id_history = ? AND id_task = ? ";
+    private static final String SQL_QUERY_CLAIM = " UPDATE workflow_task_resubmit_response SET is_complete = 1 WHERE id_history = ? AND id_task = ? AND is_complete = 0 ";
+    private static final String SQL_QUERY_RELEASE = " UPDATE workflow_task_resubmit_response SET is_complete = 0 WHERE id_history = ? AND id_task = ? ";
 
     /**
      * {@inheritDoc}
@@ -194,6 +196,40 @@ public class ResubmitFormResponseDAO implements IResubmitFormResponseDAO
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_BY_TASK, plugin ) )
         {
             daoUtil.setInt( 1, nIdTask );
+            daoUtil.executeUpdate( );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean claim( int nIdHistory, int nIdTask, Plugin plugin )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_CLAIM, plugin ) )
+        {
+            int nIndex = 1;
+            daoUtil.setInt( nIndex++, nIdHistory );
+            daoUtil.setInt( nIndex++, nIdTask );
+
+            daoUtil.executeUpdate( );
+
+            return daoUtil.getReturnedRowCount( ) == 1;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void release( int nIdHistory, int nIdTask, Plugin plugin )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_RELEASE, plugin ) )
+        {
+            int nIndex = 1;
+            daoUtil.setInt( nIndex++, nIdHistory );
+            daoUtil.setInt( nIndex++, nIdTask );
+
             daoUtil.executeUpdate( );
         }
     }

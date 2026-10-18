@@ -203,7 +203,27 @@ public class ResubmitFormResponseApp extends AbstractFormResponseApp<ResubmitFor
     {
         if ( isRecordStateValid( response, request.getLocale( ) ) )
         {
-            if ( _resubmitFormResponseService.doEditResponseData( request, response, idTask, idHistory ) )
+            // One-shot: of several concurrent submissions of the same response, only the one that claims it is processed
+            if ( !_resubmitFormResponseService.doClaimResponse( response ) )
+            {
+                _formsTaskService.setSiteMessage( request, MESSAGE_RECORD_ALREADY_COMPLETED, SiteMessage.TYPE_INFO,
+                        request.getParameter( PARAMETER_URL_RETURN ) );
+                return false;
+            }
+            boolean bEdited = false;
+            try
+            {
+                bEdited = _resubmitFormResponseService.doEditResponseData( request, response, idTask, idHistory );
+            }
+            finally
+            {
+                if ( !bEdited )
+                {
+                    // nothing was saved: the response can be submitted again
+                    _resubmitFormResponseService.doReleaseResponse( response );
+                }
+            }
+            if ( bEdited )
             {
                 _resubmitFormResponseService.doChangeResponseState( response, request.getLocale( ) );
 
