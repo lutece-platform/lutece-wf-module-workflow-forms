@@ -108,7 +108,8 @@ public abstract class AbstractFormResponseService<R>
             resourceWorkflow.setState( state );
             _resourceWorkflowService.update( resourceWorkflow );
 
-            _workflowService.doProcessAutomaticReflexiveActions( response.getId( ), FormResponse.RESOURCE_TYPE, action.getStateAfter( ).getId( ),
+            // the reflexive actions of the state the response has just moved to, not of the waiting state of the action
+            _workflowService.doProcessAutomaticReflexiveActions( response.getId( ), FormResponse.RESOURCE_TYPE, state.getId( ),
                     resourceWorkflow.getExternalParentId( ), locale, null );
             // if new state have action automatic
             _workflowService.executeActionAutomatic( response.getId( ), FormResponse.RESOURCE_TYPE, action.getWorkflow( ).getId( ),
