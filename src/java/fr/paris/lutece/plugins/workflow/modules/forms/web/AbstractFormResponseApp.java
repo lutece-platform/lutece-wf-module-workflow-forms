@@ -50,6 +50,7 @@ import fr.paris.lutece.portal.service.message.SiteMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.security.UserNotSignedException;
+import fr.paris.lutece.portal.service.template.HtmlMarkup;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.web.constants.Messages;
 import fr.paris.lutece.portal.web.xpages.XPage;
@@ -193,7 +194,8 @@ public abstract class AbstractFormResponseApp<R extends AbstractCompleteFormResp
         model.put( MARK_URL_RETURN, request.getParameter( PARAMETER_URL_RETURN ) );
         model.put( MARK_SIGNATURE, request.getParameter( PARAMETER_SIGNATURE ) );
         model.put( MARK_TIMESTAMP, request.getParameter( PARAMETER_TIMESTAMP ) );
-        model.put( MARK_STEP_LIST, listStepDisplayTree );
+        // the steps are HTML the forms step display tree renders, its data escaped
+        model.put( MARK_STEP_LIST, HtmlMarkup.ofAll( listStepDisplayTree ) );
 
         if ( formResponse != null )
         {
