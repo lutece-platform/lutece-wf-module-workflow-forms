@@ -1,33 +1,43 @@
-<@formGroup labelFor='multiform' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' hideLabel=['all'] >
+<@formGroup>
 	<@checkBox orientation='switch' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' name='multiform' id='multiform' value='1' checked=multiform />
 </@formGroup>
 <#if multiform>
-	<@formGroup labelFor='code_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
-		<@select name='code_select' items=code_list default_value='${state_code!}' />
-	</@formGroup>
-	<@formGroup labelFor='response_value' labelKey='#i18n{module.workflow.forms.state.control.forms.response.value.title}'>
-		<@input type='text' value='${response_value!}' name='response_value' />
-	</@formGroup>
+	<@fieldSet legend='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
+		<@formGroup labelFor='code_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.code}'>
+			<@select name='code_select' items=code_list default_value='${state_code!}' />
+		</@formGroup>
+		<@formGroup labelFor='response_value' labelKey='#i18n{module.workflow.forms.state.control.forms.response.value.title}'>
+			<@input type='text' value='${response_value!}' name='response_value' />
+		</@formGroup>
+	</@fieldSet>
 <#else>
-	<@formGroup labelFor='form_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
-		<@inputGroup>
-			<@select name='form_select' items=form_list default_value='${id_form!}' />
-			<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
-		</@inputGroup>
-		<#if id_form??>
-			<@inputGroup class='mt-3'>
-				<@select name='step_select' items=list_step default_value='${id_step!}' />
-				<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
+	<@fieldSet legend='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
+		<@formGroup labelFor='form_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.form}'>
+			<@inputGroup>
+				<@select name='form_select' items=form_list default_value='${id_form!}' />
+				<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' title='#i18n{module.workflow.forms.task.editFormResponse.config.validateForm}' hideTitle=['all'] />
 			</@inputGroup>
+		</@formGroup>
+		<#if id_form??>
+			<@formGroup labelFor='step_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.step}'>
+				<@inputGroup>
+					<@select name='step_select' items=list_step default_value='${id_step!}' />
+					<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' title='#i18n{module.workflow.forms.task.editFormResponse.config.validateStep}' hideTitle=['all'] />
+				</@inputGroup>
+			</@formGroup>
 		</#if>
 		<#if id_step??>
-			<@inputGroup class='mt-3'>
-				<@select name='question_select' items=question_list default_value='${id_question!}' />
-				<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' />
-			</@inputGroup>
+			<@formGroup labelFor='question_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.question}'>
+				<@inputGroup>
+					<@select name='question_select' items=question_list default_value='${id_question!}' />
+					<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' title='#i18n{module.workflow.forms.task.editFormResponse.config.validateQuestion}' hideTitle=['all'] />
+				</@inputGroup>
+			</@formGroup>
 		</#if>
 		<#if id_question??>
-			<@select name='response_value' items=value_list default_value='${response_value!}' />
+			<@formGroup labelFor='response_value' labelKey='#i18n{module.workflow.forms.state.control.forms.response.value.title}'>
+				<@select name='response_value' items=value_list default_value='${response_value!}' />
+			</@formGroup>
 		</#if>
-	</@formGroup>
+	</@fieldSet>
 </#if>

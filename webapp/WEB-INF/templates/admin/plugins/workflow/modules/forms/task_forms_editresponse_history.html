@@ -11,7 +11,7 @@
 				<#else>
 					<em>#i18n{module.workflow.forms.task.editFormResponseTaskHistory.empty}</em>
 				</#if>
-				<@icon style='arrow-right' />
+				<@icon style='arrow-right' title='#i18n{module.workflow.forms.task.editFormResponseTaskHistory.replacedBy}' />
 				<#if response.newValue?? && response.newValue?has_content && response.newValue!="">
 					<em>${response.newValue}</em>
 				<#else>
