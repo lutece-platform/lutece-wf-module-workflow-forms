@@ -73,7 +73,7 @@
 			<@manageFeatureItemColumn>#i18n{module.workflow.forms.task_linked_values_form_response_config.target.question.label} : ${(questionTargetLabel)!}</@manageFeatureItemColumn>
 			<@manageFeatureItemColumn>#i18n{module.workflow.forms.task_linked_values_form_response_config.target.value.label} : ${(value.questionTargetValue)!}</@manageFeatureItemColumn>
 			<@manageFeatureItemColumn align='end'>
-				<@button id='btnRemove' type='submit' buttonIcon='trash' name='apply' value='remove_rule' params='onclick="document.getElementById(\'id_config_value\').value = ${value.idConfigValue};"' color='danger'  />
+				<@button type='submit' buttonIcon='trash' name='apply' value='remove_rule' params={"data-config-value-id": value.idConfigValue?c} color='danger'  />
 			</@manageFeatureItemColumn>
 		</@manageFeatureItem>
 	</#list>
@@ -109,8 +109,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById('btn-offcanvasRule').addEventListener('click', function() {
 		setRequiredAttribut(true);
 	});
-	document.getElementById('btnRemove').addEventListener('click', function() {
-		setRequiredAttribut(false);
+	document.querySelectorAll('[data-config-value-id]').forEach(function(button) {
+		button.addEventListener('click', function() {
+			document.getElementById('id_config_value').value = button.dataset.configValueId;
+			setRequiredAttribut(false);
+		});
 	});
 });
 

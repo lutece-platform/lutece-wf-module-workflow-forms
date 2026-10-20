@@ -5,7 +5,7 @@
 		<@cCol>
 			<@cTitle level=2>#i18n{module.workflow.forms.complete_form.page_title}</@cTitle>
 			<#if complete_form.message?? && complete_form.message != ''><@cAlert class='warning'>${complete_form.message}</@cAlert></#if>
-			<@cForm class='form-horizontal' action='jsp/site/Portal.jsp' params=' enctype="multipart/form-data"' >
+			<@cForm class='form-horizontal' action='jsp/site/Portal.jsp' enctype="multipart/form-data" >
 				<@cInput type="hidden" name="page" value="workflow-complete-form" />
 				<@cInput type="hidden" name="id_history" value="${complete_form.idHistory}" />
 				<@cInput type="hidden" name="id_task" value="${complete_form.idTask}" />
@@ -21,7 +21,7 @@
 				</#if>
 				<@cRow >
 					<@cCol class='d-flex justify-content-center'>
-						<@cBtn label='#i18n{module.workflow.forms.complete_form.button_save}' class='primary' params=' name="save" ' />
+						<@cBtn label='#i18n{module.workflow.forms.complete_form.button_save}' class='primary' params={"name": "save"} />
 					</@cCol>
 				</@cRow>
 			</@cForm>
