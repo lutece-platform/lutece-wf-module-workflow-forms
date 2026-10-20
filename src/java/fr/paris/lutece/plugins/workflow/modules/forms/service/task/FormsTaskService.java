@@ -40,6 +40,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -59,6 +60,8 @@ import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.AbstractCompleteFormResponseValue;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import fr.paris.lutece.portal.service.util.AppPathService;
 
 import fr.paris.lutece.plugins.forms.business.Control;
 import fr.paris.lutece.plugins.forms.business.ControlGroup;
@@ -486,7 +489,7 @@ public class FormsTaskService implements IFormsTaskService
     @Override
     public void setSiteMessage( HttpServletRequest request, String strMessage, int nTypeMessage, String strUrlReturn ) throws SiteMessageException
     {
-        if ( StringUtils.isNotBlank( strUrlReturn ) )
+        if ( isSiteReturnUrl( strUrlReturn, AppPathService.getBaseUrl( request ) ) )
         {
             SiteMessageService.setMessage( request, strMessage, null, null, null,
                 null, nTypeMessage, null, strUrlReturn );
@@ -996,5 +999,58 @@ public class FormsTaskService implements IFormsTaskService
 
             formResponseStep.setQuestions( listMerged );
         }
+    }
+
+    /**
+     * Tells whether a return URL leads to this site: a relative URL of the site, or an absolute http(s) URL whose origin
+     * is the one of the site. A URL starting with // or holding a backslash, which browsers read as /, and a URL in
+     * another scheme (javascript:, data:) are refused.
+     *
+     * @param strUrl
+     *            the return URL given with the request
+     * @param strBaseUrl
+     *            the base URL of the site
+     * @return true if the URL leads to this site
+     */
+    public static boolean isSiteReturnUrl( String strUrl, String strBaseUrl )
+    {
+        if ( StringUtils.isBlank( strUrl ) )
+        {
+            return false;
+        }
+        String strCompact = strUrl.replaceAll( "[\\x00-\\x20]", "" ).toLowerCase( Locale.ROOT );
+        if ( strCompact.startsWith( "//" ) || strCompact.contains( "\\" ) )
+        {
+            return false;
+        }
+        if ( strCompact.startsWith( "http://" ) || strCompact.startsWith( "https://" ) )
+        {
+            String strOrigin = getOrigin( strCompact );
+            return strOrigin != null && StringUtils.isNotBlank( strBaseUrl ) && strOrigin.equals( getOrigin( strBaseUrl.toLowerCase( Locale.ROOT ) ) );
+        }
+        int nColon = strCompact.indexOf( ':' );
+        int nPathStart = StringUtils.indexOfAny( strCompact, "/?#" );
+
+        return nColon < 0 || ( nPathStart >= 0 && nPathStart < nColon );
+    }
+
+    /**
+     * Returns the origin (scheme, host and port) of an absolute http(s) URL.
+     *
+     * @param strUrl
+     *            the URL, in lower case
+     * @return the origin, or null if the URL has no host
+     */
+    private static String getOrigin( String strUrl )
+    {
+        int nHostStart = strUrl.indexOf( "://" );
+        if ( nHostStart < 0 )
+        {
+            return null;
+        }
+        int nHostEnd = StringUtils.indexOfAny( strUrl.substring( nHostStart + 3 ), "/?#" );
+        String strOrigin = ( nHostEnd < 0 ) ? strUrl : strUrl.substring( 0, nHostStart + 3 + nHostEnd );
+
+        return ( strOrigin.length( ) > nHostStart + 3 && !strOrigin.contains( "@" ) ) ? strOrigin : null;
     }
 }
