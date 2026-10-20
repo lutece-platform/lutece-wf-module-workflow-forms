@@ -112,7 +112,8 @@ public abstract class AbstractCompleteFormResponseTaskInfoProvider extends Abstr
             url.addParameter( PARAMETER_TIMESTAMP, strTimestamp );
             url.addParameter( PARAMETER_URL_RETURN, AppPropertiesService.getProperty( PROPERTY_URL_RETURN ) );
 
-            strInfoUrl = url.getUrlWithEntity( );
+            // a plain URL: the templates that print the marker escape it, an entity here would be escaped twice
+            strInfoUrl = url.getUrl( );
         }
 
         String strInfoEntries = getInfoEntries( nIdHistory );

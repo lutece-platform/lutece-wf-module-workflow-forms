@@ -74,6 +74,7 @@ import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.template.HtmlMarkup;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
@@ -278,7 +279,8 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
                 DisplayType.EDITION_BACKOFFICE );
 
         Map<String, Object> model = new HashMap<>( );
-        model.put( MARK_STEP_LIST, listStepDisplayTree );
+        // the steps are HTML the forms step display tree renders, its data escaped
+        model.put( MARK_STEP_LIST, HtmlMarkup.ofAll( listStepDisplayTree ) );
 
         return AppTemplateService.getTemplate( TEMPLATE_TASK_FORM, locale, model ).getHtml( );
     }

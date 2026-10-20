@@ -59,6 +59,7 @@ import fr.paris.lutece.plugins.workflowcore.business.task.ITaskType;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.template.HtmlMarkup;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
 @ApplicationScoped
@@ -124,7 +125,8 @@ public class ResubmitFormResponseTaskComponent extends AbstractFormResponseTaskC
                 DisplayType.RESUBMIT_BACKOFFICE );
 
         Map<String, Object> model = new HashMap<>( );
-        model.put( MARK_STEP_LIST, listStepDisplayTree );
+        // the steps are HTML the forms step display tree renders, its data escaped
+        model.put( MARK_STEP_LIST, HtmlMarkup.ofAll( listStepDisplayTree ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_FORM, locale, model );
 
