@@ -3,7 +3,7 @@
 </@formGroup>
 <#if multiform>
 	<@formGroup labelFor='code_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
-		<@select name='code_select' items=code_list default_value='${code!}' />
+		<@select name='code_select' items=code_list default_value='${state_code!}' />
 	</@formGroup>
 	<@formGroup labelFor='response_value' labelKey='#i18n{module.workflow.forms.state.control.forms.response.value.title}'>
 		<@input type='text' value='${response_value!}' name='response_value' />

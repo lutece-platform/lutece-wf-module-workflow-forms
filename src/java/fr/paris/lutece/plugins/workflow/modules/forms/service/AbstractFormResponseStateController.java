@@ -76,7 +76,7 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
     private static final String MARK_RESPONSE_VALUE = "response_value";
     private static final String MARK_MULTIFORM = "multiform";
     private static final String MARK_CODE_LIST = "code_list";
-    private static final String MARK_CODE = "code";
+    private static final String MARK_CODE = "state_code";
 
     // Parameters
     private static final String PARAMETER_ACTION = "apply";
