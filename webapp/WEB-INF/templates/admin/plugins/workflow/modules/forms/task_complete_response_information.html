@@ -18,7 +18,7 @@
 						<#if list_history?exists && list_history?has_content>
 							<#list list_history as history>
 								<#if history.question.idEntry==reponseValues.idEntry && history.question.iterationNumber==reponseValues.iterationNumber >
-									<@icon style='arrow-right' />${history.newValue}
+									<@icon style='arrow-right' title='#i18n{module.workflow.forms.task_complete_response_information.label_new_value}' />${history.newValue}
 								</#if>
 							</#list>
 						</#if>

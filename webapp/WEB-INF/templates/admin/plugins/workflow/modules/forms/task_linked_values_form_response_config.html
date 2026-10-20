@@ -4,7 +4,7 @@
 	<@columns class='d-flex justify-content-between align-items-center'>
 		<@h level=2>#i18n{module.workflow.forms.task_linked_values_form_response_config.title}</@h>
 		<@offcanvas id='offcanvasRule' position='end' size='half' title='#i18n{module.workflow.forms.task_linked_values_form_response_config.title.modal}' btnTitle='#i18n{module.workflow.forms.task_linked_values_form_response_config.add_rule}' btnIcon='plus' hideTitle=['xs','sm']>
-			<@formGroup labelFor='id_form' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.form.label}' mandatory=true>
+			<@formGroup labelFor='idForm' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.form.label}' mandatory=true>
 				<@select name='id_form' id="idForm" items=forms default_value='${(config.idForm)!}' />
 			</@formGroup>
 			<@formGroup labelFor='idQuestionSource' labelKey='#i18n{module.workflow.forms.task_linked_values_form_response_config.source.question.label}' mandatory=true>
@@ -73,7 +73,7 @@
 			<@manageFeatureItemColumn>#i18n{module.workflow.forms.task_linked_values_form_response_config.target.question.label} : ${(questionTargetLabel)!}</@manageFeatureItemColumn>
 			<@manageFeatureItemColumn>#i18n{module.workflow.forms.task_linked_values_form_response_config.target.value.label} : ${(value.questionTargetValue)!}</@manageFeatureItemColumn>
 			<@manageFeatureItemColumn align='end'>
-				<@button type='submit' buttonIcon='trash' name='apply' value='remove_rule' params={"data-config-value-id": value.idConfigValue?c} color='danger'  />
+				<@button type='submit' buttonIcon='trash' name='apply' value='remove_rule' params={"data-config-value-id": value.idConfigValue?c} color='danger' title='#i18n{portal.util.labelDelete} ' + (questionSourceLabel)! + ' = ' + (value.questionSourceValue)! + ' / ' + (questionTargetLabel)! + ' = ' + (value.questionTargetValue)! hideTitle=['all'] />
 			</@manageFeatureItemColumn>
 		</@manageFeatureItem>
 	</#list>
@@ -83,28 +83,48 @@
 </#if>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-	document.querySelectorAll('.question').forEach(el => el.style.display = 'none');
-	document.querySelectorAll('.answer-choice-source').forEach(el => el.style.display = 'none');
-	document.querySelectorAll('.answer-choice-target').forEach(el => el.style.display = 'none');
-	document.querySelectorAll('.form-' + document.getElementById('idForm').value).forEach(el => el.style.display = 'block');
-
-	document.getElementById('idForm').addEventListener('change', function() {
-		var value = this.value;
-		document.querySelectorAll('.question').forEach(el => el.style.display = 'none');
-		document.querySelectorAll('.form-' + value).forEach(el => el.style.display = 'block');
+	var idForm = document.getElementById('idForm');
+	var idQuestionSource = document.getElementById('idQuestionSource');
+	var questionSourceValue = document.getElementById('questionSourceValue');
+	var idQuestionTarget = document.getElementById('idQuestionTarget');
+	var questionTargetValue = document.getElementById('questionTargetValue');
+	// Every option of the dependent lists, kept aside: a list holds only the options of the selected form or question.
+	// A hidden option (style.display) can still be selected by typing its first letter, and Safari shows it anyway.
+	var allOptions = new Map();
+	[idQuestionSource, questionSourceValue, idQuestionTarget, questionTargetValue].forEach(function(select) {
+		allOptions.set(select, Array.from(select.options));
 	});
 
-	document.getElementById('idQuestionSource').addEventListener('change', function() {
-		var value = this.value;
-		document.querySelectorAll('.answer-choice-source').forEach(el => el.style.display = 'none');
-		document.querySelectorAll('.question-source-' + value).forEach(el => el.style.display = 'block');
-	});
+	function keepOptions(select, className) {
+		var value = select.value;
+		select.replaceChildren.apply(select, allOptions.get(select).filter(function(option) {
+			return !option.value || option.classList.contains(className);
+		}));
+		select.value = value;
+		if (select.selectedIndex < 0) {
+			select.value = '';
+		}
+	}
 
-	document.getElementById('idQuestionTarget').addEventListener('change', function() {
-		var value = this.value;
-		document.querySelectorAll('.answer-choice-target').forEach(el => el.style.display = 'none');
-		document.querySelectorAll('.question-target-' + value).forEach(el => el.style.display = 'block');
-	});
+	function showSourceValues() {
+		keepOptions(questionSourceValue, 'question-source-' + idQuestionSource.value);
+	}
+
+	function showTargetValues() {
+		keepOptions(questionTargetValue, 'question-target-' + idQuestionTarget.value);
+	}
+
+	function showQuestions() {
+		keepOptions(idQuestionSource, 'form-' + idForm.value);
+		keepOptions(idQuestionTarget, 'form-' + idForm.value);
+		showSourceValues();
+		showTargetValues();
+	}
+
+	showQuestions();
+	idForm.addEventListener('change', showQuestions);
+	idQuestionSource.addEventListener('change', showSourceValues);
+	idQuestionTarget.addEventListener('change', showTargetValues);
 
 	document.getElementById('btn-offcanvasRule').addEventListener('click', function() {
 		setRequiredAttribut(true);

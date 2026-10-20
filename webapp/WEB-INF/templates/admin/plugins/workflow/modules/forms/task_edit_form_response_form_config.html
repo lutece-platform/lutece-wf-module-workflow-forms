@@ -1,46 +1,55 @@
 <@input type='hidden' id='mapping_id' name='mapping_id' />
-<@formGroup labelFor='multiform' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' hideLabel=['all'] >
+<@formGroup>
 	<@checkBox orientation='switch' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' name='multiform' id='multiform' value='1' checked=multiform />
 </@formGroup>
 <#if multiform>
-	<@formGroup labelFor='code_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
-		<@inputGroup>
-			<@select name='code_select' items=code_list />
-			<@button type='submit' buttonIcon='check' name='apply' value='select_code' />
+	<@fieldSet legend='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
+		<@formGroup labelFor='code_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.code}'>
+			<@inputGroup>
+				<@select name='code_select' items=code_list />
+				<@button type='submit' buttonIcon='check' name='apply' value='select_code' title='#i18n{module.workflow.forms.task.editFormResponse.config.validateCode}' hideTitle=['all'] />
 			</@inputGroup>
-	</@formGroup>
+		</@formGroup>
+	</@fieldSet>
 	<#list mapping_list as mapping>
 		<@formGroup labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.existing}'>
 			<@staticText>
 				${mapping.code}
-				<@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params={"data-mapping-id": mapping.idConfigValue?c} color='danger'  />
+				<@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params={"data-mapping-id": mapping.idConfigValue?c} color='danger' title='#i18n{portal.util.labelDelete} ${mapping.code}' hideTitle=['all'] />
 			</@staticText>
 		</@formGroup>
 	</#list>
 <#else>
-	<@formGroup labelFor='form_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
-		<@inputGroup>
-			<@select name='form_select' items=form_list default_value='${id_form!}' />
-			<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' />
-		</@inputGroup>
-		<#if id_form??>
-			<@inputGroup class="mt-3">
-				<@select name='step_select' items=list_step default_value='${id_step!}' />
-				<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' />
+	<@fieldSet legend='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
+		<@formGroup labelFor='form_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.form}'>
+			<@inputGroup>
+				<@select name='form_select' items=form_list default_value='${id_form!}' />
+				<@button type='submit' buttonIcon='check' name='apply' value='select_form_config' title='#i18n{module.workflow.forms.task.editFormResponse.config.validateForm}' hideTitle=['all'] />
 			</@inputGroup>
+		</@formGroup>
+		<#if id_form??>
+			<@formGroup labelFor='step_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.step}'>
+				<@inputGroup>
+					<@select name='step_select' items=list_step default_value='${id_step!}' />
+					<@button type='submit' buttonIcon='check' name='apply' value='select_step_config' title='#i18n{module.workflow.forms.task.editFormResponse.config.validateStep}' hideTitle=['all'] />
+				</@inputGroup>
+			</@formGroup>
 		</#if>
 		<#if id_step??>
-			<@inputGroup class="mt-3">
-				<@select name='question_select' items=question_list default_value='${id_question!}' />
-				<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' />
-			</@inputGroup>
+			<@formGroup labelFor='question_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.question}'>
+				<@inputGroup>
+					<@select name='question_select' items=question_list default_value='${id_question!}' />
+					<@button type='submit' buttonIcon='check' name='apply' value='select_question_config' title='#i18n{module.workflow.forms.task.editFormResponse.config.validateQuestion}' hideTitle=['all'] />
+				</@inputGroup>
+			</@formGroup>
 		</#if>
-	</@formGroup>
+	</@fieldSet>
 	<#list mapping_list as mapping>
 		<@formGroup labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.existing}'>
 			<@staticText>
-				${mapping.form.title} / ${mapping.step.title} / <#if mapping.question?exists>${mapping.question.title}</#if>
-				<@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params={"data-mapping-id": mapping.idConfigValue?c} color='danger'  />
+				<#assign mappingLabel = mapping.form.title + ' / ' + mapping.step.title + ' / ' + mapping.question?exists?then( mapping.question.title, '' ) />
+				${mappingLabel}
+				<@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params={"data-mapping-id": mapping.idConfigValue?c} color='danger' title='#i18n{portal.util.labelDelete} ' + mappingLabel hideTitle=['all'] />
 			</@staticText>
 		</@formGroup>
 	</#list>
