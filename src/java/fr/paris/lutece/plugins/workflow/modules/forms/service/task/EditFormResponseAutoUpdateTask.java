@@ -146,16 +146,40 @@ public class EditFormResponseAutoUpdateTask extends SimpleTask
             }
             questionResponse.getEntryResponse( ).get( 0 ).setResponseValue( configValue.getResponse( ) );
 
-            for ( Field field : questionResponse.getQuestion( ).getEntry( ).getFields( ) )
+            Field field = findFieldByValue( questionResponse.getQuestion( ).getEntry( ).getFields( ), configValue.getResponse( ) );
+            if ( field != null )
             {
-                if ( field.getValue( ).equals( configValue.getResponse( ) ) )
-                {
-                    questionResponse.getEntryResponse( ).get( 0 ).setField( field );
-                }
+                questionResponse.getEntryResponse( ).get( 0 ).setField( field );
             }
             listFormQuestionResponseToSave.add( questionResponse );
         }
         _editFormResponseTaskService.saveResponses( formResponse, listFormQuestionResponseToSave );
         _formResponseService.saveFormResponse( formResponse );
+    }
+
+    /**
+     * Finds the field of an entry whose value is the configured response. The fields of an entry may have no value (a text entry has configuration
+     * fields without value), they never match.
+     *
+     * @param listFields
+     *            the fields of the entry
+     * @param strValue
+     *            the configured response
+     * @return the last field whose value is the configured response, or null if none
+     */
+    static Field findFieldByValue( List<Field> listFields, String strValue )
+    {
+        Field fieldFound = null;
+        if ( listFields != null )
+        {
+            for ( Field field : listFields )
+            {
+                if ( field.getValue( ) != null && field.getValue( ).equals( strValue ) )
+                {
+                    fieldFound = field;
+                }
+            }
+        }
+        return fieldFound;
     }
 }
