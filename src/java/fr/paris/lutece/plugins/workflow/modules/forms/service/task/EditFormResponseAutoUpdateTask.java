@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
@@ -126,12 +125,7 @@ public class EditFormResponseAutoUpdateTask extends SimpleTask
         List<FormQuestionResponse> listFormQuestionResponseToSave = new ArrayList<>( );
         for ( EditFormResponseConfigValue configValue : configValueList )
         {
-            listFormQuestionResponse = config.isMultiform( )
-                    ? listFormQuestionResponse.stream( ).filter( fqr -> fqr.getQuestion( ).getCode( ).equals( configValue.getCode( ) ) )
-                            .collect( Collectors.toList( ) )
-                    : listFormQuestionResponse.stream( ).filter( fqr -> fqr.getQuestion( ).getId( ) == configValue.getQuestion( ).getId( ) )
-                            .collect( Collectors.toList( ) );
-            FormQuestionResponse questionResponse = listFormQuestionResponse.isEmpty( ) ? null : listFormQuestionResponse.get( 0 );
+            FormQuestionResponse questionResponse = findQuestionResponse( listFormQuestionResponse, configValue, config.isMultiform( ) );
             if ( questionResponse == null )
             {
                 questionResponse = new FormQuestionResponse( );
@@ -155,6 +149,27 @@ public class EditFormResponseAutoUpdateTask extends SimpleTask
         }
         _editFormResponseTaskService.saveResponses( formResponse, listFormQuestionResponseToSave );
         _formResponseService.saveFormResponse( formResponse );
+    }
+
+    /**
+     * Finds, among all the question responses of the form response, the one of the question of a configured value: by question code for a multiform
+     * configuration, by question id otherwise. Each configured value is searched in the whole list, whatever the values processed before.
+     *
+     * @param listFormQuestionResponse
+     *            all the question responses of the form response
+     * @param configValue
+     *            the configured value
+     * @param bMultiform
+     *            true if the configuration applies to several forms (questions matched by code)
+     * @return the question response of the question of the configured value, or null if the form response has none
+     */
+    static FormQuestionResponse findQuestionResponse( List<FormQuestionResponse> listFormQuestionResponse, EditFormResponseConfigValue configValue,
+            boolean bMultiform )
+    {
+        return listFormQuestionResponse.stream( )
+                .filter( fqr -> bMultiform ? fqr.getQuestion( ).getCode( ).equals( configValue.getCode( ) )
+                        : fqr.getQuestion( ).getId( ) == configValue.getQuestion( ).getId( ) )
+                .findFirst( ).orElse( null );
     }
 
     /**

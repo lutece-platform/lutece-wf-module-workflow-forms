@@ -40,7 +40,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
+import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.genericattributes.business.Field;
+import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValue;
 
 /**
  * Field matching of the task that edits a response automatically
@@ -60,5 +63,57 @@ public class EditFormResponseAutoUpdateTaskTest
         assertSame( fieldYes, EditFormResponseAutoUpdateTask.findFieldByValue( List.of( fieldWithoutValue, fieldYes ), "Oui" ) );
         assertNull( EditFormResponseAutoUpdateTask.findFieldByValue( List.of( fieldWithoutValue ), "texte libre" ) );
         assertNull( EditFormResponseAutoUpdateTask.findFieldByValue( null, "Oui" ) );
+    }
+
+    /**
+     * With several configured values, each one finds the response of its own question in all the responses of the form response, whatever the values
+     * processed before: the second question is found instead of a new empty response being created
+     */
+    @Test
+    public void testEachConfiguredValueFindsItsQuestion( )
+    {
+        FormQuestionResponse responseFirst = newQuestionResponse( 1, "first" );
+        FormQuestionResponse responseSecond = newQuestionResponse( 2, "second" );
+        List<FormQuestionResponse> listResponses = List.of( responseFirst, responseSecond );
+
+        assertSame( responseFirst, EditFormResponseAutoUpdateTask.findQuestionResponse( listResponses, newConfigValue( responseFirst ), false ) );
+        assertSame( responseSecond, EditFormResponseAutoUpdateTask.findQuestionResponse( listResponses, newConfigValue( responseSecond ), false ) );
+        assertSame( responseFirst, EditFormResponseAutoUpdateTask.findQuestionResponse( listResponses, newConfigValue( responseFirst ), true ) );
+        assertSame( responseSecond, EditFormResponseAutoUpdateTask.findQuestionResponse( listResponses, newConfigValue( responseSecond ), true ) );
+        assertNull( EditFormResponseAutoUpdateTask.findQuestionResponse( List.of( responseFirst ), newConfigValue( responseSecond ), false ) );
+    }
+
+    /**
+     * Builds the response of a question
+     *
+     * @param nIdQuestion
+     *            the question id
+     * @param strCode
+     *            the question code
+     * @return the question response
+     */
+    private static FormQuestionResponse newQuestionResponse( int nIdQuestion, String strCode )
+    {
+        Question question = new Question( );
+        question.setId( nIdQuestion );
+        question.setCode( strCode );
+        FormQuestionResponse questionResponse = new FormQuestionResponse( );
+        questionResponse.setQuestion( question );
+        return questionResponse;
+    }
+
+    /**
+     * Builds a configured value targeting the question of a response
+     *
+     * @param questionResponse
+     *            the question response
+     * @return the configured value
+     */
+    private static EditFormResponseConfigValue newConfigValue( FormQuestionResponse questionResponse )
+    {
+        EditFormResponseConfigValue configValue = new EditFormResponseConfigValue( );
+        configValue.setQuestion( questionResponse.getQuestion( ) );
+        configValue.setCode( questionResponse.getQuestion( ).getCode( ) );
+        return configValue;
     }
 }
