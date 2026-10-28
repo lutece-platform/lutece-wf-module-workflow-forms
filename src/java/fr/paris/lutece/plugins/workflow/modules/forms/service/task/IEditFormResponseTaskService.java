@@ -39,6 +39,8 @@ import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import java.util.Locale;
+
 import fr.paris.lutece.util.ReferenceList;
 
 /**
@@ -91,4 +93,28 @@ public interface IEditFormResponseTaskService
     ReferenceList selectAllTechnicalCode( boolean isBo );
 
     ReferenceList getResponseReferenceList( int idQuestion );
+
+    /**
+     * Builds the answers offered for a technical code, gathered over every form carrying it.
+     * 
+     * In multiform mode the code is not bound to a form, so no single question can answer for it : the list gathers the choices of all of them, keyed by
+     * the value the runtime matches on, and each label says how many forms actually produce that value. A value only some of them produce leaves the task
+     * inert for the others, and that is what the administrator could not see.
+     * 
+     * @param strCode
+     *            the technical code of the question
+     * @param locale
+     *            the locale the labels are built in
+     * @return the answers, each labelled with the number of forms producing it
+     */
+    ReferenceList getResponseReferenceListByCode( String strCode, Locale locale );
+
+    /**
+     * Gives the number of forms carrying a technical code.
+     * 
+     * @param strCode
+     *            the technical code of the question
+     * @return how many distinct forms carry it
+     */
+    int countFormsCarryingCode( String strCode );
 }
