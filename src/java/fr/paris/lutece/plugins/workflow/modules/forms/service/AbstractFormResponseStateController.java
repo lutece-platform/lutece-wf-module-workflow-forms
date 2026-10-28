@@ -40,6 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -58,9 +59,11 @@ import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.FormResponseValueStateControllerConfig;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.FormResponseValueStateControllerConfigHome;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
 import fr.paris.lutece.plugins.workflow.modules.state.service.IChooseStateController;
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfig;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.util.ReferenceList;
 
 public abstract class AbstractFormResponseStateController implements IChooseStateController
@@ -87,6 +90,12 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
     private static final String PARAMETER_MULTIFORM = "multiform";
     private static final String PARAMETER_CODE = "code_select";
 
+    /** {0} the saved value */
+    private static final String PROPERTY_VALUE_NOT_OFFERED = "module.workflow.forms.state.control.forms.response.value.notOffered";
+
+    @Inject
+    private IEditFormResponseTaskService _editFormResponseTaskService;
+
     // Actions
     private static final String ACTION_SELECT_FORM = "select_form_config";
     private static final String ACTION_SELECT_STEP = "select_step_config";
@@ -105,7 +114,7 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
         FormResponseValueStateControllerConfigHome.removeByTask( task.getId( ) );
     }
 
-    protected Map<String, Object> createModelConfig( ITaskConfig config )
+    protected Map<String, Object> createModelConfig( ITaskConfig config, Locale locale )
     {
         FormResponseValueStateControllerConfig controllerConfig = loadConfig( config.getIdTask( ) );
 
@@ -129,6 +138,25 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
         {
             model.put( MARK_ID_QUESTION, controllerConfig.getQuestion( ).getId( ) );
             model.put( MARK_VALUE_LIST, getResponseReferenceList( controllerConfig.getQuestion( ).getId( ) ) );
+        }
+        if ( controllerConfig.isMultiform( ) && StringUtils.isNotEmpty( controllerConfig.getCode( ) ) )
+        {
+            // the code designates no single question, so the answers of every form carrying it are gathered, the way the task that writes an
+            // answer already does. Without this the value was typed by hand and nothing checked it : a value no form produces is accepted, the
+            // condition then never holds and the state never changes, with nothing on screen or in the log to say why
+            ReferenceList listValue = _editFormResponseTaskService.getAnswersByCode( controllerConfig.getCode( ), locale ).getReferenceList( );
+
+            // a saved value that no form offers any more stays in the list, named as such : otherwise the select falls back to its first item and
+            // the next save overwrites the value without anyone having chosen to
+            if ( StringUtils.isNotEmpty( controllerConfig.getValue( ) ) && !isOffered( listValue, controllerConfig.getValue( ) ) )
+            {
+                Object [ ] args = {
+                        controllerConfig.getValue( )
+                };
+                listValue.addItem( controllerConfig.getValue( ), I18nService.getLocalizedString( PROPERTY_VALUE_NOT_OFFERED, args, locale ) );
+            }
+
+            model.put( MARK_VALUE_LIST, listValue );
         }
         if ( StringUtils.isNotEmpty( controllerConfig.getValue( ) ) )
         {
@@ -171,9 +199,20 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
                     break;
             }
         }
+        String strValue = request.getParameter( PARAMETER_VALUE );
+
         if ( controllerConfig.isMultiform( ) )
         {
-            controllerConfig.setCode( request.getParameter( PARAMETER_CODE ) );
+            String strCode = request.getParameter( PARAMETER_CODE );
+
+            // the code was changed without reloading the screen : the value submitted with it was picked in the answers of the previous code, and
+            // is kept only when the new code offers it too
+            if ( !StringUtils.equals( strCode, controllerConfig.getCode( ) ) && StringUtils.isNotEmpty( strValue ) && StringUtils.isNotEmpty( strCode )
+                    && !isOffered( _editFormResponseTaskService.getAnswersByCode( strCode, locale ).getReferenceList( ), strValue ) )
+            {
+                strValue = null;
+            }
+            controllerConfig.setCode( strCode );
         }
         else
         {
@@ -183,8 +222,22 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
             }
             controllerConfig.setCode( null );
         }
-        controllerConfig.setValue( request.getParameter( PARAMETER_VALUE ) );
+        controllerConfig.setValue( strValue );
         FormResponseValueStateControllerConfigHome.update( controllerConfig );
+    }
+
+    /**
+     * Checks whether a value is one of the answers of a list.
+     *
+     * @param listValue
+     *            the answers
+     * @param strValue
+     *            the value
+     * @return true when the list holds that value
+     */
+    private static boolean isOffered( ReferenceList listValue, String strValue )
+    {
+        return listValue.stream( ).anyMatch( item -> StringUtils.equals( item.getCode( ), strValue ) );
     }
 
     protected abstract ReferenceList getResponseReferenceList( int idQuestion );
