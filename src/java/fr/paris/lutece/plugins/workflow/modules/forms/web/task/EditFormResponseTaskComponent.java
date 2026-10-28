@@ -336,7 +336,10 @@ public class EditFormResponseTaskComponent extends AbstractFormResponseTaskCompo
             List<Question> questionList = QuestionHome.getQuestionsListByStep( idStep );
             for ( Question question : questionList )
             {
-                if ( question.getEntry( ).isOnlyDisplayInBack( ) == isTaskBo( ) )
+                // une question orpheline, dont la ligne genatt_entry a disparu, suffisait a vider tout l'ecran :
+                // la liste entiere echouait, et l'administrateur ne pouvait meme plus en choisir une autre.
+                // EditFormResponseTaskService:218 pose deja cette garde sur le meme filtre.
+                if ( question.getEntry( ) != null && question.getEntry( ).isOnlyDisplayInBack( ) == isTaskBo( ) )
                 {
                     refList.addItem( question.getId( ), question.getTitle( ) );
                 }

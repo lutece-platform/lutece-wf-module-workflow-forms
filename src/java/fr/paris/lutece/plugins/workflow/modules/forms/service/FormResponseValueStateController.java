@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service;
 
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,6 +53,7 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.FormResponseValue
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfig;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
@@ -121,7 +123,16 @@ public class FormResponseValueStateController extends AbstractFormResponseStateC
         if ( idQuestion != -1 )
         {
             Question question = QuestionHome.findByPrimaryKey( idQuestion );
-            for ( Field field : question.getEntry( ).getFields( ) )
+            List<Field> listField = ( question == null || question.getEntry( ) == null ) ? null : question.getEntry( ).getFields( );
+
+            if ( listField == null )
+            {
+                // an orphan question, left without its generic attribute entry, used to break the whole configuration page
+                AppLogService.error( "Workflow forms : the question {} of the configuration has no entry any more, its answer list stays empty", idQuestion );
+                return refList;
+            }
+
+            for ( Field field : listField )
             {
                 if ( IEntryTypeService.FIELD_ANSWER_CHOICE.equals( field.getCode( ) ) )
                 {

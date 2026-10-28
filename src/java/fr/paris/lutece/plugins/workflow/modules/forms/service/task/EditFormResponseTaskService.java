@@ -62,6 +62,7 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseC
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValue;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.ReferenceList;
 
 /**
@@ -233,7 +234,16 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
         if ( idQuestion != -1 )
         {
             Question question = QuestionHome.findByPrimaryKey( idQuestion );
-            for ( Field field : question.getEntry( ).getFields( ) )
+            List<Field> listField = ( question == null || question.getEntry( ) == null ) ? null : question.getEntry( ).getFields( );
+
+            if ( listField == null )
+            {
+                // an orphan question, left without its generic attribute entry, used to break the whole configuration page
+                AppLogService.error( "Workflow forms : the question {} of the configuration has no entry any more, its answer list stays empty", idQuestion );
+                return refList;
+            }
+
+            for ( Field field : listField )
             {
                 if ( IEntryTypeService.FIELD_ANSWER_CHOICE.equals( field.getCode( ) ) )
                 {
