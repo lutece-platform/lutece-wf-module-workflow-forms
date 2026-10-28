@@ -80,7 +80,13 @@
 		<#list mapping_list as mapping>
 			<@formGroup labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.existing}'>
 				<@staticText>
-					${mapping.form.title} / ${mapping.step.title} / ${mapping.question.title} / ${mapping.response!}
+					<#-- un formulaire, une etape ou une question supprime laisse son parametrage en place : le decrire par defaut
+					     plutot que de faire echouer le rendu, sinon l'ecran entier part vide et le bouton qui retire la ligne
+					     fautive, rendu juste apres, n'est jamais atteint -->
+					<#if mapping.form??>${mapping.form.title}<#else>#i18n{module.workflow.forms.task.editFormResponse.config.deletedElement}</#if>
+					 / <#if mapping.step??>${mapping.step.title}<#else>#i18n{module.workflow.forms.task.editFormResponse.config.deletedElement}</#if>
+					 / <#if mapping.question??>${mapping.question.title}<#else>#i18n{module.workflow.forms.task.editFormResponse.config.deletedElement}</#if>
+					 / ${mapping.response!}
 					<@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="document.getElementById(\'mapping_id\').value = ${mapping.idConfigValue};"' color='danger' size='sm' />
 				</@staticText>
 			</@formGroup>
