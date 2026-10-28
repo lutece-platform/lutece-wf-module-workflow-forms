@@ -104,7 +104,7 @@ public class FormResponseValueStateController extends AbstractFormResponseStateC
     @Override
     public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITaskConfig config )
     {
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_CONFIG, locale, createModelConfig( config ) );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_CONFIG, locale, createModelConfig( config, locale ) );
         return template.getHtml( );
     }
 
