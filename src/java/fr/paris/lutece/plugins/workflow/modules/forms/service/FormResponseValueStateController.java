@@ -134,9 +134,10 @@ public class FormResponseValueStateController extends AbstractFormResponseStateC
 
             for ( Field field : listField )
             {
-                if ( IEntryTypeService.FIELD_ANSWER_CHOICE.equals( field.getCode( ) ) )
+                // value and title are both nullable on genatt_field : an answer with no value cannot be saved and collides with the empty item
+                if ( IEntryTypeService.FIELD_ANSWER_CHOICE.equals( field.getCode( ) ) && StringUtils.isNotEmpty( field.getValue( ) ) )
                 {
-                    refList.addItem( field.getValue( ), field.getTitle( ) );
+                    refList.addItem( field.getValue( ), StringUtils.defaultIfEmpty( field.getTitle( ), field.getValue( ) ) );
                 }
             }
         }

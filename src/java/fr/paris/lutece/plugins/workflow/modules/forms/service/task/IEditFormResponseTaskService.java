@@ -39,6 +39,8 @@ import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.Question;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import java.util.Locale;
+
 import fr.paris.lutece.util.ReferenceList;
 
 /**
@@ -91,4 +93,15 @@ public interface IEditFormResponseTaskService
     ReferenceList selectAllTechnicalCode( boolean isBo );
 
     ReferenceList getResponseReferenceList( int idQuestion );
+
+    /**
+     * Gathers, in one walk over the questions, the answer choices of every form carrying a technical code and how many forms carry it.
+     * 
+     * @param strCode
+     *            the technical code of the question
+     * @param locale
+     *            the locale the labels are built in
+     * @return the answers, each labelled with the number of forms producing it when not all of them do, and the number of forms
+     */
+    CodeAnswers getAnswersByCode( String strCode, Locale locale );
 }

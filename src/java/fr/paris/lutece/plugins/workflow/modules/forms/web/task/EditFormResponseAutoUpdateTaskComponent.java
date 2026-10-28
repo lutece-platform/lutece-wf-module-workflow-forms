@@ -40,6 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
@@ -49,11 +50,13 @@ import fr.paris.lutece.plugins.forms.business.QuestionHome;
 import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfig;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValue;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.CodeAnswers;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskHistoryService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskService;
 import fr.paris.lutece.plugins.workflow.web.task.NoFormTaskComponent;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
@@ -75,6 +78,11 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
     private static final String MARK_MULTIFORM = "multiform";
     private static final String MARK_CODE_LIST = "code_list";
     private static final String MARK_RESPONSE_LIST = "response_list";
+    private static final String MARK_CODE_INFO = "code_info";
+    private static final String MARK_CODE = "code";
+
+    /** {0} the number of forms carrying the code */
+    private static final String PROPERTY_CODE_CARRIED_BY = "module.workflow.forms.task.editFormResponse.config.codeCarriedBy";
     private static final String MARK_STEP_LIST = "list_step";
 
     // Parameters
@@ -166,9 +174,23 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
         }
         if ( _configValue.getCode( ) != null )
         {
+            // without this value the selector falls back to the first code of the list, and the screen shows the answers of one code
+            // under the name of another. Both state controller templates already pass it.
+            model.put( MARK_CODE, _configValue.getCode( ) );
             model.put( MARK_ID_QUESTION, _configValue.getCode( ) );
-            model.put( MARK_RESPONSE_LIST,
-                    _editFormResponseTaskService.getResponseReferenceList( QuestionHome.findByCode( _configValue.getCode( ) ).get( 0 ).getId( ) ) );
+            CodeAnswers codeAnswers = _editFormResponseTaskService.getAnswersByCode( _configValue.getCode( ), locale );
+            model.put( MARK_RESPONSE_LIST, codeAnswers.getReferenceList( ) );
+
+            int nNbForm = codeAnswers.getFormCount( );
+
+            if ( nNbForm > 1 )
+            {
+                // the code names no single form : say how many it spans, otherwise the answers below read as one form's own
+                Object [ ] args = {
+                        nNbForm
+                };
+                model.put( MARK_CODE_INFO, I18nService.getLocalizedString( PROPERTY_CODE_CARRIED_BY, args, locale ) );
+            }
         }
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_FORM_EDITRESPONSE_CONFIG, locale, model );

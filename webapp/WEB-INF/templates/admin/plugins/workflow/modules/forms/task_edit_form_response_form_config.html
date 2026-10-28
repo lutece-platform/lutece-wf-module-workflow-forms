@@ -1,17 +1,37 @@
-	<@formGroup>
-		<@inputGroup size='sm'>
-			<@checkBox labelFor='multiform' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' name='multiform' id='multiform' value='1' checked=multiform />
-			<@inputGroupItem>
-				<@button type='submit' buttonIcon='check' name='apply' value='select_multiform' size='sm'/>
-			</@inputGroupItem>
-		</@inputGroup>
+	<@formGroup helpKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform.editHelp}'>
+		<#-- the checkbox submits the form by itself : the validation button stuck to it in an input-group
+		     made an ambiguous control, read as a drop-down list. The `apply` parameter is added at submit time
+		     rather than set as a hidden field : a permanent hidden field would be sent twice along with the
+		     one of the button actually clicked, and getParameter would only return the first one. -->
+		<@checkBox labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' name='multiform' id='multiform' value='1' checked=multiform />
 	</@formGroup>
+	<script>
+	document.getElementById( 'multiform' ).addEventListener( 'change', function ( ) {
+		// bound here rather than through a macro attribute : @checkBox puts its `params` on the
+		// container div, where `this.form` and `this.checked` do not exist
+		var checkbox = this;
+		var form = checkbox.form;
+		<#if mapping_list?? && mapping_list?has_content>
+		// switching mode erases the mappings already entered : say so before, not after
+		if ( !window.confirm( '#i18n{module.workflow.forms.task.editFormResponse.config.confirmSwitchMultiform}' ) ) {
+			checkbox.checked = !checkbox.checked;
+			return;
+		}
+		</#if>
+		var action = document.createElement( 'input' );
+		action.type = 'hidden';
+		action.name = 'apply';
+		action.value = 'select_multiform';
+		form.appendChild( action );
+		form.submit( );
+	} );
+	</script>
 	<@input type='hidden' id='mapping_id' name='mapping_id' />
 	
 	<#if multiform>
 		<@formGroup labelFor='code_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
 			<@inputGroup>
-				<@select name='code_select' items=code_list />
+				<@select name='code_select' items=code_list default_value='${code!}' />
 				<@inputGroupItem>
 					<@button type='submit' buttonIcon='check' name='apply' value='select_code' />
 				</@inputGroupItem>
