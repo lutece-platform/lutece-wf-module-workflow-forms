@@ -1,6 +1,6 @@
 <@formGroup>
 	<@inputGroup size='sm'>
-		<@checkBox labelFor='multiform' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' name='multiform' id='multiform' value='1' checked=multiform />
+		<@checkBox labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' name='multiform' id='multiform' value='1' checked=multiform />
 		<@inputGroupItem>
 			<@button type='submit' buttonIcon='check' name='apply' value='select_multiform' size='sm'/>
 		</@inputGroupItem>
@@ -11,7 +11,13 @@
 		<@select name='code_select' items=code_list default_value='${code!}' />
 	</@formGroup>
 	<@formGroup labelFor='response_value' labelKey='#i18n{module.workflow.forms.state.control.forms.response.value.title}'>
-		<@input type='text' value='${response_value!}' name='response_value' />
+		<#-- une liste des reponses que les formulaires portant ce code produisent reellement, des qu'un code est choisi :
+		     saisie a la main, une valeur qu'aucun d'eux ne produit est acceptee et la condition ne tombe jamais -->
+		<#if value_list?? && (value_list?size > 1)>
+			<@select name='response_value' items=value_list default_value='${response_value!}' />
+		<#else>
+			<@input type='text' value='${response_value!}' name='response_value' />
+		</#if>
 	</@formGroup>
 <#else>
 	<@formGroup labelFor='form_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>

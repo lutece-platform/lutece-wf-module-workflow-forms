@@ -40,6 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -58,6 +59,7 @@ import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.FormResponseValueStateControllerConfig;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.FormResponseValueStateControllerConfigHome;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
 import fr.paris.lutece.plugins.workflow.modules.state.service.IChooseStateController;
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfig;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
@@ -87,6 +89,9 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
     private static final String PARAMETER_MULTIFORM = "multiform";
     private static final String PARAMETER_CODE = "code_select";
 
+    @Inject
+    private IEditFormResponseTaskService _editFormResponseTaskService;
+
     // Actions
     private static final String ACTION_SELECT_FORM = "select_form_config";
     private static final String ACTION_SELECT_STEP = "select_step_config";
@@ -105,7 +110,7 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
         FormResponseValueStateControllerConfigHome.removeByTask( task.getId( ) );
     }
 
-    protected Map<String, Object> createModelConfig( ITaskConfig config )
+    protected Map<String, Object> createModelConfig( ITaskConfig config, Locale locale )
     {
         FormResponseValueStateControllerConfig controllerConfig = loadConfig( config.getIdTask( ) );
 
@@ -129,6 +134,13 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
         {
             model.put( MARK_ID_QUESTION, controllerConfig.getQuestion( ).getId( ) );
             model.put( MARK_VALUE_LIST, getResponseReferenceList( controllerConfig.getQuestion( ).getId( ) ) );
+        }
+        if ( controllerConfig.isMultiform( ) && StringUtils.isNotEmpty( controllerConfig.getCode( ) ) )
+        {
+            // the code designates no single question, so the answers of every form carrying it are gathered, the way the task that writes an
+            // answer already does. Without this the value was typed by hand and nothing checked it : a value no form produces is accepted, the
+            // condition then never holds and the state never changes, with nothing on screen or in the log to say why
+            model.put( MARK_VALUE_LIST, _editFormResponseTaskService.getResponseReferenceListByCode( controllerConfig.getCode( ), locale ) );
         }
         if ( StringUtils.isNotEmpty( controllerConfig.getValue( ) ) )
         {

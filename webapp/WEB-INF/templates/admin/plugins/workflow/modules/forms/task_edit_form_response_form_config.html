@@ -1,17 +1,37 @@
-	<@formGroup>
-		<@inputGroup size='sm'>
-			<@checkBox labelFor='multiform' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' name='multiform' id='multiform' value='1' checked=multiform />
-			<@inputGroupItem>
-				<@button type='submit' buttonIcon='check' name='apply' value='select_multiform' size='sm'/>
-			</@inputGroupItem>
-		</@inputGroup>
+	<@formGroup helpKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform.help}'>
+		<#-- la case envoie le formulaire d'elle-meme : le bouton de validation accole dedans un input-group
+		     donnait un controle ambigu, qu'on lisait comme une liste deroulante. Le parametre `apply` est
+		     ajoute a la soumission et non pose en champ cache : un champ cache permanent serait envoye en
+		     double avec celui du bouton reellement clique, et getParameter ne rendrait que le premier. -->
+		<@checkBox labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' name='multiform' id='multiform' value='1' checked=multiform />
 	</@formGroup>
+	<script>
+	document.getElementById( 'multiform' ).addEventListener( 'change', function ( ) {
+		// la liaison se fait ici et non par un attribut de la macro : @checkBox pose ses `params` sur le
+		// div conteneur, ou `this.form` et `this.checked` n'existent pas
+		var caseACocher = this;
+		var formulaire = caseACocher.form;
+		<#if mapping_list?? && mapping_list?has_content>
+		// changer de mode efface les parametrages deja saisis : on le dit avant, pas apres
+		if ( !window.confirm( '#i18n{module.workflow.forms.task.editFormResponse.config.confirmSwitchMultiform}' ) ) {
+			caseACocher.checked = !caseACocher.checked;
+			return;
+		}
+		</#if>
+		var action = document.createElement( 'input' );
+		action.type = 'hidden';
+		action.name = 'apply';
+		action.value = 'select_multiform';
+		formulaire.appendChild( action );
+		formulaire.submit( );
+	} );
+	</script>
 	<@input type='hidden' id='mapping_id' name='mapping_id' />
 	
 	<#if multiform>
-		<@formGroup labelFor='code_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
+		<@formGroup labelFor='code_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}' helpKey='#i18n{module.workflow.forms.task.editFormResponse.config.code.help}'>
 			<@inputGroup>
-				<@select name='code_select' items=code_list />
+				<@select name='code_select' items=code_list default_value='${code!}' />
 				<@inputGroupItem>
 					<@button type='submit' buttonIcon='check' name='apply' value='select_code' />
 				</@inputGroupItem>
@@ -55,7 +75,12 @@
 		<#list mapping_list as mapping>
 			<@formGroup labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.existing}'>
 				<@staticText>
-					${mapping.form.title} / ${mapping.step.title} /&nbsp;<#if mapping.question?exists>${mapping.question.title}</#if>
+					<#-- un formulaire, une etape ou une question supprime laisse son parametrage en place : le decrire par defaut
+					     plutot que de faire echouer le rendu, sinon l'ecran entier part vide et le bouton qui retire la ligne
+					     fautive, rendu juste apres, n'est jamais atteint -->
+					<#if mapping.form??>${mapping.form.title}<#else>#i18n{module.workflow.forms.task.editFormResponse.config.deletedElement}</#if>
+					 / <#if mapping.step??>${mapping.step.title}<#else>#i18n{module.workflow.forms.task.editFormResponse.config.deletedElement}</#if>
+					 / <#if mapping.question??>${mapping.question.title}<#else>#i18n{module.workflow.forms.task.editFormResponse.config.deletedElement}</#if>
 					<@button type='submit' buttonIcon='trash' name='apply' value='delete_mapping' params='onclick="document.getElementById(\'mapping_id\').value = ${mapping.idConfigValue};"' color='danger' size='sm' />
 				</@staticText>
 			</@formGroup>

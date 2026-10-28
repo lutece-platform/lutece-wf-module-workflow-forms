@@ -34,8 +34,15 @@
 package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,6 +50,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
@@ -62,6 +70,8 @@ import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseC
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValue;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.ReferenceList;
 
 /**
@@ -225,6 +235,109 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
         return referenceList;
     }
 
+    /** {0} the answer label, {1} the number of forms producing it, {2} the number of forms carrying the code */
+    private static final String PROPERTY_ANSWER_FORM_COUNT = "module.workflow.forms.task.editFormResponse.config.answerFormCount";
+
+    /** {0} the answer label, {1} the number of different labels the forms give this value */
+    private static final String PROPERTY_ANSWER_LABEL_CONFLICT = "module.workflow.forms.task.editFormResponse.config.answerLabelConflict";
+
+    @Override
+    public ReferenceList getResponseReferenceListByCode( String strCode, Locale locale )
+    {
+        ReferenceList refList = new ReferenceList( );
+        refList.addItem( "", "" );
+
+        Map<String, Set<Integer>> mapFormsByValue = new LinkedHashMap<>( );
+        Map<String, Set<String>> mapLabelByValue = new HashMap<>( );
+        Set<Integer> setForm = collectAnswersByCode( strCode, mapFormsByValue, mapLabelByValue );
+
+        for ( Map.Entry<String, Set<Integer>> entry : mapFormsByValue.entrySet( ) )
+        {
+            Set<String> setLabel = mapLabelByValue.getOrDefault( entry.getKey( ), Collections.emptySet( ) );
+            String strLabel = setLabel.isEmpty( ) ? entry.getKey( ) : setLabel.iterator( ).next( );
+
+            if ( setLabel.size( ) > 1 )
+            {
+                // the same value does not mean the same thing everywhere : counting the forms that produce it would say they agree. Whoever
+                // configures the task has to go and look, and a label picked among the others would hide that
+                Object [ ] argsConflict = {
+                        strLabel, setLabel.size( )
+                };
+                strLabel = I18nService.getLocalizedString( PROPERTY_ANSWER_LABEL_CONFLICT, argsConflict, locale );
+            }
+
+            if ( entry.getValue( ).size( ) < setForm.size( ) )
+            {
+                // only the answers some forms do not produce carry the count : written on every line it reads as decoration, and the one line that
+                // matters stops being read
+                Object [ ] args = {
+                        strLabel, entry.getValue( ).size( ), setForm.size( )
+                };
+                strLabel = I18nService.getLocalizedString( PROPERTY_ANSWER_FORM_COUNT, args, locale );
+            }
+
+            refList.addItem( entry.getKey( ), strLabel );
+        }
+
+        return refList;
+    }
+
+    @Override
+    public int countFormsCarryingCode( String strCode )
+    {
+        return collectAnswersByCode( strCode, new LinkedHashMap<>( ), new HashMap<>( ) ).size( );
+    }
+
+    /**
+     * Walks the questions carrying a code and gathers their answer choices by value.
+     * 
+     * The value is the key, not the field identifier : each form has its own fields, and the runtime matches the saved response on the value. Two forms
+     * offering the same value therefore count as two forms producing the same answer, which is the whole point of the count.
+     * 
+     * @param strCode
+     *            the technical code
+     * @param mapFormsByValue
+     *            filled with, per answer value, the forms producing it, in encounter order
+     * @param mapLabelByValue
+     *            filled with, per answer value, a label to show
+     * @return the forms carrying the code
+     */
+    private Set<Integer> collectAnswersByCode( String strCode, Map<String, Set<Integer>> mapFormsByValue, Map<String, Set<String>> mapLabelByValue )
+    {
+        Set<Integer> setForm = new HashSet<>( );
+
+        for ( Question question : QuestionHome.findByCode( strCode ) )
+        {
+            Step step = StepHome.findByPrimaryKey( question.getIdStep( ) );
+
+            if ( step == null || question.getEntry( ) == null || question.getEntry( ).getFields( ) == null )
+            {
+                // a question whose step or entry is gone says nothing about the forms producing a value
+                AppLogService.error( "Workflow forms : the question {} carrying the code {} cannot be read, it is left out of the answer list",
+                        question.getId( ), strCode );
+
+                continue;
+            }
+
+            setForm.add( step.getIdForm( ) );
+
+            for ( Field field : question.getEntry( ).getFields( ) )
+            {
+                // genatt_field.value and genatt_field.title are both nullable : a value saying nothing cannot be saved as a response and would
+                // collide with the empty item opening the list, and a missing label falls back to the value, which at least names the answer
+                if ( IEntryTypeService.FIELD_ANSWER_CHOICE.equals( field.getCode( ) ) && StringUtils.isNotEmpty( field.getValue( ) ) )
+                {
+                    mapFormsByValue.computeIfAbsent( field.getValue( ), v -> new HashSet<>( ) ).add( step.getIdForm( ) );
+                    // every label this value is given, not the first one met : keeping only one would show agreement where the forms disagree
+                    mapLabelByValue.computeIfAbsent( field.getValue( ), v -> new LinkedHashSet<>( ) )
+                            .add( StringUtils.defaultIfEmpty( field.getTitle( ), field.getValue( ) ) );
+                }
+            }
+        }
+
+        return setForm;
+    }
+
     @Override
     public ReferenceList getResponseReferenceList( int idQuestion )
     {
@@ -233,11 +346,20 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
         if ( idQuestion != -1 )
         {
             Question question = QuestionHome.findByPrimaryKey( idQuestion );
-            for ( Field field : question.getEntry( ).getFields( ) )
+            List<Field> listField = ( question == null || question.getEntry( ) == null ) ? null : question.getEntry( ).getFields( );
+
+            if ( listField == null )
             {
-                if ( IEntryTypeService.FIELD_ANSWER_CHOICE.equals( field.getCode( ) ) )
+                // an orphan question, left without its generic attribute entry, used to break the whole configuration page
+                AppLogService.error( "Workflow forms : the question {} of the configuration has no entry any more, its answer list stays empty", idQuestion );
+                return refList;
+            }
+
+            for ( Field field : listField )
+            {
+                if ( IEntryTypeService.FIELD_ANSWER_CHOICE.equals( field.getCode( ) ) && StringUtils.isNotEmpty( field.getValue( ) ) )
                 {
-                    refList.addItem( field.getValue( ), field.getTitle( ) );
+                    refList.addItem( field.getValue( ), StringUtils.defaultIfEmpty( field.getTitle( ), field.getValue( ) ) );
                 }
             }
         }
