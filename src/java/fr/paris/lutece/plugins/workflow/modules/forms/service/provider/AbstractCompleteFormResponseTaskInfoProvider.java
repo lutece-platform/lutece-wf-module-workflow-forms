@@ -50,6 +50,8 @@ import fr.paris.lutece.plugins.workflow.service.taskinfo.AbstractTaskInfoProvide
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.portal.service.content.XPageAppService;
+import fr.paris.lutece.portal.service.util.AppException;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.url.UrlItem;
@@ -97,7 +99,14 @@ public abstract class AbstractCompleteFormResponseTaskInfoProvider extends Abstr
 
             String strTimestamp = Long.toString( new Date( ).getTime( ) );
             String strSignature = ResubmitFormResponseRequestAuthenticatorService.getRequestAuthenticator( ).buildSignature( listElements, strTimestamp );
-            StringBuilder sbUrl = new StringBuilder( getBaseUrl( request ) );
+            String strBaseUrl = getBaseUrl( request );
+
+            if ( StringUtils.isBlank( strBaseUrl ) )
+            {
+                throw new AppException( "Unable to build the url of the task " + nIdTask + " for the resource history " + nIdHistory + ": no base url" );
+            }
+
+            StringBuilder sbUrl = new StringBuilder( strBaseUrl );
 
             if ( !sbUrl.toString( ).endsWith( SLASH ) )
             {
@@ -157,6 +166,13 @@ public abstract class AbstractCompleteFormResponseTaskInfoProvider extends Abstr
             if ( StringUtils.isBlank( strBaseUrl ) )
             {
                 strBaseUrl = AppPropertiesService.getProperty( PROPERTY_LUTECE_PROD_URL );
+            }
+
+            // Without a base url the link of the task cannot be built: name the missing properties in the logs
+            if ( StringUtils.isBlank( strBaseUrl ) )
+            {
+                AppLogService.error( "Unable to build the url of the task: the properties {} and {} are both empty ({}={})", PROPERTY_LUTECE_BASE_URL,
+                        PROPERTY_LUTECE_PROD_URL, PROPERTY_BASE_URL_USE_PROPERTY, isBaseUrlFetchedInProperty( ) );
             }
         }
 
