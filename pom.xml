@@ -10,7 +10,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>module-workflow-forms</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>3.0.2-beta-05</version>
+    <version>3.0.2-SNAPSHOT</version>
 
     <name>Lutece workflow forms module</name>
 
