@@ -1,6 +1,7 @@
 <@input type='hidden' id='mapping_id' name='mapping_id' />
 <@formGroup>
 	<@checkBox orientation='switch' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.labelMultiform}' name='multiform' id='multiform' value='1' checked=multiform />
+	<@button type='submit' buttonIcon='check' name='apply' value='select_multiform' size='sm' title='#i18n{module.workflow.forms.task.editFormResponse.config.validateMultiform}' />
 </@formGroup>
 <#if multiform>
 	<@fieldSet legend='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
