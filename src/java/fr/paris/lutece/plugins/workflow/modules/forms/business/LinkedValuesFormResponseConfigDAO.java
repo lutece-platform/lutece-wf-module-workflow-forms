@@ -50,7 +50,7 @@ public class LinkedValuesFormResponseConfigDAO implements ITaskConfigDAO<LinkedV
 {
     // Constants
     private static final String SQL_QUERY_SELECT    = "SELECT id_config, id_task FROM workflow_task_linkedvaluesformresponse_config WHERE id_task = ?";
-    private static final String SQL_QUERY_INSERT    = "INSERT INTO workflow_task_linkedvaluesformresponse_config ( id_config, id_task ) VALUES ( ?, ? ) ";
+    private static final String SQL_QUERY_INSERT    = "INSERT INTO workflow_task_linkedvaluesformresponse_config ( id_task ) VALUES ( ? ) ";
     private static final String SQL_QUERY_DELETE    = "DELETE FROM workflow_task_linkedvaluesformresponse_config WHERE id_task = ? ";
     private static final String SQL_QUERY_UPDATE    = "UPDATE workflow_task_linkedvaluesformresponse_config SET id_config = ?, id_task = ? WHERE id_config = ?";
 
@@ -69,8 +69,8 @@ public class LinkedValuesFormResponseConfigDAO implements ITaskConfigDAO<LinkedV
     {
         try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, WorkflowUtils.getPlugin( ) ) )
         {
+            // the id is generated: a copied configuration must not reuse the id of the original
             int nIndex = 0;
-            daoUtil.setInt( ++nIndex, config.getIdConfig( ) );
             daoUtil.setInt( ++nIndex, config.getIdTask( ) );
     
             daoUtil.executeUpdate( );

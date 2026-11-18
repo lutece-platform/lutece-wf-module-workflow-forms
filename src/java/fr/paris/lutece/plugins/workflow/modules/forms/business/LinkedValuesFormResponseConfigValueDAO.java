@@ -53,7 +53,7 @@ public class LinkedValuesFormResponseConfigValueDAO implements ILinkedValuesForm
     
     // Constants
     private static final String SQL_QUERY_SELECT    = "SELECT id_config_value, id_config, id_form, id_question_source, question_source_value, id_question_target, question_target_value FROM workflow_task_linkedvaluesformresponse_config_value WHERE id_config_value = ?";
-    private static final String SQL_QUERY_INSERT    = "INSERT INTO workflow_task_linkedvaluesformresponse_config_value ( id_config_value, id_config, id_form, id_question_source, question_source_value, id_question_target, question_target_value ) VALUES ( ?, ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_INSERT    = "INSERT INTO workflow_task_linkedvaluesformresponse_config_value ( id_config, id_form, id_question_source, question_source_value, id_question_target, question_target_value ) VALUES ( ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE    = "DELETE FROM workflow_task_linkedvaluesformresponse_config_value WHERE id_config_value = ? ";
     private static final String SQL_QUERY_UPDATE    = "UPDATE workflow_task_linkedvaluesformresponse_config_value SET id_config_value = ?, id_config = ?, id_form = ?, id_question_source = ?, question_source_value = ?, id_question_target = ?, question_target_value = ? WHERE id_config_value = ?";
     private static final String SQL_QUERY_SELECTALL = "SELECT id_config_value, id_config, id_form, id_question_source, question_source_value, id_question_target, question_target_value FROM workflow_task_linkedvaluesformresponse_config_value";
@@ -69,7 +69,7 @@ public class LinkedValuesFormResponseConfigValueDAO implements ILinkedValuesForm
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, WorkflowUtils.getPlugin( ) ) )
         {
             int nIndex = 0;
-            daoUtil.setInt( ++nIndex, linkedValuesFormResponseConfigValue.getIdConfigValue( ) );
+            // the id is generated: a copied value must not reuse the id of the original
             daoUtil.setInt( ++nIndex, linkedValuesFormResponseConfigValue.getIdConfig( ) );
             daoUtil.setInt( ++nIndex, linkedValuesFormResponseConfigValue.getIdForm( ) );
             daoUtil.setInt( ++nIndex, linkedValuesFormResponseConfigValue.getIdQuestionSource( ) );
