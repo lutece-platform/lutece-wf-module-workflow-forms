@@ -73,4 +73,22 @@ public class CompleteFormResponseTaskHistoryService implements ICompleteFormResp
     {
         _completeFormResponseTaskHistoryDAO.deleteByIdHistoryAndTask( history.getId( ), task.getId( ) );
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeByIdHistoryAndTask( int nIdHistory, int nIdTask )
+    {
+        _completeFormResponseTaskHistoryDAO.deleteByIdHistoryAndTask( nIdHistory, nIdTask );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAllByTask( int nIdTask )
+    {
+        _completeFormResponseTaskHistoryDAO.deleteByIdTask( nIdTask );
+    }
 }

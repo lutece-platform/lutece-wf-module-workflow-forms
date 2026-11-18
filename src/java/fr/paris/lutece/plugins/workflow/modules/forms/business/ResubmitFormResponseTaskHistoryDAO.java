@@ -48,6 +48,7 @@ public class ResubmitFormResponseTaskHistoryDAO implements IResubmitFormResponse
             + "(id_history, id_task, id_question, iteration_number, previous_value, new_value) VALUES (?,?,?,?,?,?)";
     private static final String SQL_FILTER_IDHISTORY_IDTASK = SQL_QUERY_SELECT + "WHERE id_history = ? AND id_task = ?";
     private static final String SQL_QUERY_DELETE = "DELETE FROM workflow_task_resubmit_response_history WHERE id_history = ? AND id_task = ? ";
+    private static final String SQL_QUERY_DELETE_BY_TASK = "DELETE FROM workflow_task_resubmit_response_history WHERE id_task = ? ";
 
     @Override
     public synchronized void insert( ResubmitFormResponseTaskHistory resubmitFormResponseTaskHistory )
@@ -115,6 +116,19 @@ public class ResubmitFormResponseTaskHistoryDAO implements IResubmitFormResponse
         {
             daoUtil.setInt( 1, nIdHistory );
             daoUtil.setInt( 2, nIdTask );
+            daoUtil.executeUpdate( );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteByIdTask( int nIdTask )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_BY_TASK, WorkflowUtils.getPlugin( ) ) )
+        {
+            daoUtil.setInt( 1, nIdTask );
             daoUtil.executeUpdate( );
         }
     }

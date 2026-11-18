@@ -66,6 +66,9 @@ public class ResubmitFormResponseTask extends Task
     private IResubmitFormResponseService _resubmitFormResponseService;
 
     @Inject
+    private IResubmitFormResponseTaskHistoryService _resubmitFormResponseTaskHistoryService;
+
+    @Inject
     private IStateService _stateService;
 
     @Override
@@ -129,12 +132,14 @@ public class ResubmitFormResponseTask extends Task
     public void doRemoveTaskInformation( int nIdHistory )
     {
         _resubmitFormResponseService.removeByIdHistory( nIdHistory, getId( ) );
+        _resubmitFormResponseTaskHistoryService.removeByIdHistoryAndTask( nIdHistory, getId( ) );
     }
 
     @Override
     public void doRemoveConfig( )
     {
         _resubmitFormResponseService.removeByIdTask( getId( ) );
+        _resubmitFormResponseTaskHistoryService.removeAllByTask( getId( ) );
         _taskResubmitResponseConfigService.remove( getId( ) );
     }
 

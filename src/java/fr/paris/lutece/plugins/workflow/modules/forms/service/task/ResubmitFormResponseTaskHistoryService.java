@@ -73,4 +73,22 @@ public class ResubmitFormResponseTaskHistoryService implements IResubmitFormResp
     {
         _resubmitFormResponseTaskHistoryDAO.deleteByIdHistoryAndTask( history.getId( ), task.getId( ) );
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeByIdHistoryAndTask( int nIdHistory, int nIdTask )
+    {
+        _resubmitFormResponseTaskHistoryDAO.deleteByIdHistoryAndTask( nIdHistory, nIdTask );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAllByTask( int nIdTask )
+    {
+        _resubmitFormResponseTaskHistoryDAO.deleteByIdTask( nIdTask );
+    }
 }
