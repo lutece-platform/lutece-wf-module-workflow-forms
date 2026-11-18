@@ -146,5 +146,6 @@ public abstract class AbstractEditFormsTask extends SimpleTask
     public void doRemoveConfig( )
     {
         _taskEditFormConfigService.remove( getId( ) );
+        _editFormResponseTaskHistoryService.removeAllByTask( getId( ) );
     }
 }
