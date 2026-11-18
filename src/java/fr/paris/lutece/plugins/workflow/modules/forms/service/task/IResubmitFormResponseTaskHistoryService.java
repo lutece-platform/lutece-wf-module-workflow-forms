@@ -66,4 +66,22 @@ public interface IResubmitFormResponseTaskHistoryService
      * @param task
      */
     void removeAllByHistoryAndTask( ResourceHistory history, ITask task );
+
+    /**
+     * Deletes the history a task wrote for one execution
+     *
+     * @param nIdHistory
+     *            the resource history
+     * @param nIdTask
+     *            the task
+     */
+    void removeByIdHistoryAndTask( int nIdHistory, int nIdTask );
+
+    /**
+     * Deletes the history a task wrote, whatever the execution
+     *
+     * @param nIdTask
+     *            the task
+     */
+    void removeAllByTask( int nIdTask );
 }

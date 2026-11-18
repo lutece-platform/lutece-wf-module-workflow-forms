@@ -66,6 +66,9 @@ public class CompleteFormResponseTask extends Task
     private ICompleteFormResponseService _completeFormResponseService;
 
     @Inject
+    private ICompleteFormResponseTaskHistoryService _completeFormResponseTaskHistoryService;
+
+    @Inject
     private IStateService _stateService;
 
     @Override
@@ -130,12 +133,14 @@ public class CompleteFormResponseTask extends Task
     public void doRemoveTaskInformation( int nIdHistory )
     {
         _completeFormResponseService.removeByIdHistory( nIdHistory, getId( ) );
+        _completeFormResponseTaskHistoryService.removeByIdHistoryAndTask( nIdHistory, getId( ) );
     }
 
     @Override
     public void doRemoveConfig( )
     {
         _completeFormResponseService.removeByIdTask( getId( ) );
+        _completeFormResponseTaskHistoryService.removeAllByTask( getId( ) );
         _taskCompleteResponseConfigService.remove( getId( ) );
     }
 

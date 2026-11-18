@@ -84,4 +84,22 @@ public class EditFormResponseTaskHistoryService implements IEditFormResponseTask
     {
         _editFormResponseTaskHistoryDAO.deleteByIdHistoryAndTask( history.getId( ), task.getId( ) );
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeByIdHistoryAndTask( int nIdHistory, int nIdTask )
+    {
+        _editFormResponseTaskHistoryDAO.deleteByIdHistoryAndTask( nIdHistory, nIdTask );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAllByTask( int nIdTask )
+    {
+        _editFormResponseTaskHistoryDAO.deleteByIdTask( nIdTask );
+    }
 }

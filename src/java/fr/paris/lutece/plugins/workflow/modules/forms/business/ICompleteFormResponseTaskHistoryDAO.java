@@ -66,4 +66,12 @@ public interface ICompleteFormResponseTaskHistoryDAO
      *            id
      */
     void deleteByIdHistoryAndTask( int nIdHistory, int nIdTask );
+
+    /**
+     * Deletes the history a task wrote, whatever the execution
+     *
+     * @param nIdTask
+     *            the task
+     */
+    void deleteByIdTask( int nIdTask );
 }
