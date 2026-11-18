@@ -107,9 +107,8 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
     protected final IFormsTaskService _formsTaskService;
     private final IEditFormResponseTaskService _editFormResponseTaskService;
     
-    @Inject
-    private EditFormResponseConfigValue _configValue;
-    private EditFormResponseConfig _config;
+    // the mapping being built is kept per task in the session of the administrator, not in this application scoped component
+    private static final String SESSION_CONFIG_VALUE = "workflow-forms.editFormResponseAutoUpdate.configValue.";
 
     /**
      * Constructor
@@ -144,42 +143,39 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
     @Override
     public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
     {
-        _config = getTaskConfigService( ).findByPrimaryKey( task.getId( ) );
-        if ( _config == null )
+        EditFormResponseConfig config = getTaskConfigService( ).findByPrimaryKey( task.getId( ) );
+        if ( config == null )
         {
-            _config = new EditFormResponseConfig( );
+            config = new EditFormResponseConfig( );
         }
-        if ( _configValue == null )
-        {
-            _configValue = new EditFormResponseConfigValue( );
-        }
+        EditFormResponseConfigValue configValue = getConfigValue( request, task );
 
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_FORM_LIST, FormHome.getFormsReferenceList( ) );
-        model.put( MARK_MAPPING_LIST, _config.getListConfigValues( ) );
-        model.put( MARK_MULTIFORM, _config.isMultiform( ) );
+        model.put( MARK_MAPPING_LIST, config.getListConfigValues( ) );
+        model.put( MARK_MULTIFORM, config.isMultiform( ) );
         model.put( MARK_CODE_LIST, _editFormResponseTaskService.selectAllTechnicalCode( isTaskBo( ) ) );
 
-        if ( _configValue.getForm( ) != null )
+        if ( configValue.getForm( ) != null )
         {
-            model.put( MARK_ID_FORM, _configValue.getForm( ).getId( ) );
-            model.put( MARK_STEP_LIST, StepHome.getStepReferenceListByForm( _configValue.getForm( ).getId( ) ) );
+            model.put( MARK_ID_FORM, configValue.getForm( ).getId( ) );
+            model.put( MARK_STEP_LIST, StepHome.getStepReferenceListByForm( configValue.getForm( ).getId( ) ) );
         }
-        if ( _configValue.getStep( ) != null )
+        if ( configValue.getStep( ) != null )
         {
-            model.put( MARK_ID_STEP, _configValue.getStep( ).getId( ) );
-            model.put( MARK_QUESTION_LIST, getQuestionReferenceList( _configValue.getStep( ).getId( ) ) );
+            model.put( MARK_ID_STEP, configValue.getStep( ).getId( ) );
+            model.put( MARK_QUESTION_LIST, getQuestionReferenceList( configValue.getStep( ).getId( ) ) );
         }
-        if ( _configValue.getQuestion( ) != null )
+        if ( configValue.getQuestion( ) != null )
         {
-            model.put( MARK_ID_QUESTION, _configValue.getQuestion( ).getId( ) );
-            model.put( MARK_RESPONSE_LIST, _editFormResponseTaskService.getResponseReferenceList( _configValue.getQuestion( ).getId( ) ) );
+            model.put( MARK_ID_QUESTION, configValue.getQuestion( ).getId( ) );
+            model.put( MARK_RESPONSE_LIST, _editFormResponseTaskService.getResponseReferenceList( configValue.getQuestion( ).getId( ) ) );
         }
-        if ( _configValue.getCode( ) != null )
+        if ( configValue.getCode( ) != null )
         {
-            model.put( MARK_ID_QUESTION, _configValue.getCode( ) );
+            model.put( MARK_ID_QUESTION, configValue.getCode( ) );
             model.put( MARK_RESPONSE_LIST,
-                    _editFormResponseTaskService.getResponseReferenceList( QuestionHome.findByCode( _configValue.getCode( ) ).get( 0 ).getId( ) ) );
+                    _editFormResponseTaskService.getResponseReferenceList( QuestionHome.findByCode( configValue.getCode( ) ).get( 0 ).getId( ) ) );
         }
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_FORM_EDITRESPONSE_CONFIG, locale, model );
@@ -213,67 +209,86 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
     @Override
     public String doSaveConfig( HttpServletRequest request, Locale locale, ITask task )
     {
-        _config = getTaskConfigService( ).findByPrimaryKey( task.getId( ) );
-        boolean create = _config == null;
+        EditFormResponseConfig config = getTaskConfigService( ).findByPrimaryKey( task.getId( ) );
+        boolean create = config == null;
         if ( create )
         {
-            _config = new EditFormResponseConfig( );
-            _config.setIdTask( task.getId( ) );
+            config = new EditFormResponseConfig( );
+            config.setIdTask( task.getId( ) );
         }
 
         String action = request.getParameter( PARAMETER_ACTION );
         if ( action != null )
         {
-            doProcessAction( action, request );
+            EditFormResponseConfigValue configValue = doProcessAction( action, request, config, getConfigValue( request, task ) );
+            request.getSession( ).setAttribute( SESSION_CONFIG_VALUE + task.getId( ), configValue );
         }
 
         if ( create )
         {
-            getTaskConfigService( ).create( _config );
+            getTaskConfigService( ).create( config );
         }
         else
         {
-            getTaskConfigService( ).update( _config );
+            getTaskConfigService( ).update( config );
         }
         return null;
     }
 
-    private void doProcessAction( String action, HttpServletRequest request )
+    private EditFormResponseConfigValue doProcessAction( String action, HttpServletRequest request, EditFormResponseConfig config,
+            EditFormResponseConfigValue configValue )
     {
         switch( action )
         {
             case ACTION_SELECT_MULTIFORM:
-                _config.setMultiform( request.getParameter( PARAMETER_MULTIFORM ) != null );
-                _config.setListConfigValues( new ArrayList<>( ) );
+                config.setMultiform( request.getParameter( PARAMETER_MULTIFORM ) != null );
+                config.setListConfigValues( new ArrayList<>( ) );
                 break;
             case ACTION_SELECT_FORM:
-                _configValue = new EditFormResponseConfigValue( );
-                _configValue.setForm( FormHome.findByPrimaryKey( Integer.valueOf( request.getParameter( PARAMETER_FORM ) ) ) );
+                configValue = new EditFormResponseConfigValue( );
+                configValue.setForm( FormHome.findByPrimaryKey( Integer.valueOf( request.getParameter( PARAMETER_FORM ) ) ) );
                 break;
             case ACTION_SELECT_STEP:
-                _configValue.setStep( StepHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_STEP ) ) ) );
-                _configValue.setQuestion( null );
+                configValue.setStep( StepHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_STEP ) ) ) );
+                configValue.setQuestion( null );
                 break;
             case ACTION_SELECT_QUESTION:
-                _configValue.setQuestion( QuestionHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_QUESTION ) ) ) );
+                configValue.setQuestion( QuestionHome.findByPrimaryKey( Integer.parseInt( request.getParameter( PARAMETER_QUESTION ) ) ) );
                 break;
             case ACTION_SELECT_RESPONSE:
-                _configValue.setResponse( request.getParameter( PARAMETER_RESPONSE ) );
-                _config.addConfigValue( _configValue );
-                _configValue = new EditFormResponseConfigValue( );
+                configValue.setResponse( request.getParameter( PARAMETER_RESPONSE ) );
+                config.addConfigValue( configValue );
+                configValue = new EditFormResponseConfigValue( );
                 break;
             case ACTION_SELECT_CODE:
-                _configValue = new EditFormResponseConfigValue( );
-                _configValue.setCode( request.getParameter( PARAMETER_CODE ) );
+                configValue = new EditFormResponseConfigValue( );
+                configValue.setCode( request.getParameter( PARAMETER_CODE ) );
                 break;
             case ACTION_REMOVE_MAPPING:
                 int idToRemove = Integer.parseInt( request.getParameter( PARAMETER_MAPPING_ID ) );
-                List<EditFormResponseConfigValue> newList = _config.getListConfigValues( ).stream( )
-                        .filter( configValue -> configValue.getIdConfigValue( ) != idToRemove ).collect( Collectors.toList( ) );
-                _config.setListConfigValues( newList );
+                List<EditFormResponseConfigValue> newList = config.getListConfigValues( ).stream( )
+                        .filter( value -> value.getIdConfigValue( ) != idToRemove ).collect( Collectors.toList( ) );
+                config.setListConfigValues( newList );
                 break;
             default:
                 break;
         }
+        return configValue;
+    }
+
+    /**
+     * Gets the mapping being built for a task by the current administrator
+     * 
+     * @param request
+     *            the request
+     * @param task
+     *            the task
+     * @return the mapping being built, a new one if there is none
+     */
+    private EditFormResponseConfigValue getConfigValue( HttpServletRequest request, ITask task )
+    {
+        Object configValue = request.getSession( ).getAttribute( SESSION_CONFIG_VALUE + task.getId( ) );
+
+        return ( configValue instanceof EditFormResponseConfigValue ) ? (EditFormResponseConfigValue) configValue : new EditFormResponseConfigValue( );
     }
 }
