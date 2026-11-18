@@ -228,4 +228,13 @@ public class DuplicateFormResponseTask extends SimpleTask
 		
 		return fileDuplicate;
 	}
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doRemoveConfig( )
+    {
+        _config.remove( getId( ) );
+    }
 }

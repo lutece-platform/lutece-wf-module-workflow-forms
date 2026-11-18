@@ -249,4 +249,13 @@ public class EditFormResponseAutoUpdateTask extends SimpleTask
 
         return false;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doRemoveConfig( )
+    {
+        _taskEditFormConfigService.remove( getId( ) );
+    }
 }
