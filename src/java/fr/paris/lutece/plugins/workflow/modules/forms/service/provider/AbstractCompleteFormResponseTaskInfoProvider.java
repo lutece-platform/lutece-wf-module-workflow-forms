@@ -50,7 +50,6 @@ import fr.paris.lutece.plugins.workflow.service.taskinfo.AbstractTaskInfoProvide
 import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceHistory;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistoryService;
 import fr.paris.lutece.portal.service.content.XPageAppService;
-import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -93,36 +92,17 @@ public abstract class AbstractCompleteFormResponseTaskInfoProvider extends Abstr
         ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdHistory );
         if ( resourceHistory != null )
         {
-            List<String> listElements = new ArrayList<>( );
-            listElements.add( Integer.toString( nIdHistory ) );
-            listElements.add( Integer.toString( nIdTask ) );
-
-            String strTimestamp = Long.toString( new Date( ).getTime( ) );
-            String strSignature = ResubmitFormResponseRequestAuthenticatorService.getRequestAuthenticator( ).buildSignature( listElements, strTimestamp );
             String strBaseUrl = getBaseUrl( request );
 
-            if ( StringUtils.isBlank( strBaseUrl ) )
+            // Without a base url the marker of the link stays empty: the other markers and the action that uses them still work
+            if ( StringUtils.isNotBlank( strBaseUrl ) )
             {
-                throw new AppException( "Unable to build the url of the task " + nIdTask + " for the resource history " + nIdHistory + ": no base url" );
+                strInfoUrl = buildInfoUrl( strBaseUrl, nIdHistory, nIdTask );
             }
-
-            StringBuilder sbUrl = new StringBuilder( strBaseUrl );
-
-            if ( !sbUrl.toString( ).endsWith( SLASH ) )
+            else
             {
-                sbUrl.append( SLASH );
+                AppLogService.getLogger( ).warn( "The url of the task {} for the resource history {} is left empty: no base url", nIdTask, nIdHistory );
             }
-
-            UrlItem url = new UrlItem( sbUrl.toString( ) + AppPathService.getPortalUrl( ) );
-            url.addParameter( XPageAppService.PARAM_XPAGE_APP, getPageName( ) );
-            url.addParameter( PARAMETER_ID_HISTORY, nIdHistory );
-            url.addParameter( PARAMETER_ID_TASK, nIdTask );
-            url.addParameter( PARAMETER_SIGNATURE, strSignature );
-            url.addParameter( PARAMETER_TIMESTAMP, strTimestamp );
-            url.addParameter( PARAMETER_URL_RETURN, AppPropertiesService.getProperty( PROPERTY_URL_RETURN ) );
-
-            // a plain URL: the templates that print the marker escape it, an entity here would be escaped twice
-            strInfoUrl = url.getUrl( );
         }
 
         String strInfoEntries = getInfoEntries( nIdHistory );
@@ -133,6 +113,45 @@ public abstract class AbstractCompleteFormResponseTaskInfoProvider extends Abstr
         jsonInfos.put(getMarkEntries(), strInfoEntries);
 
         return jsonInfos.toString( );
+    }
+
+    /**
+     * Build the url of the task
+     *
+     * @param strBaseUrl
+     *            the base url of the site
+     * @param nIdHistory
+     *            the id of the resource history
+     * @param nIdTask
+     *            the id of the task
+     * @return the url of the task, signed
+     */
+    private String buildInfoUrl( String strBaseUrl, int nIdHistory, int nIdTask )
+    {
+        List<String> listElements = new ArrayList<>( );
+        listElements.add( Integer.toString( nIdHistory ) );
+        listElements.add( Integer.toString( nIdTask ) );
+
+        String strTimestamp = Long.toString( new Date( ).getTime( ) );
+        String strSignature = ResubmitFormResponseRequestAuthenticatorService.getRequestAuthenticator( ).buildSignature( listElements, strTimestamp );
+
+        StringBuilder sbUrl = new StringBuilder( strBaseUrl );
+
+        if ( !sbUrl.toString( ).endsWith( SLASH ) )
+        {
+            sbUrl.append( SLASH );
+        }
+
+        UrlItem url = new UrlItem( sbUrl.toString( ) + AppPathService.getPortalUrl( ) );
+        url.addParameter( XPageAppService.PARAM_XPAGE_APP, getPageName( ) );
+        url.addParameter( PARAMETER_ID_HISTORY, nIdHistory );
+        url.addParameter( PARAMETER_ID_TASK, nIdTask );
+        url.addParameter( PARAMETER_SIGNATURE, strSignature );
+        url.addParameter( PARAMETER_TIMESTAMP, strTimestamp );
+        url.addParameter( PARAMETER_URL_RETURN, AppPropertiesService.getProperty( PROPERTY_URL_RETURN ) );
+
+        // a plain URL: the templates that print the marker escape it, an entity here would be escaped twice
+        return url.getUrl( );
     }
 
     protected abstract String getInfoEntries( int nIdHistory );
@@ -172,7 +191,7 @@ public abstract class AbstractCompleteFormResponseTaskInfoProvider extends Abstr
             // Without a base url the link of the task cannot be built: name the missing properties in the logs
             if ( StringUtils.isBlank( strBaseUrl ) )
             {
-                AppLogService.error( "Unable to build the url of the task: the properties {} and {} are both empty ({}={})", PROPERTY_LUTECE_BASE_URL,
+                AppLogService.getLogger( ).warn( "Unable to build the url of the task: the properties {} and {} are both empty ({}={})", PROPERTY_LUTECE_BASE_URL,
                         PROPERTY_LUTECE_PROD_URL, PROPERTY_BASE_URL_USE_PROPERTY, isBaseUrlFetchedInProperty( ) );
             }
         }
