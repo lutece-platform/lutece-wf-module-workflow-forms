@@ -211,9 +211,9 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
             List<Question> questionList = QuestionHome.getQuestionsListByStep( idStep );
             for ( Question question : questionList )
             {
-                // une question orpheline, dont la ligne genatt_entry a disparu, suffisait a vider tout l'ecran :
-                // la liste entiere echouait, et l'administrateur ne pouvait meme plus en choisir une autre.
-                // EditFormResponseTaskService:218 pose deja cette garde sur le meme filtre.
+                // an orphan question, whose genatt_entry row is gone, was enough to empty the whole screen :
+                // the whole list failed, and the administrator could not even pick another one.
+                // EditFormResponseTaskService:218 already puts this guard on the same filter.
                 if ( question.getEntry( ) != null && question.getEntry( ).isOnlyDisplayInBack( ) == isTaskBo( ) )
                 {
                     refList.addItem( question.getId( ), question.getTitle( ) );
