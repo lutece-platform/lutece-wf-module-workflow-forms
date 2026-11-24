@@ -101,7 +101,8 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
                 for ( Question question : questionList )
                 {
                     Step step = StepHome.findByPrimaryKey( question.getIdStep( ) );
-                    if ( step.getIdForm( ) == formResponse.getFormId( ) )
+                    // a question left behind by a removed step belongs to no form
+                    if ( step != null && step.getIdForm( ) == formResponse.getFormId( ) )
                     {
                         listFormQuestion.add( question );
                     }
@@ -110,7 +111,9 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
         }
         else
         {
-            listFormQuestion = config.getListConfigValues( ).stream( ).filter( cv -> cv.getForm( ).getId( ) == formResponse.getFormId( ) )
+            // a mapping whose form or question was removed holds none : it is skipped rather than failing the whole action
+            listFormQuestion = config.getListConfigValues( ).stream( )
+                    .filter( cv -> cv.getForm( ) != null && cv.getQuestion( ) != null && cv.getForm( ).getId( ) == formResponse.getFormId( ) )
                     .map( EditFormResponseConfigValue::getQuestion ).collect( Collectors.toList( ) );
         }
         listFormQuestion = addIteration( formResponse, listFormQuestion );

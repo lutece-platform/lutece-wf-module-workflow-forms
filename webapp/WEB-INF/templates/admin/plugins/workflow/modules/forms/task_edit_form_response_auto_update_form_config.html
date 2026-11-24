@@ -80,9 +80,9 @@
 		<#list mapping_list as mapping>
 			<@formGroup labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.existing}'>
 				<@staticText>
-					<#-- un formulaire, une etape ou une question supprime laisse son parametrage en place : le decrire par defaut
-					     plutot que de faire echouer le rendu, sinon l'ecran entier part vide et le bouton qui retire la ligne
-					     fautive, rendu juste apres, n'est jamais atteint -->
+					<#-- a removed form, step or question leaves its mapping in place : describe it with a default label
+					     rather than fail the rendering, otherwise the whole screen comes out empty and the button that removes
+					     the faulty row, rendered right after, is never reached -->
 					<#if mapping.form??>${mapping.form.title}<#else>#i18n{module.workflow.forms.task.editFormResponse.config.deletedElement}</#if>
 					 / <#if mapping.step??>${mapping.step.title}<#else>#i18n{module.workflow.forms.task.editFormResponse.config.deletedElement}</#if>
 					 / <#if mapping.question??>${mapping.question.title}<#else>#i18n{module.workflow.forms.task.editFormResponse.config.deletedElement}</#if>
