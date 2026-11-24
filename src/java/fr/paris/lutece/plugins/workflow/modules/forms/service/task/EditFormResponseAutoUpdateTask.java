@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -129,11 +130,24 @@ public class EditFormResponseAutoUpdateTask extends SimpleTask
         {
             // the whole list is filtered again for each configured value : narrowing the list being iterated left the second value and the ones
             // after it nothing to match, and they all fell into the branch that builds a response from nothing
-            List<FormQuestionResponse> listMatching = config.isMultiform( )
-                    ? listFormQuestionResponse.stream( ).filter( fqr -> fqr.getQuestion( ).getCode( ).equals( configValue.getCode( ) ) )
-                            .collect( Collectors.toList( ) )
-                    : listFormQuestionResponse.stream( ).filter( fqr -> fqr.getQuestion( ).getId( ) == configValue.getQuestion( ).getId( ) )
+            // a configuration whose question was removed holds no question : it matches nothing, and the guard below logs it and moves on
+            List<FormQuestionResponse> listMatching;
+
+            if ( config.isMultiform( ) )
+            {
+                listMatching = listFormQuestionResponse.stream( ).filter( fqr -> fqr.getQuestion( ).getCode( ).equals( configValue.getCode( ) ) )
+                        .collect( Collectors.toList( ) );
+            }
+            else
+                if ( configValue.getQuestion( ) == null )
+                {
+                    listMatching = Collections.emptyList( );
+                }
+                else
+                {
+                    listMatching = listFormQuestionResponse.stream( ).filter( fqr -> fqr.getQuestion( ).getId( ) == configValue.getQuestion( ).getId( ) )
                             .collect( Collectors.toList( ) );
+                }
             FormQuestionResponse questionResponse = listMatching.isEmpty( ) ? null : listMatching.get( 0 );
 
             if ( questionResponse == null )
