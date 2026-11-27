@@ -104,4 +104,30 @@ public interface IEditFormResponseTaskService
      * @return the answers, each labelled with the number of forms producing it when not all of them do, and the number of forms
      */
     CodeAnswers getAnswersByCode( String strCode, Locale locale );
+
+    /** The workflow of a task that cannot be found */
+    int NO_WORKFLOW = -1;
+
+    /**
+     * Gathers the answer choices of a technical code over the forms using a workflow, the only ones whose responses its tasks will see. When no form
+     * uses the workflow yet, every form carrying the code is walked, and the result says so.
+     * 
+     * @param strCode
+     *            the technical code of the question
+     * @param nIdWorkflow
+     *            the workflow, or NO_WORKFLOW for every form carrying the code
+     * @param locale
+     *            the locale the labels are built in
+     * @return the answers, each labelled with the number of forms producing it when not all of them do, and the number of forms
+     */
+    CodeAnswers getAnswersByCode( String strCode, int nIdWorkflow, Locale locale );
+
+    /**
+     * @param nIdTask
+     *            a task
+     * @param locale
+     *            the locale
+     * @return the workflow the task belongs to, or NO_WORKFLOW
+     */
+    int getIdWorkflowOfTask( int nIdTask, Locale locale );
 }

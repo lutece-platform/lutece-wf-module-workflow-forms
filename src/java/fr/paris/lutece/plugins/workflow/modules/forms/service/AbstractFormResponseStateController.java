@@ -59,6 +59,7 @@ import fr.paris.lutece.plugins.forms.business.StepHome;
 import fr.paris.lutece.plugins.genericattributes.business.Response;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.FormResponseValueStateControllerConfig;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.FormResponseValueStateControllerConfigHome;
+import fr.paris.lutece.plugins.workflow.modules.forms.service.task.CodeAnswers;
 import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IEditFormResponseTaskService;
 import fr.paris.lutece.plugins.workflow.modules.state.service.IChooseStateController;
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfig;
@@ -80,6 +81,7 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
     private static final String MARK_MULTIFORM = "multiform";
     private static final String MARK_CODE_LIST = "code_list";
     private static final String MARK_CODE = "code";
+    private static final String MARK_VALUE_WARNING = "value_warning";
 
     // Parameters
     private static final String PARAMETER_ACTION = "apply";
@@ -92,6 +94,8 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
 
     /** {0} the saved value */
     private static final String PROPERTY_VALUE_NOT_OFFERED = "module.workflow.forms.state.control.forms.response.value.notOffered";
+    private static final String PROPERTY_CODE_NOT_IN_WORKFLOW = "module.workflow.forms.task.editFormResponse.config.codeNotInWorkflow";
+    private static final String PROPERTY_VALUE_NOT_PRODUCED = "module.workflow.forms.state.control.forms.response.value.notProducedByWorkflow";
 
     @Inject
     private IEditFormResponseTaskService _editFormResponseTaskService;
@@ -144,7 +148,15 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
             // the code designates no single question, so the answers of every form carrying it are gathered, the way the task that writes an
             // answer already does. Without this the value was typed by hand and nothing checked it : a value no form produces is accepted, the
             // condition then never holds and the state never changes, with nothing on screen or in the log to say why
-            ReferenceList listValue = _editFormResponseTaskService.getAnswersByCode( controllerConfig.getCode( ), locale ).getReferenceList( );
+            CodeAnswers codeAnswers = _editFormResponseTaskService.getAnswersByCode( controllerConfig.getCode( ),
+                    _editFormResponseTaskService.getIdWorkflowOfTask( config.getIdTask( ), locale ), locale );
+            ReferenceList listValue = codeAnswers.getReferenceList( );
+            String strWarning = getValueWarning( codeAnswers, controllerConfig.getValue( ), locale );
+
+            if ( strWarning != null )
+            {
+                model.put( MARK_VALUE_WARNING, strWarning );
+            }
 
             // a saved value that no form offers any more stays in the list, named as such : otherwise the select falls back to its first item and
             // the next save overwrites the value without anyone having chosen to
@@ -208,7 +220,8 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
             // the code was changed without reloading the screen : the value submitted with it was picked in the answers of the previous code, and
             // is kept only when the new code offers it too
             if ( !StringUtils.equals( strCode, controllerConfig.getCode( ) ) && StringUtils.isNotEmpty( strValue ) && StringUtils.isNotEmpty( strCode )
-                    && !isOffered( _editFormResponseTaskService.getAnswersByCode( strCode, locale ).getReferenceList( ), strValue ) )
+                    && !_editFormResponseTaskService.getAnswersByCode( strCode, _editFormResponseTaskService.getIdWorkflowOfTask( task.getId( ), locale ), locale )
+                            .isOffered( strValue ) )
             {
                 strValue = null;
             }
@@ -224,6 +237,43 @@ public abstract class AbstractFormResponseStateController implements IChooseStat
         }
         controllerConfig.setValue( strValue );
         FormResponseValueStateControllerConfigHome.update( controllerConfig );
+    }
+
+    /**
+     * The state chooser gives this controller no way to refuse a value when it is saved : what the configuration screen can do is say, on every display,
+     * that the condition never holds because no form using the workflow produces the value, or carries the code. Until a form uses the workflow there is
+     * nothing to check against.
+     * 
+     * @param codeAnswers
+     *            the answers of the code over the forms using the workflow
+     * @param strValue
+     *            the saved value
+     * @param locale
+     *            the locale
+     * @return the warning to show, or null
+     */
+    private static String getValueWarning( CodeAnswers codeAnswers, String strValue, Locale locale )
+    {
+        if ( codeAnswers.isWorkflowUnused( ) )
+        {
+            return null;
+        }
+
+        if ( codeAnswers.getFormCount( ) == 0 )
+        {
+            return I18nService.getLocalizedString( PROPERTY_CODE_NOT_IN_WORKFLOW, locale );
+        }
+
+        if ( StringUtils.isNotEmpty( strValue ) && codeAnswers.hasChoices( ) && !codeAnswers.isOffered( strValue ) )
+        {
+            Object [ ] args = {
+                    strValue
+            };
+
+            return I18nService.getLocalizedString( PROPERTY_VALUE_NOT_PRODUCED, args, locale );
+        }
+
+        return null;
     }
 
     /**

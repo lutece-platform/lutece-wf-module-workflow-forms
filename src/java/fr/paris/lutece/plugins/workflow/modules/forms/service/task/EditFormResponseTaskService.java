@@ -52,6 +52,8 @@ import javax.inject.Named;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import fr.paris.lutece.plugins.forms.business.Form;
+import fr.paris.lutece.plugins.forms.business.FormHome;
 import fr.paris.lutece.plugins.forms.business.FormQuestionResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponse;
 import fr.paris.lutece.plugins.forms.business.FormResponseStep;
@@ -68,9 +70,15 @@ import fr.paris.lutece.plugins.genericattributes.business.Field;
 import fr.paris.lutece.plugins.genericattributes.service.entrytype.IEntryTypeService;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfig;
 import fr.paris.lutece.plugins.workflow.modules.forms.business.EditFormResponseConfigValue;
+import fr.paris.lutece.plugins.workflowcore.business.action.Action;
+import fr.paris.lutece.plugins.workflowcore.service.action.ActionService;
+import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
+import fr.paris.lutece.plugins.workflowcore.service.task.TaskService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.ReferenceList;
 
@@ -238,6 +246,22 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
         return referenceList;
     }
 
+    @Override
+    public int getIdWorkflowOfTask( int nIdTask, Locale locale )
+    {
+        // the task loads its action by identifier only : the workflow is read on the action
+        ITask task = SpringContextService.<ITaskService> getBean( TaskService.BEAN_SERVICE ).findByPrimaryKey( nIdTask, locale );
+
+        if ( task == null || task.getAction( ) == null )
+        {
+            return NO_WORKFLOW;
+        }
+
+        Action action = SpringContextService.<IActionService> getBean( ActionService.BEAN_SERVICE ).findByPrimaryKey( task.getAction( ).getId( ) );
+
+        return ( action == null || action.getWorkflow( ) == null ) ? NO_WORKFLOW : action.getWorkflow( ).getId( );
+    }
+
     /** {0} the answer label, {1} the number of forms producing it, {2} the number of forms carrying the code */
     private static final String PROPERTY_ANSWER_FORM_COUNT = "module.workflow.forms.task.editFormResponse.config.answerFormCount";
 
@@ -247,12 +271,25 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
     @Override
     public CodeAnswers getAnswersByCode( String strCode, Locale locale )
     {
+        return getAnswersByCode( strCode, NO_WORKFLOW, locale );
+    }
+
+    @Override
+    public CodeAnswers getAnswersByCode( String strCode, int nIdWorkflow, Locale locale )
+    {
         ReferenceList refList = new ReferenceList( );
         refList.addItem( "", "" );
 
+        // the task only ever sees the responses of the forms using its workflow : a value the other forms carrying the code produce would be
+        // accepted, and the task would never apply it. Until a form uses the workflow, there is nothing to narrow down to
+        Set<Integer> setFormOfWorkflow = ( nIdWorkflow == NO_WORKFLOW ) ? Collections.emptySet( )
+                : FormHome.getFormList( ).stream( ).filter( form -> form.getIdWorkflow( ) == nIdWorkflow ).map( Form::getId )
+                        .collect( Collectors.toSet( ) );
+        boolean bWorkflowUnused = setFormOfWorkflow.isEmpty( );
+
         Map<String, Set<Integer>> mapFormsByValue = new LinkedHashMap<>( );
         Map<String, Set<String>> mapLabelByValue = new HashMap<>( );
-        Set<Integer> setForm = collectAnswersByCode( strCode, mapFormsByValue, mapLabelByValue );
+        Set<Integer> setForm = collectAnswersByCode( strCode, bWorkflowUnused ? null : setFormOfWorkflow, mapFormsByValue, mapLabelByValue );
 
         for ( Map.Entry<String, Set<Integer>> entry : mapFormsByValue.entrySet( ) )
         {
@@ -282,7 +319,7 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
             refList.addItem( entry.getKey( ), strLabel );
         }
 
-        return new CodeAnswers( refList, setForm.size( ) );
+        return new CodeAnswers( refList, setForm.size( ), bWorkflowUnused );
     }
 
     /**
@@ -293,13 +330,16 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
      * 
      * @param strCode
      *            the technical code
+     * @param setFormFilter
+     *            the only forms to walk, or null for every form carrying the code
      * @param mapFormsByValue
      *            filled with, per answer value, the forms producing it, in encounter order
      * @param mapLabelByValue
      *            filled with, per answer value, a label to show
      * @return the forms carrying the code
      */
-    private Set<Integer> collectAnswersByCode( String strCode, Map<String, Set<Integer>> mapFormsByValue, Map<String, Set<String>> mapLabelByValue )
+    private Set<Integer> collectAnswersByCode( String strCode, Set<Integer> setFormFilter, Map<String, Set<Integer>> mapFormsByValue,
+            Map<String, Set<String>> mapLabelByValue )
     {
         Set<Integer> setForm = new HashSet<>( );
 
@@ -313,6 +353,11 @@ public class EditFormResponseTaskService implements IEditFormResponseTaskService
                 AppLogService.error( "Workflow forms : the question {} carrying the code {} cannot be read, it is left out of the answer list",
                         question.getId( ), strCode );
 
+                continue;
+            }
+
+            if ( setFormFilter != null && !setFormFilter.contains( step.getIdForm( ) ) )
+            {
                 continue;
             }
 
