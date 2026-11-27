@@ -133,6 +133,13 @@ public class EditFormResponseAutoUpdateTask extends SimpleTask
             // a configuration whose question was removed holds no question : it matches nothing, and the guard below logs it and moves on
             List<FormQuestionResponse> listMatching;
 
+            // a workflow may serve several forms : a value configured on a question of another form does not concern this response, and writing it
+            // gave the response an answer and a step of that other form. The task letting an agent edit a response already filters this way
+            if ( !config.isMultiform( ) && ( configValue.getForm( ) == null || configValue.getForm( ).getId( ) != formResponse.getFormId( ) ) )
+            {
+                continue;
+            }
+
             if ( config.isMultiform( ) )
             {
                 listMatching = listFormQuestionResponse.stream( ).filter( fqr -> fqr.getQuestion( ).getCode( ).equals( configValue.getCode( ) ) )
