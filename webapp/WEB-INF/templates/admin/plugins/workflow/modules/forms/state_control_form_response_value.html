@@ -19,6 +19,10 @@
 			<@input type='text' value='${response_value!}' name='response_value' />
 		</#if>
 	</@formGroup>
+	<#-- the state chooser cannot refuse the value : the screen says, on every display, when the condition can never hold -->
+	<#if value_warning??>
+		<@alert color='warning'>${value_warning}</@alert>
+	</#if>
 <#else>
 	<@formGroup labelFor='form_select' labelKey='#i18n{module.workflow.forms.task.editFormResponse.config.label}'>
 		<@inputGroup>

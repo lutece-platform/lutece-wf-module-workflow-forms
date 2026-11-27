@@ -57,6 +57,8 @@ import fr.paris.lutece.plugins.workflow.modules.forms.service.task.IFormsTaskSer
 import fr.paris.lutece.plugins.workflow.web.task.NoFormTaskComponent;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.message.AdminMessage;
+import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.HtmlTemplate;
@@ -83,6 +85,9 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
 
     /** {0} the number of forms carrying the code */
     private static final String PROPERTY_CODE_CARRIED_BY = "module.workflow.forms.task.editFormResponse.config.codeCarriedBy";
+    private static final String PROPERTY_WORKFLOW_UNUSED = "module.workflow.forms.task.editFormResponse.config.workflowUnused";
+    private static final String PROPERTY_CODE_NOT_IN_WORKFLOW = "module.workflow.forms.task.editFormResponse.config.codeNotInWorkflow";
+    private static final String MESSAGE_VALUE_NOT_PRODUCED = "module.workflow.forms.task.editFormResponse.config.error.valueNotProduced";
     private static final String MARK_STEP_LIST = "list_step";
 
     // Parameters
@@ -178,12 +183,21 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
             // under the name of another. Both state controller templates already pass it.
             model.put( MARK_CODE, _configValue.getCode( ) );
             model.put( MARK_ID_QUESTION, _configValue.getCode( ) );
-            CodeAnswers codeAnswers = _editFormResponseTaskService.getAnswersByCode( _configValue.getCode( ), locale );
+            CodeAnswers codeAnswers = _editFormResponseTaskService.getAnswersByCode( _configValue.getCode( ),
+                    _editFormResponseTaskService.getIdWorkflowOfTask( task.getId( ), locale ), locale );
             model.put( MARK_RESPONSE_LIST, codeAnswers.getReferenceList( ) );
 
             int nNbForm = codeAnswers.getFormCount( );
 
-            if ( nNbForm > 1 )
+            if ( codeAnswers.isWorkflowUnused( ) )
+            {
+                model.put( MARK_CODE_INFO, I18nService.getLocalizedString( PROPERTY_WORKFLOW_UNUSED, locale ) );
+            }
+            else if ( nNbForm == 0 )
+            {
+                model.put( MARK_CODE_INFO, I18nService.getLocalizedString( PROPERTY_CODE_NOT_IN_WORKFLOW, locale ) );
+            }
+            else if ( nNbForm > 1 )
             {
                 // the code names no single form : say how many it spans, otherwise the answers below read as one form's own
                 Object [ ] args = {
@@ -236,9 +250,10 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
         }
 
         String action = request.getParameter( PARAMETER_ACTION );
+        String strError = null;
         if ( action != null )
         {
-            doProcessAction( action, request );
+            strError = doProcessAction( action, request, locale, task );
         }
 
         if ( create )
@@ -249,10 +264,23 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
         {
             getTaskConfigService( ).update( _config );
         }
-        return null;
+        return strError;
     }
 
-    private void doProcessAction( String action, HttpServletRequest request )
+    /**
+     * Applies an action of the configuration screen
+     * 
+     * @param action
+     *            the action
+     * @param request
+     *            the request
+     * @param locale
+     *            the locale
+     * @param task
+     *            the task
+     * @return the URL of an error message, or null
+     */
+    private String doProcessAction( String action, HttpServletRequest request, Locale locale, ITask task )
     {
         switch( action )
         {
@@ -273,6 +301,13 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
                 break;
             case ACTION_SELECT_RESPONSE:
                 _configValue.setResponse( request.getParameter( PARAMETER_RESPONSE ) );
+
+                String strError = checkValueProduced( request, locale, task );
+
+                if ( strError != null )
+                {
+                    return strError;
+                }
                 _config.addConfigValue( _configValue );
                 _configValue = new EditFormResponseConfigValue( );
                 break;
@@ -289,5 +324,52 @@ public class EditFormResponseAutoUpdateTaskComponent extends NoFormTaskComponent
             default:
                 break;
         }
+        return null;
+    }
+
+    /**
+     * A code chosen in multiform mode only names a question through the forms using the workflow : a value none of them produces, or a code none of
+     * them carries, is a configuration the task would never apply, without anything to say so. Until a form uses the workflow there is nothing to
+     * check against.
+     * 
+     * @param request
+     *            the request
+     * @param locale
+     *            the locale
+     * @param task
+     *            the task
+     * @return the URL of an error message, or null when the value can be saved
+     */
+    private String checkValueProduced( HttpServletRequest request, Locale locale, ITask task )
+    {
+        if ( _configValue.getCode( ) == null )
+        {
+            return null;
+        }
+
+        CodeAnswers codeAnswers = _editFormResponseTaskService.getAnswersByCode( _configValue.getCode( ),
+                _editFormResponseTaskService.getIdWorkflowOfTask( task.getId( ), locale ), locale );
+
+        if ( codeAnswers.isWorkflowUnused( ) )
+        {
+            return null;
+        }
+
+        if ( codeAnswers.getFormCount( ) == 0 )
+        {
+            return AdminMessageService.getMessageUrl( request, PROPERTY_CODE_NOT_IN_WORKFLOW, AdminMessage.TYPE_STOP );
+        }
+
+        // a free text answer can take any value; a choice has to be one of those the forms offer
+        if ( codeAnswers.hasChoices( ) && !codeAnswers.isOffered( _configValue.getResponse( ) ) )
+        {
+            Object [ ] args = {
+                    _configValue.getResponse( ), _configValue.getCode( )
+            };
+
+            return AdminMessageService.getMessageUrl( request, MESSAGE_VALUE_NOT_PRODUCED, args, AdminMessage.TYPE_STOP );
+        }
+
+        return null;
     }
 }

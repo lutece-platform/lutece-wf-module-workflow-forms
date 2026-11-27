@@ -33,26 +33,35 @@
  */
 package fr.paris.lutece.plugins.workflow.modules.forms.service.task;
 
+import org.apache.commons.lang3.StringUtils;
+
 import fr.paris.lutece.util.ReferenceList;
 
 /**
- * The answers a technical code offers over every form carrying it, and how many forms carry it : both come from one walk over the questions.
+ * The answers a technical code offers over the forms that count, and how many of them carry it : both come from one walk over the questions.
+ * 
+ * The forms that count are those using the workflow of the task, which are the only ones whose responses the task will ever see; when no form uses
+ * the workflow yet, every form carrying the code counts.
  */
 public final class CodeAnswers
 {
     private final ReferenceList _referenceList;
     private final int _nFormCount;
+    private final boolean _bWorkflowUnused;
 
     /**
      * @param referenceList
      *            the answers, each labelled with the number of forms producing it when not all of them do
      * @param nFormCount
      *            the number of distinct forms carrying the code
+     * @param bWorkflowUnused
+     *            true when no form uses the workflow, so that the answers gather every form carrying the code
      */
-    public CodeAnswers( ReferenceList referenceList, int nFormCount )
+    public CodeAnswers( ReferenceList referenceList, int nFormCount, boolean bWorkflowUnused )
     {
         _referenceList = referenceList;
         _nFormCount = nFormCount;
+        _bWorkflowUnused = bWorkflowUnused;
     }
 
     /**
@@ -69,5 +78,32 @@ public final class CodeAnswers
     public int getFormCount( )
     {
         return _nFormCount;
+    }
+
+    /**
+     * @return true when no form uses the workflow, so that the answers gather every form carrying the code
+     */
+    public boolean isWorkflowUnused( )
+    {
+        return _bWorkflowUnused;
+    }
+
+    /**
+     * @return true when the questions carrying the code offer answer choices : a free text answer can take any value
+     */
+    public boolean hasChoices( )
+    {
+        // the list opens with an empty item
+        return _referenceList.size( ) > 1;
+    }
+
+    /**
+     * @param strValue
+     *            an answer value
+     * @return true when at least one of the forms that count produces this value
+     */
+    public boolean isOffered( String strValue )
+    {
+        return StringUtils.isNotEmpty( strValue ) && _referenceList.stream( ).anyMatch( item -> strValue.equals( item.getCode( ) ) );
     }
 }
